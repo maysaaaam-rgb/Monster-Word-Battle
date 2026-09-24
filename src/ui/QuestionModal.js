@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import AnswerCard from './AnswerCard.js';
 
 export default class QuestionModal {
   constructor(scene, audioSystem, onRewardGranted, onModalClosed) {
@@ -8,18 +9,20 @@ export default class QuestionModal {
     this.onModalClosed = onModalClosed;
     this.currentQuestion = null;
     this.isLocked = false;
+    this.cards = [];
 
     // Root Container
     this.container = scene.add.container(0, 0).setDepth(40);
     this.container.setVisible(false);
 
-    // 1. Full-screen Interactive Input Blocker (Prevents ANY pointer events passing to arena)
+    // 1. Full-screen Interactive Input Blocker (Prevents ANY pointer events passing to arena/monsters/controls)
     this.blocker = scene.add.rectangle(0, 0, 1280, 720, 0x050f1e, 0.42)
       .setOrigin(0, 0)
       .setInteractive();
 
     this.blocker.on('pointerdown', (pointer, localX, localY, event) => {
       if (event && event.stopPropagation) event.stopPropagation();
+      console.log('[QUESTION] Background click blocked');
     });
     this.container.add(this.blocker);
 
@@ -32,8 +35,10 @@ export default class QuestionModal {
 
   createEventFrame() {
     // Ornate Wooden Plaque Frame
-    this.scrollFrame = this.scene.add.image(0, 0, 'challenge_scroll').setOrigin(0.5, 0.5);
-    this.modalBox.add(this.scrollFrame);
+    if (this.scene.textures.exists('challenge_scroll')) {
+      this.scrollFrame = this.scene.add.image(0, 0, 'challenge_scroll').setOrigin(0.5, 0.5);
+      this.modalBox.add(this.scrollFrame);
+    }
 
     // Question Prompt Text in Plaque Banner Ribbon
     this.promptText = this.scene.add.text(0, -96, 'Where is the cat?', {
@@ -44,18 +49,31 @@ export default class QuestionModal {
     }).setOrigin(0.5);
     this.modalBox.add(this.promptText);
 
-    // Container for 3 Picture Cards
-    this.cardsContainer = this.scene.add.container(0, 18);
+    // Container for Answer Cards
+    this.cardsContainer = this.scene.add.container(0, 14);
     this.modalBox.add(this.cardsContainer);
 
-    // Status / Feedback Banner below cards
+    // Debug Indicator Text below the cards
+    this.debugIndicator = this.scene.add.text(0, 96, 'ANSWER CLICKED: NONE', {
+      fontFamily: 'monospace, system-ui, sans-serif',
+      fontSize: '14px',
+      fontStyle: '900',
+      color: '#feca57',
+      stroke: '#000000',
+      strokeThickness: 3,
+      backgroundColor: '#1e272edd',
+      padding: { x: 10, y: 3 }
+    }).setOrigin(0.5);
+    this.modalBox.add(this.debugIndicator);
+
+    // Status / Feedback Banner below debug indicator
     this.feedbackBanner = this.scene.add.container(0, 134);
     this.feedbackBg = this.scene.add.graphics();
     this.feedbackBanner.add(this.feedbackBg);
 
     this.feedbackText = this.scene.add.text(0, 0, '', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '18px',
+      fontSize: '17px',
       fontStyle: '900',
       color: '#ffffff'
     }).setOrigin(0.5);
@@ -70,9 +88,12 @@ export default class QuestionModal {
     this.isLocked = false;
     this.feedbackBanner.setVisible(false);
 
+    // Reset debug indicator to initial state
+    this.debugIndicator.setText('ANSWER CLICKED: NONE');
+
     this.promptText.setText(question.prompt);
     this.cardsContainer.removeAll(true);
-    this.cardObjects = [];
+    this.cards = [];
 
     const choices = question.choices || [];
     const cardW = 160;
@@ -82,69 +103,26 @@ export default class QuestionModal {
 
     choices.forEach((choice, i) => {
       const cardX = startX + i * spacing;
-      const card = this.scene.add.container(cardX, 0);
-      card.setSize(cardW, cardH);
-
-      // Card Background
-      const cardBg = this.scene.add.graphics();
-      this.drawCardBorder(cardBg, cardW, cardH, 0xdcdde1, 0xffffff);
-      card.add(cardBg);
-
-      // Illustrated Picture Scene
-      const sceneImg = this.scene.add.image(0, -20, choice.image).setOrigin(0.5, 0.5);
-      sceneImg.setScale(0.92);
-      card.add(sceneImg);
-
-      // Label Pill Button at bottom of card
-      const pillBg = this.scene.add.graphics();
-      pillBg.fillStyle(0x0984e3, 1);
-      pillBg.fillRoundedRect(-cardW / 2 + 12, cardH / 2 - 36, cardW - 24, 28, 8);
-      card.add(pillBg);
-
-      const pillTxt = this.scene.add.text(0, cardH / 2 - 22, choice.label, {
-        fontFamily: 'system-ui, -apple-system, sans-serif',
-        fontSize: '16px',
-        fontStyle: '900',
-        color: '#ffffff'
-      }).setOrigin(0.5);
-      card.add(pillTxt);
-
-      // Checkmark Icon (Initially hidden)
-      const checkSprite = this.scene.add.image(cardW / 2 - 12, -cardH / 2 + 12, 'card_checkmark')
-        .setOrigin(0.5, 0.5)
-        .setVisible(false);
-      card.add(checkSprite);
-
-      // Interactive Click Handling on the card container
-      card.setInteractive({ useHandCursor: true });
-
-      card.on('pointerover', () => {
-        if (!this.isLocked) card.setScale(1.04);
-      });
-      card.on('pointerout', () => {
-        if (!this.isLocked) card.setScale(1.0);
-      });
-      card.on('pointerdown', (pointer, localX, localY, event) => {
-        if (event && event.stopPropagation) event.stopPropagation();
-        if (this.isLocked) return;
-        this.selectChoice(i);
-      });
+      const card = new AnswerCard(
+        this.scene,
+        cardX,
+        0,
+        cardW,
+        cardH,
+        choice,
+        i,
+        (idx, cardComponent) => this.handleCardClicked(idx, cardComponent)
+      );
 
       this.cardsContainer.add(card);
-      this.cardObjects.push({
-        container: card,
-        cardBg,
-        pillBg,
-        pillTxt,
-        checkSprite,
-        baseX: cardX
-      });
+      this.cards.push(card);
     });
 
     // Animate Entrance
     this.container.setVisible(true);
     this.modalBox.setScale(0.7);
     this.modalBox.setAlpha(0);
+    this.modalBox.y = 195;
 
     this.scene.tweens.add({
       targets: this.modalBox,
@@ -156,51 +134,45 @@ export default class QuestionModal {
     });
   }
 
-  drawCardBorder(graphics, w, h, borderColor, fillColor) {
-    graphics.clear();
-    graphics.fillStyle(fillColor, 1);
-    graphics.fillRoundedRect(-w / 2, -h / 2, w, h, 14);
-    graphics.lineStyle(3, borderColor, 1);
-    graphics.strokeRoundedRect(-w / 2, -h / 2, w, h, 14);
-  }
+  handleCardClicked(selectedIndex, cardComponent) {
+    // 1. Double-click lockout: register ONLY ONE answer event
+    if (this.isLocked) {
+      return;
+    }
+    this.isLocked = true;
 
-  selectChoice(selectedIndex) {
-    if (this.isLocked) return;
-    this.isLocked = true; // Lock immediately to prevent duplicate clicks
+    // 2. Debug indicator update & console log
+    const letters = ['A', 'B', 'C'];
+    const letter = letters[selectedIndex] || `${selectedIndex + 1}`;
+    this.debugIndicator.setText(`ANSWER CLICKED: ${letter}`);
+    console.log(`[QUESTION] answer clicked: ${selectedIndex}`);
 
-    const isCorrect = selectedIndex === this.currentQuestion.correctIndex;
-    const cardObj = this.cardObjects[selectedIndex];
+    const isCorrect = (selectedIndex === this.currentQuestion.correctIndex);
 
     if (isCorrect) {
-      this.handleCorrect(cardObj);
+      this.handleCorrect(cardComponent);
     } else {
-      this.handleIncorrect(cardObj);
+      this.handleIncorrect(cardComponent);
     }
   }
 
-  handleCorrect(cardObj) {
+  handleCorrect(cardComponent) {
     if (this.audioSystem) this.audioSystem.playCorrect();
 
-    // 1. Highlight selected card with green border & emerald checkmark
-    this.drawCardBorder(cardObj.cardBg, 160, 142, 0x2ed573, 0xffffff);
+    // 1. Highlight card with green state
+    cardComponent.setStateCorrect();
 
-    cardObj.pillBg.clear();
-    cardObj.pillBg.fillStyle(0x2ed573, 1);
-    cardObj.pillBg.fillRoundedRect(-160 / 2 + 12, 142 / 2 - 36, 160 - 24, 28, 8);
-
-    cardObj.checkSprite.setVisible(true);
-    cardObj.checkSprite.setScale(0.2);
-    this.scene.tweens.add({
-      targets: cardObj.checkSprite,
-      scale: 1,
-      duration: 250,
-      ease: 'Back.easeOut'
+    // 2. Disable all other cards
+    this.cards.forEach(c => {
+      if (c !== cardComponent) {
+        c.setDisabled(true);
+      }
     });
 
-    // 2. Confetti Burst Shower
+    // 3. Confetti Burst Shower
     this.spawnConfetti();
 
-    // 3. Show Celebratory Reward Banner
+    // 4. Show Celebratory Reward Banner
     const rewardName = this.currentQuestion.reward || 'FIREBALL';
     let bannerColor = 0xeb3b5a; // Red/Fire
     let bannerText = `🎉 CORRECT! 🔥 ${rewardName} UNLOCKED!`;
@@ -230,13 +202,13 @@ export default class QuestionModal {
       ease: 'Back.easeOut'
     });
 
-    // 4. Notify reward granted immediately
+    // 5. Grant in-game ability
     if (this.onRewardGranted) {
       this.onRewardGranted(rewardName.toLowerCase());
     }
 
-    // 5. Wait 800ms, then slide out challenge and restore arena
-    this.scene.time.delayedCall(850, () => {
+    // 6. Wait ~800ms, close question overlay, restore battlefield
+    this.scene.time.delayedCall(800, () => {
       this.scene.tweens.add({
         targets: this.modalBox,
         y: -320,
@@ -246,6 +218,7 @@ export default class QuestionModal {
         onComplete: () => {
           this.container.setVisible(false);
           this.modalBox.y = 195;
+          this.modalBox.setAlpha(1);
           if (this.onModalClosed) {
             this.onModalClosed(rewardName.toLowerCase());
           }
@@ -254,13 +227,10 @@ export default class QuestionModal {
     });
   }
 
-  handleIncorrect(cardObj) {
+  handleIncorrect(cardComponent) {
     if (this.audioSystem) this.audioSystem.playWrong();
 
-    // 1. Red highlight on wrong card
-    this.drawCardBorder(cardObj.cardBg, 160, 142, 0xff4757, 0xffffff);
-
-    // 2. "TRY AGAIN!" Feedback Banner
+    // 1. Show TRY AGAIN feedback banner
     this.feedbackBg.clear();
     this.feedbackBg.fillStyle(0xff4757, 1);
     this.feedbackBg.fillRoundedRect(-140, -18, 280, 36, 12);
@@ -270,26 +240,10 @@ export default class QuestionModal {
     this.feedbackText.setText('❌ TRY AGAIN!');
     this.feedbackBanner.setVisible(true);
 
-    // 3. Shake animation on wrong card
-    const originX = cardObj.baseX;
-    this.scene.tweens.add({
-      targets: cardObj.container,
-      x: originX + 10,
-      duration: 40,
-      yoyo: true,
-      repeat: 4,
-      ease: 'Linear',
-      onComplete: () => {
-        cardObj.container.x = originX;
-
-        // Wait brief delay, reset card style, and unlock for another attempt!
-        this.scene.time.delayedCall(400, () => {
-          this.drawCardBorder(cardObj.cardBg, 160, 142, 0xdcdde1, 0xffffff);
-          this.feedbackBanner.setVisible(false);
-          cardObj.container.setScale(1.0);
-          this.isLocked = false; // UNLOCKED for next attempt!
-        });
-      }
+    // 2. Card turns RED, shakes, shows "TRY AGAIN", returns to normal, then unlocks
+    cardComponent.setStateIncorrect(() => {
+      this.feedbackBanner.setVisible(false);
+      this.isLocked = false; // Child CAN TRY AGAIN!
     });
   }
 

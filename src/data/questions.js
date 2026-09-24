@@ -19,7 +19,7 @@ export const questions = [
       { image: "mini_cat_on_box", label: "ON" },
       { image: "mini_cat_under_box", label: "UNDER" }
     ],
-    correctIndex: 1, // ON
+    correctIndex: 0, // IN
     reward: "FIREBALL"
   },
   {

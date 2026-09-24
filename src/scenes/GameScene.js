@@ -12,11 +12,15 @@ import QuestionModal from '../ui/QuestionModal.js';
 import { questions } from '../data/questions.js';
 
 export const GAME_STATE = {
-  PLAYER_QUESTION: 'PLAYER_QUESTION',
-  PLAYER_AIM: 'PLAYER_AIM',
-  PLAYER_FLYING: 'PLAYER_FLYING',
-  PLAYER_RESULT: 'PLAYER_RESULT',
-  ENEMY_TURN: 'ENEMY_TURN'
+  QUESTION: 'QUESTION',
+  AIM: 'AIM',
+  FLYING: 'FLYING',
+  RESULT: 'RESULT',
+  ENEMY_TURN: 'ENEMY_TURN',
+  PLAYER_QUESTION: 'QUESTION',
+  PLAYER_AIM: 'AIM',
+  PLAYER_FLYING: 'FLYING',
+  PLAYER_RESULT: 'RESULT'
 };
 
 export default class GameScene extends Phaser.Scene {
@@ -60,16 +64,16 @@ export default class GameScene extends Phaser.Scene {
 
     this.controls = new Controls(this, this.aimSystem.angle, this.aimSystem.power, this.audioSystem, {
       onAngleChange: (angle) => {
-        if (this.gameState !== GAME_STATE.PLAYER_AIM) return;
+        if (this.gameState !== GAME_STATE.AIM) return;
         this.aimSystem.setAngle(angle);
         this.playerMonster.setAimAngle(angle);
       },
       onPowerChange: (power) => {
-        if (this.gameState !== GAME_STATE.PLAYER_AIM) return;
+        if (this.gameState !== GAME_STATE.AIM) return;
         this.aimSystem.setPower(power);
       },
       onActionChange: (actionType) => {
-        if (this.gameState !== GAME_STATE.PLAYER_AIM) return;
+        if (this.gameState !== GAME_STATE.AIM) return;
         if (actionType === 'heal' || actionType === 'shield') {
           this.aimSystem.hide();
           this.playerMonster.setHeldItem(null);
@@ -116,7 +120,7 @@ export default class GameScene extends Phaser.Scene {
 
     // Start First Player Turn via State Machine
     this.time.delayedCall(300, () => {
-      this.setGameState(GAME_STATE.PLAYER_QUESTION);
+      this.setGameState(GAME_STATE.QUESTION);
     });
   }
 
@@ -138,7 +142,7 @@ export default class GameScene extends Phaser.Scene {
     this.gameState = newState;
 
     switch (newState) {
-      case GAME_STATE.PLAYER_QUESTION:
+      case GAME_STATE.QUESTION:
         this.controls.setEnabled(false);
         this.aimSystem.hide();
         this.playerMonster.setHeldItem(null);
@@ -151,7 +155,7 @@ export default class GameScene extends Phaser.Scene {
         });
         break;
 
-      case GAME_STATE.PLAYER_AIM:
+      case GAME_STATE.AIM:
         this.controls.setEnabled(true);
         this.controls.setUnlockedAbilities(this.rewardSystem.inventory);
 
@@ -168,12 +172,12 @@ export default class GameScene extends Phaser.Scene {
         }
         break;
 
-      case GAME_STATE.PLAYER_FLYING:
+      case GAME_STATE.FLYING:
         this.controls.setEnabled(false);
         this.aimSystem.hide();
         break;
 
-      case GAME_STATE.PLAYER_RESULT:
+      case GAME_STATE.RESULT:
         this.controls.setEnabled(false);
         this.aimSystem.hide();
         this.resetCamera();
@@ -253,20 +257,20 @@ export default class GameScene extends Phaser.Scene {
   }
 
   onModalClosed(rewardName) {
-    // Challenge is closed, now transition to PLAYER_AIM state
-    this.setGameState(GAME_STATE.PLAYER_AIM);
+    // Challenge is closed, now transition to AIM state
+    this.setGameState(GAME_STATE.AIM);
   }
 
   executePlayerAction(actionType) {
     // Verify player is in AIM state
-    if (this.gameState !== GAME_STATE.PLAYER_AIM) {
-      console.warn("Cannot execute action outside PLAYER_AIM state!");
+    if (this.gameState !== GAME_STATE.AIM) {
+      console.warn("Cannot execute action outside AIM state!");
       return;
     }
 
     if (actionType === 'shield') {
       // Deploy Shield immediately
-      this.setGameState(GAME_STATE.PLAYER_RESULT);
+      this.setGameState(GAME_STATE.RESULT);
       this.playerMonster.activateShield();
       this.rewardSystem.consumeReward();
       this.controls.setUnlockedAbilities(this.rewardSystem.inventory);
@@ -277,7 +281,7 @@ export default class GameScene extends Phaser.Scene {
       });
     } else if (actionType === 'heal') {
       // Heal immediately
-      this.setGameState(GAME_STATE.PLAYER_RESULT);
+      this.setGameState(GAME_STATE.RESULT);
       this.audioSystem.playHeal();
       this.playerMonster.heal(30);
       this.hud.updateP1Health(this.playerMonster.hp);
@@ -296,7 +300,7 @@ export default class GameScene extends Phaser.Scene {
 
   executePlayerThrow(weaponType = 'fireball') {
     // Transition to FLYING state
-    this.setGameState(GAME_STATE.PLAYER_FLYING);
+    this.setGameState(GAME_STATE.FLYING);
 
     // 1. Play Monster Throw Squash & Stretch Animation
     this.playerMonster.playThrowAnimation(() => {
@@ -335,7 +339,7 @@ export default class GameScene extends Phaser.Scene {
 
   onPlayerProjectileResult(hitMonster, hx, hy, damage, isShieldBlocked) {
     this.activeProjectile = null;
-    this.setGameState(GAME_STATE.PLAYER_RESULT);
+    this.setGameState(GAME_STATE.RESULT);
 
     if (hitMonster && !isShieldBlocked) {
       this.opponentMonster.takeDamage(damage);
@@ -431,12 +435,12 @@ export default class GameScene extends Phaser.Scene {
       return;
     }
 
-    // Wait for enemy attack reaction, randomize wind, then transition back to PLAYER_QUESTION!
+    // Wait for enemy attack reaction, randomize wind, then transition back to QUESTION!
     this.time.delayedCall(700, () => {
       if (this.isGameOver) return;
       this.windSystem.randomize();
       this.hud.updateWind(this.windSystem.getWind());
-      this.setGameState(GAME_STATE.PLAYER_QUESTION);
+      this.setGameState(GAME_STATE.QUESTION);
     });
   }
 
@@ -608,7 +612,7 @@ export default class GameScene extends Phaser.Scene {
     this.controls.setAction('rock');
     this.windSystem.setWind(0);
     this.hud.updateWind(0);
-    this.setGameState(GAME_STATE.PLAYER_QUESTION);
+    this.setGameState(GAME_STATE.QUESTION);
   }
 
   update(time, delta) {
