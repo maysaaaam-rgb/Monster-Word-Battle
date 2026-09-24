@@ -14,6 +14,12 @@ export default class QuestionModal {
     this.container = scene.add.container(640, 195).setDepth(30);
     this.container.setVisible(false);
 
+    // Soft 30% vignette dimmer behind modal (fullscreen overlay)
+    this.dimmer = scene.add.graphics();
+    this.dimmer.fillStyle(0x050f1e, 0.35);
+    this.dimmer.fillRect(-640, -195, 1280, 720);
+    this.container.add(this.dimmer);
+
     this.modalBox = scene.add.container(0, 0);
     this.container.add(this.modalBox);
 
@@ -196,7 +202,9 @@ export default class QuestionModal {
       // Reward Banner
       this.rewardBannerBg.clear();
       const isFire = reward.type === 'fireball';
-      this.rewardBannerBg.fillStyle(isFire ? 0xeb3b5a : 0x20bf6b, 1);
+      const isShield = reward.type === 'shield';
+      const bannerColor = isFire ? 0xeb3b5a : isShield ? 0xf59e0b : 0x20bf6b;
+      this.rewardBannerBg.fillStyle(bannerColor, 1);
       this.rewardBannerBg.fillRoundedRect(-190, -18, 380, 36, 12);
       this.rewardBannerBg.lineStyle(2, 0xffffff, 1);
       this.rewardBannerBg.strokeRoundedRect(-190, -18, 380, 36, 12);

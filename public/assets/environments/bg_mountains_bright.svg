@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 300" width="1280" height="300">
+  <defs>
+    <linearGradient id="mountFarBright" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#b39ddb"/>
+      <stop offset="60%" stop-color="#7e57c2"/>
+      <stop offset="100%" stop-color="#fff9c4" stop-opacity="0.4"/>
+    </linearGradient>
+    <linearGradient id="mountNearBright" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4dd0e1"/>
+      <stop offset="60%" stop-color="#0097a7"/>
+      <stop offset="100%" stop-color="#80deea" stop-opacity="0.3"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Far Mountain Peaks -->
+  <path d="M 0 300
+           L 0 150
+           L 130 65
+           L 260 170
+           L 410 85
+           L 560 195
+           L 690 45
+           L 840 185
+           L 990 75
+           L 1140 175
+           L 1280 110
+           L 1280 300 Z"
+        fill="url(#mountFarBright)" opacity="0.85"/>
+
+  <!-- Crisp Snow Caps -->
+  <polygon points="130,65 105,100 155,100" fill="#ffffff" opacity="0.95"/>
+  <polygon points="410,85 385,115 435,115" fill="#ffffff" opacity="0.95"/>
+  <polygon points="690,45 650,90 730,90" fill="#ffffff" opacity="0.98"/>
+  <polygon points="990,75 960,110 1020,110" fill="#ffffff" opacity="0.95"/>
+
+  <!-- Mid Mountain Ridges -->
+  <path d="M 0 300
+           L 0 190
+           L 170 120
+           L 340 210
+           L 510 135
+           L 660 225
+           L 820 115
+           L 980 205
+           L 1130 130
+           L 1280 185
+           L 1280 300 Z"
+        fill="url(#mountNearBright)" opacity="0.78"/>
+</svg>

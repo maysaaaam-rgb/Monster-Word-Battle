@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 
 export default class Projectile extends Phaser.GameObjects.Container {
-  constructor(scene, x, y, vx, vy, gravity, windAcc, targetMonster, groundY, audioSystem, weaponType = 'rock', onHit) {
+  constructor(scene, x, y, vx, vy, gravity, windAcc, targetMonster, groundY, audioSystem, weaponType = 'rock', onHit, obstacleBounds = null) {
     super(scene, x, y);
     this.scene = scene;
     this.vx = vx;
@@ -14,6 +14,7 @@ export default class Projectile extends Phaser.GameObjects.Container {
     this.weaponType = weaponType; // 'rock' or 'fireball'
     this.damage = weaponType === 'fireball' ? 35 : 20;
     this.onHit = onHit;
+    this.obstacleBounds = obstacleBounds || { xMin: 560, xMax: 720, yMin: 450 };
     this.isDead = false;
 
     this.trailTimer = 0;
@@ -52,7 +53,15 @@ export default class Projectile extends Phaser.GameObjects.Container {
       this.spawnMotionTrail();
     }
 
-    // 4. Collision with Opponent Monster
+    // 4. Collision with Central Rock/Crate Obstacle
+    if (this.obstacleBounds) {
+      if (this.x >= this.obstacleBounds.xMin && this.x <= this.obstacleBounds.xMax && this.y >= this.obstacleBounds.yMin) {
+        this.hit('obstacle');
+        return;
+      }
+    }
+
+    // 5. Collision with Opponent Monster
     if (this.targetMonster && !this.targetMonster.isHit) {
       const bounds = this.targetMonster.getHitBounds();
       const dist = Phaser.Math.Distance.Between(this.x, this.y, bounds.x, bounds.y);
@@ -62,15 +71,16 @@ export default class Projectile extends Phaser.GameObjects.Container {
       }
     }
 
-    // 5. Collision with Ground / Water / Out of Bounds
+    // 6. Collision with Ground / Water
     if (this.y >= this.groundY) {
       this.hit('ground');
       return;
     }
 
-    if (this.x > 1320 || this.x < -60 || this.y > 760) {
+    // Out of Bounds
+    if (this.x > 1340 || this.x < -60 || this.y > 760) {
       this.destroySelf();
-      if (this.onHit) this.onHit(false, this.x, this.y, 0);
+      if (this.onHit) this.onHit(false, this.x, this.y, 0, false);
     }
   }
 
@@ -119,6 +129,13 @@ export default class Projectile extends Phaser.GameObjects.Container {
     const hitX = this.x;
     const hitY = this.y;
 
+    // Check Shield Protection
+    let isShieldBlocked = false;
+    if (targetType === 'monster' && this.targetMonster && this.targetMonster.isShieldActive) {
+      isShieldBlocked = true;
+      this.targetMonster.breakShield();
+    }
+
     // 1. Comic Impact Starburst & Shockwave
     const explosion = this.scene.add.image(hitX, hitY, 'impact_explosion')
       .setDepth(25)
@@ -141,7 +158,7 @@ export default class Projectile extends Phaser.GameObjects.Container {
     // 3. Audio Impact
     if (this.audioSystem) {
       this.audioSystem.playImpact();
-      if (targetType === 'monster') {
+      if (targetType === 'monster' && !isShieldBlocked) {
         this.audioSystem.playHit();
       }
     }
@@ -171,11 +188,33 @@ export default class Projectile extends Phaser.GameObjects.Container {
       });
     }
 
+    // 5. If hitting obstacle, spawn rubble dust puff
+    if (targetType === 'obstacle') {
+      const dustPuff = this.scene.add.text(hitX, hitY - 30, '💥 THUD!', {
+        fontFamily: 'system-ui, -apple-system, sans-serif',
+        fontSize: '22px',
+        fontStyle: '900',
+        color: '#f59e0b',
+        stroke: '#000000',
+        strokeThickness: 5
+      }).setOrigin(0.5).setDepth(27);
+
+      this.scene.tweens.add({
+        targets: dustPuff,
+        y: dustPuff.y - 35,
+        alpha: 0,
+        duration: 700,
+        ease: 'Cubic.easeOut',
+        onComplete: () => dustPuff.destroy()
+      });
+    }
+
     this.destroySelf();
 
     // Notify scene
+    const effectiveDamage = isShieldBlocked ? 0 : this.damage;
     if (this.onHit) {
-      this.onHit(targetType === 'monster', hitX, hitY, this.damage);
+      this.onHit(targetType === 'monster', hitX, hitY, effectiveDamage, isShieldBlocked);
     }
   }
 

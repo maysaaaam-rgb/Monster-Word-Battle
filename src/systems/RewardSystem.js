@@ -1,37 +1,54 @@
 export default class RewardSystem {
   constructor() {
-    this.currentReward = 'rock'; // 'rock', 'fireball', 'heal'
+    this.currentReward = 'rock'; // 'rock', 'fireball', 'shield', 'heal'
     this.streak = 0;
+    this.inventory = {
+      rock: true,
+      fireball: false,
+      shield: false,
+      heal: false
+    };
   }
 
   onCorrectAnswer(question) {
     this.streak++;
 
-    // Alternate or determine reward based on target/streak
-    if (question.target === 'in' || this.streak % 3 === 1) {
+    // Cycle between Fireball, Shield, and Heal
+    const cycle = this.streak % 3;
+
+    if (cycle === 1) {
       this.currentReward = 'fireball';
+      this.inventory.fireball = true;
       return {
         type: 'fireball',
-        label: 'CORRECT! + ATTACK POWER!',
-        badge: '🔥 x1.5',
+        label: '🎉 AWESOME! FIREBALL UNLOCKED!',
+        badge: '🔥 35 DMG',
         damage: 35
       };
-    } else if (this.streak % 3 === 2) {
+    } else if (cycle === 2) {
+      this.currentReward = 'shield';
+      this.inventory.shield = true;
+      return {
+        type: 'shield',
+        label: '🛡️ SUPER! SHIELD DOME UNLOCKED!',
+        badge: '🛡️ BLOCK 1 HIT',
+        shieldPower: 1
+      };
+    } else {
       this.currentReward = 'heal';
+      this.inventory.heal = true;
       return {
         type: 'heal',
-        label: 'AMAZING! HEAL UNLOCKED!',
+        label: '💚 GREAT JOB! HEAL UNLOCKED!',
         badge: '💚 +30 HP',
         healAmount: 30
       };
-    } else {
-      this.currentReward = 'fireball';
-      return {
-        type: 'fireball',
-        label: 'PERFECT! FIRE POWER!',
-        badge: '🔥 x1.5',
-        damage: 35
-      };
+    }
+  }
+
+  setReward(type) {
+    if (this.inventory[type] || type === 'rock') {
+      this.currentReward = type;
     }
   }
 
@@ -41,7 +58,10 @@ export default class RewardSystem {
 
   consumeReward() {
     const reward = this.currentReward;
-    this.currentReward = 'rock'; // Resets to normal rock after use
+    if (reward !== 'rock') {
+      this.inventory[reward] = false;
+      this.currentReward = 'rock'; // Resets to normal rock after single use
+    }
     return reward;
   }
 }

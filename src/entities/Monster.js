@@ -12,12 +12,16 @@ export default class Monster extends Phaser.GameObjects.Container {
     this.isDizzy = false;
     this.heldItemType = null; // 'rock', 'fireball', or null
     this.isHit = false;
+    this.isShieldActive = false;
 
     this.prefix = this.type === 'player' ? 'blue_' : 'red_';
 
     this.createCharacterRig();
     this.setupBreathingIdle();
     this.setupBlinkingTimer();
+
+    // Scale up mascot size for cartoon presence
+    this.setScale(1.35);
 
     scene.add.existing(this);
   }
@@ -83,6 +87,21 @@ export default class Monster extends Phaser.GameObjects.Container {
     // Held Item (Equipped weapon held in hand when aiming)
     this.heldItemSprite = this.scene.add.image(-52, -72, 'proj_fireball').setOrigin(0.5, 0.5).setVisible(false);
     this.torso.add(this.heldItemSprite);
+
+    // Shield Dome Overlay (protective golden energy bubble)
+    this.shieldDome = this.scene.add.image(0, -55, 'shield_dome').setOrigin(0.5, 0.5).setVisible(false).setDepth(20);
+    this.add(this.shieldDome);
+
+    this.scene.tweens.add({
+      targets: this.shieldDome,
+      scaleX: 1.05,
+      scaleY: 1.05,
+      alpha: 0.85,
+      duration: 850,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
   }
 
   setupBreathingIdle() {
@@ -149,19 +168,106 @@ export default class Monster extends Phaser.GameObjects.Container {
   setAimAngle(angleDeg) {
     if (this.type !== 'player') return;
     // Rotate arm slightly with angle
-    const rad = Phaser.Math.DegToRad(angleDeg);
     this.armLeft.setRotation(-0.3 - (angleDeg / 90) * 0.35);
   }
 
+  activateShield() {
+    this.isShieldActive = true;
+    this.shieldDome.setVisible(true);
+    this.shieldDome.setAlpha(0);
+    this.shieldDome.setScale(0.5);
+
+    this.scene.tweens.add({
+      targets: this.shieldDome,
+      alpha: 1,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 350,
+      ease: 'Back.easeOut'
+    });
+
+    // Floating text: SHIELD READY!
+    const shieldText = this.scene.add.text(this.x, this.y - 120, '🛡️ SHIELD READY!', {
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      fontSize: '28px',
+      fontStyle: '900',
+      color: '#f59e0b',
+      stroke: '#ffffff',
+      strokeThickness: 6,
+      shadow: { blur: 8, color: '#000000', fill: true }
+    }).setOrigin(0.5).setDepth(30);
+
+    this.scene.tweens.add({
+      targets: shieldText,
+      y: shieldText.y - 45,
+      alpha: 0,
+      duration: 1000,
+      ease: 'Cubic.easeOut',
+      onComplete: () => shieldText.destroy()
+    });
+  }
+
+  breakShield() {
+    this.isShieldActive = false;
+    this.shieldDome.setVisible(false);
+
+    // Golden crystal shatter fragments
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const dist = Phaser.Math.Between(40, 90);
+      const piece = this.scene.add.image(this.x, this.y - 60, 'shield_break')
+        .setScale(Phaser.Math.FloatBetween(0.5, 0.9))
+        .setDepth(28);
+
+      this.scene.tweens.add({
+        targets: piece,
+        x: this.x + Math.cos(angle) * dist,
+        y: this.y - 60 + Math.sin(angle) * dist,
+        rotation: Phaser.Math.FloatBetween(-3, 3),
+        alpha: 0,
+        duration: 600,
+        ease: 'Cubic.easeOut',
+        onComplete: () => piece.destroy()
+      });
+    }
+
+    // Floating BLOCKED! text
+    const blockText = this.scene.add.text(this.x, this.y - 120, '🛡️ BLOCKED!', {
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      fontSize: '34px',
+      fontStyle: '900',
+      color: '#38bdf8',
+      stroke: '#ffffff',
+      strokeThickness: 8,
+      shadow: { blur: 10, color: '#000000', fill: true }
+    }).setOrigin(0.5).setDepth(30);
+
+    this.scene.tweens.add({
+      targets: blockText,
+      y: blockText.y - 50,
+      scale: 1.35,
+      alpha: 0,
+      duration: 950,
+      ease: 'Cubic.easeOut',
+      onComplete: () => blockText.destroy()
+    });
+  }
+
   playThrowAnimation(onRelease) {
+    const isPlayer = this.type === 'player';
+    const leanX = isPlayer ? -18 : 18;
+    const leanRot = isPlayer ? -0.15 : 0.15;
+    const thrustX = isPlayer ? 24 : -24;
+    const thrustRot = isPlayer ? 0.22 : -0.22;
+
     // 3-Stage Cartoon Squash & Stretch Throw
     // Stage 1: Anticipation (wind-up lean back & squash)
     this.scene.tweens.add({
       targets: this.torso,
       scaleX: 1.15,
       scaleY: 0.85,
-      x: -18,
-      rotation: -0.15,
+      x: leanX,
+      rotation: leanRot,
       duration: 150,
       ease: 'Quad.easeOut',
       onComplete: () => {
@@ -170,14 +276,17 @@ export default class Monster extends Phaser.GameObjects.Container {
           targets: this.torso,
           scaleX: 0.88,
           scaleY: 1.25,
-          x: 24,
-          rotation: 0.22,
+          x: thrustX,
+          rotation: thrustRot,
           duration: 110,
           ease: 'Cubic.easeOut',
           onStart: () => {
-            // Hide held item upon release
-            this.heldItemSprite.setVisible(false);
-            this.armLeft.setRotation(0.8);
+            if (isPlayer) {
+              this.heldItemSprite.setVisible(false);
+              this.armLeft.setRotation(0.8);
+            } else {
+              this.armRight.setRotation(-0.8);
+            }
             if (onRelease) onRelease();
           },
           onComplete: () => {
@@ -191,7 +300,8 @@ export default class Monster extends Phaser.GameObjects.Container {
               duration: 380,
               ease: 'Back.easeOut',
               onComplete: () => {
-                this.armLeft.setRotation(0);
+                if (isPlayer) this.armLeft.setRotation(0);
+                else this.armRight.setRotation(0);
               }
             });
           }
@@ -364,6 +474,8 @@ export default class Monster extends Phaser.GameObjects.Container {
     this.hp = this.maxHp;
     this.isDizzy = false;
     this.isHit = false;
+    this.isShieldActive = false;
+    if (this.shieldDome) this.shieldDome.setVisible(false);
     this.x = this.baseX;
     this.y = this.baseY;
     this.torso.setScale(1);
@@ -373,21 +485,25 @@ export default class Monster extends Phaser.GameObjects.Container {
     this.eyeOpen.setVisible(true);
     if (this.type === 'player') {
       this.mouth.setTexture('blue_mouth_smile');
+      this.armLeft.setRotation(0);
+    } else {
+      this.armRight.setRotation(0);
     }
   }
 
   getLaunchPoint() {
+    const offsetX = this.type === 'player' ? 55 * this.scaleX : -55 * this.scaleX;
     return {
-      x: this.x + 48,
-      y: this.y - 72
+      x: this.x + offsetX,
+      y: this.y - 70 * this.scaleY
     };
   }
 
   getHitBounds() {
     return {
       x: this.x,
-      y: this.y - 55,
-      radius: 55
+      y: this.y - 55 * this.scaleY,
+      radius: 65 * this.scaleX
     };
   }
 }

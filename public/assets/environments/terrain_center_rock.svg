@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 120" width="160" height="120">
+  <defs>
+    <linearGradient id="centerRockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#90a4ae"/>
+      <stop offset="50%" stop-color="#607d8b"/>
+      <stop offset="100%" stop-color="#37474f"/>
+    </linearGradient>
+    <linearGradient id="centerCrateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffb74d"/>
+      <stop offset="60%" stop-color="#f57c00"/>
+      <stop offset="100%" stop-color="#b26a00"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Big Central Stone Outcrop Base -->
+  <polygon points="10,120 25,60 55,35 105,35 135,60 150,120" fill="url(#centerRockGrad)" stroke="#263238" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Rock chiseled highlights -->
+  <line x1="55" y1="35" x2="80" y2="75" stroke="#cfd8dc" stroke-width="2"/>
+  <line x1="105" y1="35" x2="80" y2="75" stroke="#263238" stroke-width="2.5"/>
+  <line x1="80" y1="75" x2="80" y2="120" stroke="#263238" stroke-width="2.5"/>
+
+  <!-- Grass Patch atop Rock -->
+  <path d="M 45 35 C 65 28, 95 28, 115 35 C 105 40, 55 40, 45 35 Z" fill="#76ff03" stroke="#33691e" stroke-width="1.5"/>
+
+  <!-- Stacked Wooden Supply Crate on Rock Plateau -->
+  <g transform="translate(60, 2)">
+    <rect x="0" y="0" width="40" height="34" rx="2" fill="url(#centerCrateGrad)" stroke="#5d4037" stroke-width="2"/>
+    <line x1="0" y1="12" x2="40" y2="12" stroke="#5d4037" stroke-width="1.2"/>
+    <line x1="0" y1="23" x2="40" y2="23" stroke="#5d4037" stroke-width="1.2"/>
+    <line x1="3" y1="3" x2="37" y2="31" stroke="#4e342e" stroke-width="2.5"/>
+    <!-- Iron Corner brackets -->
+    <rect x="0" y="0" width="6" height="6" fill="#78909c"/>
+    <rect x="34" y="0" width="6" height="6" fill="#78909c"/>
+    <rect x="0" y="28" width="6" height="6" fill="#78909c"/>
+    <rect x="34" y="28" width="6" height="6" fill="#78909c"/>
+  </g>
+</svg>

@@ -66,14 +66,20 @@ export default class BootScene extends Phaser.Scene {
 
     // 3. Environments
     this.load.svg('bg_sky', 'assets/environments/bg_sky.svg', { width: 1280, height: 720 });
+    this.load.svg('bg_sky_bright', 'assets/environments/bg_sky_bright.svg', { width: 1280, height: 720 });
     this.load.svg('bg_mountains', 'assets/environments/bg_mountains.svg', { width: 1280, height: 300 });
+    this.load.svg('bg_mountains_bright', 'assets/environments/bg_mountains_bright.svg', { width: 1280, height: 300 });
     this.load.svg('bg_hills_village', 'assets/environments/bg_hills_village.svg', { width: 1280, height: 320 });
+    this.load.svg('bg_hills_bright', 'assets/environments/bg_hills_bright.svg', { width: 1280, height: 320 });
     this.load.svg('cliff_left', 'assets/environments/cliff_platform_left.svg', { width: 340, height: 220 });
     this.load.svg('cliff_right', 'assets/environments/cliff_platform_right.svg', { width: 340, height: 220 });
+    this.load.svg('terrain_center_rock', 'assets/environments/terrain_center_rock.svg', { width: 180, height: 140 });
     this.load.svg('river_water', 'assets/environments/river_water_layer.svg', { width: 1280, height: 180 });
     this.load.svg('rope_bridge', 'assets/environments/rope_bridge.svg', { width: 260, height: 70 });
     this.load.svg('wooden_crate', 'assets/environments/wooden_crate.svg', { width: 70, height: 70 });
     this.load.svg('observer_cat', 'assets/environments/observer_cat.svg', { width: 60, height: 60 });
+    this.load.svg('butterfly', 'assets/environments/butterfly.svg', { width: 44, height: 40 });
+    this.load.svg('bird', 'assets/environments/bird.svg', { width: 48, height: 36 });
     this.load.svg('foreground_plants', 'assets/environments/foreground_plants.svg', { width: 1280, height: 80 });
 
     // 4. Projectiles
@@ -86,10 +92,13 @@ export default class BootScene extends Phaser.Scene {
     this.load.svg('heal_cross', 'assets/effects/heal_cross.svg', { width: 40, height: 40 });
     this.load.svg('heart_particle', 'assets/effects/heart_particle.svg', { width: 36, height: 36 });
     this.load.svg('confetti', 'assets/effects/confetti.svg', { width: 32, height: 32 });
+    this.load.svg('shield_dome', 'assets/effects/shield_dome.svg', { width: 180, height: 180 });
+    this.load.svg('shield_break', 'assets/effects/shield_break.svg', { width: 120, height: 120 });
 
     // 6. UI
     this.load.svg('avatar_frame', 'assets/ui/avatar_frame.svg', { width: 80, height: 80 });
     this.load.svg('hp_bar_frame', 'assets/ui/hp_bar_frame.svg', { width: 200, height: 24 });
+    this.load.svg('turn_banner', 'assets/ui/turn_banner.svg', { width: 380, height: 70 });
     this.load.svg('ability_fire', 'assets/ui/ability_card_fire.svg', { width: 48, height: 48 });
     this.load.svg('ability_heal', 'assets/ui/ability_card_heal.svg', { width: 48, height: 48 });
     this.load.svg('ability_shield', 'assets/ui/ability_card_shield.svg', { width: 48, height: 48 });

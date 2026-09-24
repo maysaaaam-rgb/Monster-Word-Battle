@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 28" width="32" height="28">
+  <defs>
+    <radialGradient id="wingGrad" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#fff176"/>
+      <stop offset="60%" stop-color="#ffb74d"/>
+      <stop offset="100%" stop-color="#ff7043"/>
+    </radialGradient>
+  </defs>
+  <!-- Left Upper Wing -->
+  <ellipse cx="9" cy="8" rx="8" ry="7" fill="url(#wingGrad)" stroke="#e65100" stroke-width="1.2"/>
+  <circle cx="8" cy="7" r="2" fill="#ffffff" opacity="0.6"/>
+  <!-- Left Lower Wing -->
+  <ellipse cx="10" cy="19" rx="5" ry="6" fill="url(#wingGrad)" stroke="#e65100" stroke-width="1.2"/>
+
+  <!-- Right Upper Wing -->
+  <ellipse cx="23" cy="8" rx="8" ry="7" fill="url(#wingGrad)" stroke="#e65100" stroke-width="1.2"/>
+  <circle cx="24" cy="7" r="2" fill="#ffffff" opacity="0.6"/>
+  <!-- Right Lower Wing -->
+  <ellipse cx="22" cy="19" rx="5" ry="6" fill="url(#wingGrad)" stroke="#e65100" stroke-width="1.2"/>
+
+  <!-- Body & Head -->
+  <ellipse cx="16" cy="14" rx="2.5" ry="8" fill="#3e2723"/>
+  <circle cx="16" cy="5" r="3" fill="#3e2723"/>
+  <!-- Antennae -->
+  <line x1="15" y1="3" x2="11" y2="0" stroke="#3e2723" stroke-width="1.2" stroke-linecap="round"/>
+  <line x1="17" y1="3" x2="21" y2="0" stroke="#3e2723" stroke-width="1.2" stroke-linecap="round"/>
+</svg>

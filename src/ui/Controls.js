@@ -8,7 +8,8 @@ export default class Controls {
     this.audioSystem = audioSystem;
     this.callbacks = callbacks;
     this.isEnabled = true;
-    this.activeAction = 'rock'; // 'rock', 'fireball', 'heal'
+    this.activeAction = 'rock'; // 'rock', 'fireball', 'shield', 'heal'
+    this.unlockedAbilities = { rock: true, fireball: false, shield: false, heal: false };
 
     this.container = scene.add.container(640, 655);
     this.container.setDepth(20);
@@ -16,12 +17,22 @@ export default class Controls {
     this.createPanel();
     this.createAngleControls();
     this.createPowerControls();
+    this.createAbilitySelectors();
     this.createActionButton();
+  }
+
+  setUnlockedAbilities(abilities) {
+    this.unlockedAbilities = { ...this.unlockedAbilities, ...abilities };
+    this.updateAbilitySelectors();
   }
 
   setAction(type) {
     this.activeAction = type;
     this.updateActionButton();
+    this.updateAbilitySelectors();
+    if (this.callbacks.onActionChange) {
+      this.callbacks.onActionChange(type);
+    }
   }
 
   createPanel() {
@@ -77,7 +88,7 @@ export default class Controls {
   }
 
   createPowerControls() {
-    const x = 30;
+    const x = -35;
 
     // Label
     this.powerLabel = this.scene.add.text(x, -30, `POWER`, {
@@ -88,15 +99,15 @@ export default class Controls {
     }).setOrigin(0.5);
     this.container.add(this.powerLabel);
 
-    // Slider Track (orange/yellow gradient fill as in reference)
-    const trackWidth = 200;
+    // Slider Track
+    const trackWidth = 170;
     const trackHeight = 16;
     const trackY = 6;
 
     this.sliderTrack = this.scene.add.graphics();
     this.container.add(this.sliderTrack);
 
-    const hitZone = this.scene.add.rectangle(x, trackY, trackWidth + 30, 44, 0x000000, 0)
+    const hitZone = this.scene.add.rectangle(x, trackY, trackWidth + 24, 44, 0x000000, 0)
       .setInteractive({ useHandCursor: true });
     this.container.add(hitZone);
 
@@ -124,6 +135,67 @@ export default class Controls {
       if (pointer.isDown && this.isEnabled && hitZone.input && hitZone.input.dragState) {
         updateFromPointer(pointer);
       }
+    });
+  }
+
+  createAbilitySelectors() {
+    this.abilityButtons = {};
+    const abilities = [
+      { key: 'rock', icon: 'ability_rock', x: 105, y: -16 },
+      { key: 'fireball', icon: 'ability_fire', x: 147, y: -16 },
+      { key: 'shield', icon: 'ability_shield', x: 105, y: 18 },
+      { key: 'heal', icon: 'ability_heal', x: 147, y: 18 }
+    ];
+
+    abilities.forEach(ab => {
+      const container = this.scene.add.container(ab.x, ab.y);
+
+      const bg = this.scene.add.graphics();
+      container.add(bg);
+
+      const icon = this.scene.add.image(0, 0, ab.icon).setDisplaySize(26, 26);
+      container.add(icon);
+
+      const hit = this.scene.add.rectangle(0, 0, 36, 30, 0x000000, 0)
+        .setInteractive({ useHandCursor: true });
+      container.add(hit);
+
+      hit.on('pointerdown', () => {
+        if (!this.isEnabled) return;
+        if (!this.unlockedAbilities[ab.key] && ab.key !== 'rock') return;
+        if (this.audioSystem) this.audioSystem.playClick();
+        this.setAction(ab.key);
+      });
+
+      this.container.add(container);
+      this.abilityButtons[ab.key] = { container, bg, icon };
+    });
+
+    this.updateAbilitySelectors();
+  }
+
+  updateAbilitySelectors() {
+    if (!this.abilityButtons) return;
+
+    Object.entries(this.abilityButtons).forEach(([key, btn]) => {
+      const isUnlocked = this.unlockedAbilities[key] || key === 'rock';
+      const isSelected = this.activeAction === key;
+
+      btn.bg.clear();
+      if (isSelected) {
+        btn.bg.fillStyle(0xf1c40f, 0.45);
+        btn.bg.fillRoundedRect(-18, -15, 36, 30, 8);
+        btn.bg.lineStyle(2, 0xffd700, 1);
+        btn.bg.strokeRoundedRect(-18, -15, 36, 30, 8);
+      } else {
+        btn.bg.fillStyle(0x1e272e, 0.6);
+        btn.bg.fillRoundedRect(-18, -15, 36, 30, 8);
+        btn.bg.lineStyle(1, 0x57606f, 0.7);
+        btn.bg.strokeRoundedRect(-18, -15, 36, 30, 8);
+      }
+
+      btn.container.setAlpha(isUnlocked ? 1.0 : 0.3);
+      btn.icon.setScale(isSelected ? 1.15 : 1.0);
     });
   }
 
@@ -164,7 +236,7 @@ export default class Controls {
     this.btnBody = this.scene.add.graphics();
     this.actionBtnContainer.add(this.btnBody);
 
-    this.btnText = this.scene.add.text(0, 0, '🔥 THROW!', {
+    this.btnText = this.scene.add.text(0, 0, '🪨 THROW!', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
       fontSize: '22px',
       fontStyle: '900',
@@ -208,11 +280,26 @@ export default class Controls {
     const btnHeight = 56;
 
     const isFire = this.activeAction === 'fireball';
+    const isShield = this.activeAction === 'shield';
     const isHeal = this.activeAction === 'heal';
 
-    const color = isFire ? 0xeb3b5a : isHeal ? 0x20bf6b : 0x4b6584;
-    const shadowColor = isFire ? 0x991b1b : isHeal ? 0x0f7940 : 0x2d3436;
-    const label = isFire ? '🔥 THROW!' : isHeal ? '💚 HEAL!' : '🪨 THROW!';
+    let color = 0x4b6584;
+    let shadowColor = 0x2d3436;
+    let label = '🪨 THROW!';
+
+    if (isFire) {
+      color = 0xeb3b5a;
+      shadowColor = 0x991b1b;
+      label = '🔥 THROW!';
+    } else if (isShield) {
+      color = 0xf59e0b;
+      shadowColor = 0xb45309;
+      label = '🛡️ SHIELD!';
+    } else if (isHeal) {
+      color = 0x20bf6b;
+      shadowColor = 0x0f7940;
+      label = '💚 HEAL!';
+    }
 
     this.btnShadow.clear();
     this.btnShadow.fillStyle(shadowColor, 1);

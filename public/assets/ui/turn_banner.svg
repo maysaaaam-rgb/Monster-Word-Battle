@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 70" width="380" height="70">
+  <defs>
+    <filter id="bannerShadow" x="-10%" y="-10%" width="125%" height="130%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#051525" flood-opacity="0.35"/>
+    </filter>
+    <linearGradient id="ribbonLeftGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <linearGradient id="ribbonRightGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#b45309"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="mainPlankGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fbbf24"/>
+      <stop offset="35%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+    <linearGradient id="innerGlow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fef08a" stop-opacity="0.9"/>
+      <stop offset="15%" stop-color="#fef08a" stop-opacity="0.1"/>
+      <stop offset="100%" stop-color="#b45309" stop-opacity="0.4"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left Ribbon Tail Behind -->
+  <polygon points="40,20 10,12 28,38 10,62 40,54" fill="url(#ribbonLeftGrad)" filter="url(#bannerShadow)" stroke="#78350f" stroke-width="2"/>
+  <polygon points="40,20 40,54 50,46" fill="#78350f" opacity="0.6"/>
+
+  <!-- Right Ribbon Tail Behind -->
+  <polygon points="340,20 370,12 352,38 370,62 340,54" fill="url(#ribbonRightGrad)" filter="url(#bannerShadow)" stroke="#78350f" stroke-width="2"/>
+  <polygon points="340,20 340,54 330,46" fill="#78350f" opacity="0.6"/>
+
+  <!-- Main Banner Body -->
+  <rect x="36" y="8" width="308" height="52" rx="14" fill="url(#mainPlankGrad)" stroke="#78350f" stroke-width="3.5" filter="url(#bannerShadow)"/>
+
+  <!-- Inner Inset Border & Highlight -->
+  <rect x="41" y="12" width="298" height="44" rx="10" fill="url(#innerGlow)" stroke="#fef08a" stroke-width="1.8" stroke-dasharray="1000"/>
+
+  <!-- Decorative Corner Rivets / Gems -->
+  <circle cx="48" cy="34" r="4" fill="#fef08a" stroke="#78350f" stroke-width="1.5"/>
+  <circle cx="332" cy="34" r="4" fill="#fef08a" stroke="#78350f" stroke-width="1.5"/>
+
+  <!-- Little top ribbon highlight line -->
+  <path d="M 52 14 L 328 14" stroke="#ffffff" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+</svg>

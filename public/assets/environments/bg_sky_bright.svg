@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <defs>
+    <linearGradient id="brightSky" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#29b6f6"/>
+      <stop offset="40%" stop-color="#4fc3f7"/>
+      <stop offset="75%" stop-color="#b3e5fc"/>
+      <stop offset="100%" stop-color="#fff9c4"/>
+    </linearGradient>
+    <radialGradient id="brightSun" cx="50%" cy="18%" r="45%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="25%" stop-color="#fff59d" stop-opacity="0.9"/>
+      <stop offset="60%" stop-color="#ffee58" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#ffee58" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Bright Sky Background -->
+  <rect x="0" y="0" width="1280" height="720" fill="url(#brightSky)"/>
+
+  <!-- Golden Sunbeams & Glow -->
+  <circle cx="640" cy="115" r="280" fill="url(#brightSun)"/>
+  <circle cx="640" cy="115" r="70" fill="#fff9c4"/>
+  <circle cx="640" cy="115" r="52" fill="#ffffff"/>
+
+  <!-- Warm Sunbeams -->
+  <g stroke="#ffffff" stroke-width="2.5" opacity="0.3" stroke-linecap="round">
+    <line x1="640" y1="35" x2="640" y2="10"/>
+    <line x1="640" y1="195" x2="640" y2="220"/>
+    <line x1="560" y1="115" x2="535" y2="115"/>
+    <line x1="720" y1="115" x2="745" y2="115"/>
+    <line x1="585" y1="60" x2="565" y2="40"/>
+    <line x1="695" y1="170" x2="715" y2="190"/>
+    <line x1="695" y1="60" x2="715" y2="40"/>
+    <line x1="585" y1="170" x2="565" y2="190"/>
+  </g>
+</svg>
