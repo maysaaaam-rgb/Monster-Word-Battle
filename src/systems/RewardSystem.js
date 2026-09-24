@@ -46,6 +46,13 @@ export default class RewardSystem {
     }
   }
 
+  unlockReward(rewardType = 'fireball') {
+    const type = (rewardType || 'fireball').toLowerCase();
+    this.currentReward = type;
+    this.inventory[type] = true;
+    return type;
+  }
+
   setReward(type) {
     if (this.inventory[type] || type === 'rock') {
       this.currentReward = type;

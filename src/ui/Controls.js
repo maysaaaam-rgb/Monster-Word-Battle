@@ -258,8 +258,10 @@ export default class Controls {
       this.actionBtnContainer.setScale(1.0);
     });
 
-    hitArea.on('pointerdown', () => {
+    hitArea.on('pointerdown', (pointer, localX, localY, event) => {
+      if (event && event.stopPropagation) event.stopPropagation();
       if (!this.isEnabled) return;
+      this.setEnabled(false); // Immediately lock to prevent duplicate throws!
       if (this.audioSystem) this.audioSystem.playClick();
       this.actionBtnContainer.setScale(0.96);
       if (this.callbacks.onAction) {

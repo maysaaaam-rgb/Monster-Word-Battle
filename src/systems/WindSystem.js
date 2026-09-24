@@ -1,17 +1,24 @@
+import Phaser from 'phaser';
+import { PHYSICS } from './PhysicsConfig.js';
+
 export default class WindSystem {
   constructor() {
-    this.wind = 8; // Default initial wind
-    this.windMultiplier = 15; // Translates wind units to horizontal acceleration (px/s^2)
+    this.wind = 0; // Starts at 0 for initial predictability
+    this.windScale = PHYSICS.windScale;
   }
 
   randomize() {
-    // Pick wind between -20 and 20 (excluding -2 to 2 for more noticeable effect)
+    // Wind between -10 and 10 (excluding 0)
     let newWind = 0;
-    while (Math.abs(newWind) < 3) {
-      newWind = Phaser.Math.Between(-20, 20);
+    while (newWind === 0) {
+      newWind = Phaser.Math.Between(-8, 8);
     }
     this.wind = newWind;
     return this.wind;
+  }
+
+  setWind(val) {
+    this.wind = val;
   }
 
   getWind() {
@@ -19,6 +26,6 @@ export default class WindSystem {
   }
 
   getAcceleration() {
-    return this.wind * this.windMultiplier;
+    return this.wind * this.windScale;
   }
 }

@@ -1,116 +1,107 @@
 import Phaser from 'phaser';
 
 export default class QuestionModal {
-  constructor(scene, audioSystem, rewardSystem, onRewardGranted, onModalClosed) {
+  constructor(scene, audioSystem, onRewardGranted, onModalClosed) {
     this.scene = scene;
     this.audioSystem = audioSystem;
-    this.rewardSystem = rewardSystem;
     this.onRewardGranted = onRewardGranted;
     this.onModalClosed = onModalClosed;
     this.currentQuestion = null;
-    this.isAnswering = false;
+    this.isLocked = false;
 
-    // Floating in upper center (y: 195) preserving 100% visibility of the arena, monsters, bridge, and river below!
-    this.container = scene.add.container(640, 195).setDepth(30);
+    // Root Container
+    this.container = scene.add.container(0, 0).setDepth(40);
     this.container.setVisible(false);
 
-    // Soft 30% vignette dimmer behind modal (fullscreen overlay)
-    this.dimmer = scene.add.graphics();
-    this.dimmer.fillStyle(0x050f1e, 0.35);
-    this.dimmer.fillRect(-640, -195, 1280, 720);
-    this.container.add(this.dimmer);
+    // 1. Full-screen Interactive Input Blocker (Prevents ANY pointer events passing to arena)
+    this.blocker = scene.add.rectangle(0, 0, 1280, 720, 0x050f1e, 0.42)
+      .setOrigin(0, 0)
+      .setInteractive();
 
-    this.modalBox = scene.add.container(0, 0);
+    this.blocker.on('pointerdown', (pointer, localX, localY, event) => {
+      if (event && event.stopPropagation) event.stopPropagation();
+    });
+    this.container.add(this.blocker);
+
+    // 2. Floating Plaque Box (Upper center at x: 640, y: 195)
+    this.modalBox = scene.add.container(640, 195);
     this.container.add(this.modalBox);
 
     this.createEventFrame();
   }
 
   createEventFrame() {
-    // 1. Ornate Wooden & Golden Plaque Scroll
+    // Ornate Wooden Plaque Frame
     this.scrollFrame = this.scene.add.image(0, 0, 'challenge_scroll').setOrigin(0.5, 0.5);
     this.modalBox.add(this.scrollFrame);
 
-    // 2. Question Prompt Text in Golden Ribbon
+    // Question Prompt Text in Plaque Banner Ribbon
     this.promptText = this.scene.add.text(0, -96, 'Where is the cat?', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '20px',
+      fontSize: '22px',
       fontStyle: '900',
       color: '#3d2005'
     }).setOrigin(0.5);
     this.modalBox.add(this.promptText);
 
-    // 3. Cards Container
+    // Container for 3 Picture Cards
     this.cardsContainer = this.scene.add.container(0, 18);
     this.modalBox.add(this.cardsContainer);
 
-    // 4. Reward Banner
-    this.rewardBanner = this.scene.add.container(0, 132);
-    this.rewardBannerBg = this.scene.add.graphics();
-    this.rewardBanner.add(this.rewardBannerBg);
+    // Status / Feedback Banner below cards
+    this.feedbackBanner = this.scene.add.container(0, 134);
+    this.feedbackBg = this.scene.add.graphics();
+    this.feedbackBanner.add(this.feedbackBg);
 
-    this.rewardBannerText = this.scene.add.text(0, 0, '', {
+    this.feedbackText = this.scene.add.text(0, 0, '', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '17px',
+      fontSize: '18px',
       fontStyle: '900',
       color: '#ffffff'
     }).setOrigin(0.5);
-    this.rewardBanner.add(this.rewardBannerText);
+    this.feedbackBanner.add(this.feedbackText);
 
-    this.rewardBanner.setVisible(false);
-    this.modalBox.add(this.rewardBanner);
+    this.feedbackBanner.setVisible(false);
+    this.modalBox.add(this.feedbackBanner);
   }
 
   showQuestion(question) {
     this.currentQuestion = question;
-    this.isAnswering = false;
-    this.rewardBanner.setVisible(false);
+    this.isLocked = false;
+    this.feedbackBanner.setVisible(false);
 
     this.promptText.setText(question.prompt);
     this.cardsContainer.removeAll(true);
+    this.cardObjects = [];
 
-    const cardDefs = [
-      { key: 'mini_cat_in_box', label: 'IN', target: 'in' },
-      { key: 'mini_cat_on_box', label: 'ON', target: 'on' },
-      { key: 'mini_cat_under_box', label: 'UNDER', target: 'under' }
-    ];
-
-    // Determine correct answer index
-    const targetPreposition = (question.target || 'on').toLowerCase();
-    const correctIdx = cardDefs.findIndex(c => c.target === targetPreposition);
-    this.currentQuestion.answer = correctIdx >= 0 ? correctIdx : 1;
-
+    const choices = question.choices || [];
     const cardW = 160;
     const cardH = 142;
     const spacing = 175;
     const startX = -spacing;
 
-    this.cardObjects = [];
-
-    cardDefs.forEach((def, i) => {
+    choices.forEach((choice, i) => {
       const cardX = startX + i * spacing;
       const card = this.scene.add.container(cardX, 0);
+      card.setSize(cardW, cardH);
 
-      // Card Background with Rounded Border
+      // Card Background
       const cardBg = this.scene.add.graphics();
-      cardBg.fillStyle(0xffffff, 0.98);
-      cardBg.fillRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 14);
-      cardBg.lineStyle(3, 0xdcdde1, 1);
-      cardBg.strokeRoundedRect(-cardW / 2, -cardH / 2, cardW, cardH, 14);
+      this.drawCardBorder(cardBg, cardW, cardH, 0xdcdde1, 0xffffff);
       card.add(cardBg);
 
-      // Illustrated Mini-Scene SVG
-      const miniScene = this.scene.add.image(0, -20, def.key).setOrigin(0.5, 0.5);
-      miniScene.setScale(0.92);
-      card.add(miniScene);
+      // Illustrated Picture Scene
+      const sceneImg = this.scene.add.image(0, -20, choice.image).setOrigin(0.5, 0.5);
+      sceneImg.setScale(0.92);
+      card.add(sceneImg);
 
-      // Pill Label Button at Bottom
+      // Label Pill Button at bottom of card
       const pillBg = this.scene.add.graphics();
       pillBg.fillStyle(0x0984e3, 1);
       pillBg.fillRoundedRect(-cardW / 2 + 12, cardH / 2 - 36, cardW - 24, 28, 8);
       card.add(pillBg);
 
-      const pillTxt = this.scene.add.text(0, cardH / 2 - 22, def.label, {
+      const pillTxt = this.scene.add.text(0, cardH / 2 - 22, choice.label, {
         fontFamily: 'system-ui, -apple-system, sans-serif',
         fontSize: '16px',
         fontStyle: '900',
@@ -118,35 +109,36 @@ export default class QuestionModal {
       }).setOrigin(0.5);
       card.add(pillTxt);
 
-      // Emerald Checkmark Icon (Hidden initially)
+      // Checkmark Icon (Initially hidden)
       const checkSprite = this.scene.add.image(cardW / 2 - 12, -cardH / 2 + 12, 'card_checkmark')
         .setOrigin(0.5, 0.5)
         .setVisible(false);
       card.add(checkSprite);
 
-      // Hit Area
-      const hit = this.scene.add.rectangle(0, 0, cardW, cardH, 0x000000, 0)
-        .setInteractive({ useHandCursor: true });
-      card.add(hit);
+      // Interactive Click Handling on the card container
+      card.setInteractive({ useHandCursor: true });
 
-      hit.on('pointerover', () => {
-        if (!this.isAnswering) card.setScale(1.05);
+      card.on('pointerover', () => {
+        if (!this.isLocked) card.setScale(1.04);
       });
-      hit.on('pointerout', () => {
-        if (!this.isAnswering) card.setScale(1.0);
+      card.on('pointerout', () => {
+        if (!this.isLocked) card.setScale(1.0);
       });
-      hit.on('pointerdown', () => {
-        if (!this.isAnswering) {
-          card.setScale(0.96);
-          this.handleCardSelected(i, card, cardBg, pillBg, pillTxt, checkSprite);
-        }
-      });
-      hit.on('pointerup', () => {
-        if (!this.isAnswering) card.setScale(1.0);
+      card.on('pointerdown', (pointer, localX, localY, event) => {
+        if (event && event.stopPropagation) event.stopPropagation();
+        if (this.isLocked) return;
+        this.selectChoice(i);
       });
 
       this.cardsContainer.add(card);
-      this.cardObjects.push({ card, cardBg, pillBg, pillTxt, checkGfx: checkSprite });
+      this.cardObjects.push({
+        container: card,
+        cardBg,
+        pillBg,
+        pillTxt,
+        checkSprite,
+        baseX: cardX
+      });
     });
 
     // Animate Entrance
@@ -159,105 +151,146 @@ export default class QuestionModal {
       scaleX: 1,
       scaleY: 1,
       alpha: 1,
-      duration: 320,
+      duration: 280,
       ease: 'Back.easeOut'
     });
   }
 
-  handleCardSelected(index, card, cardBg, pillBg, pillTxt, checkSprite) {
-    if (this.isAnswering) return;
+  drawCardBorder(graphics, w, h, borderColor, fillColor) {
+    graphics.clear();
+    graphics.fillStyle(fillColor, 1);
+    graphics.fillRoundedRect(-w / 2, -h / 2, w, h, 14);
+    graphics.lineStyle(3, borderColor, 1);
+    graphics.strokeRoundedRect(-w / 2, -h / 2, w, h, 14);
+  }
 
-    const isCorrect = index === this.currentQuestion.answer;
+  selectChoice(selectedIndex) {
+    if (this.isLocked) return;
+    this.isLocked = true; // Lock immediately to prevent duplicate clicks
+
+    const isCorrect = selectedIndex === this.currentQuestion.correctIndex;
+    const cardObj = this.cardObjects[selectedIndex];
 
     if (isCorrect) {
-      this.isAnswering = true;
-      if (this.audioSystem) this.audioSystem.playCorrect();
-
-      // Card emerald highlight & checkmark badge
-      cardBg.clear();
-      cardBg.fillStyle(0xffffff, 1);
-      cardBg.fillRoundedRect(-160 / 2, -142 / 2, 160, 142, 14);
-      cardBg.lineStyle(4, 0x2ed573, 1);
-      cardBg.strokeRoundedRect(-160 / 2, -142 / 2, 160, 142, 14);
-
-      pillBg.clear();
-      pillBg.fillStyle(0x2ed573, 1);
-      pillBg.fillRoundedRect(-160 / 2 + 12, 142 / 2 - 36, 160 - 24, 28, 8);
-
-      checkSprite.setVisible(true);
-      checkSprite.setScale(0.2);
-      this.scene.tweens.add({
-        targets: checkSprite,
-        scale: 1,
-        duration: 250,
-        ease: 'Back.easeOut'
-      });
-
-      // Confetti Explosion Shower
-      this.spawnConfetti();
-
-      // Earn Battle Reward
-      const reward = this.rewardSystem.onCorrectAnswer(this.currentQuestion);
-
-      // Reward Banner
-      this.rewardBannerBg.clear();
-      const isFire = reward.type === 'fireball';
-      const isShield = reward.type === 'shield';
-      const bannerColor = isFire ? 0xeb3b5a : isShield ? 0xf59e0b : 0x20bf6b;
-      this.rewardBannerBg.fillStyle(bannerColor, 1);
-      this.rewardBannerBg.fillRoundedRect(-190, -18, 380, 36, 12);
-      this.rewardBannerBg.lineStyle(2, 0xffffff, 1);
-      this.rewardBannerBg.strokeRoundedRect(-190, -18, 380, 36, 12);
-
-      this.rewardBannerText.setText(`${reward.label} ${reward.badge}`);
-      this.rewardBanner.setVisible(true);
-      this.rewardBanner.setScale(0.8);
-      this.scene.tweens.add({
-        targets: this.rewardBanner,
-        scaleX: 1,
-        scaleY: 1,
-        duration: 200,
-        ease: 'Back.easeOut'
-      });
-
-      // Immediately grant reward so monster pulls out weapon and button changes!
-      if (this.onRewardGranted) {
-        this.onRewardGranted(reward);
-      }
-
-      // Smooth slide-up transition into battle
-      this.scene.time.delayedCall(500, () => {
-        this.scene.tweens.add({
-          targets: this.modalBox,
-          y: -280,
-          alpha: 0,
-          duration: 300,
-          ease: 'Cubic.easeIn',
-          onComplete: () => {
-            this.container.setVisible(false);
-            this.modalBox.y = 0;
-            if (this.onModalClosed) {
-              this.onModalClosed(reward);
-            }
-          }
-        });
-      });
+      this.handleCorrect(cardObj);
     } else {
-      // Wrong answer - Immediate retry without losing turn
-      if (this.audioSystem) this.audioSystem.playWrong();
-
-      cardBg.lineStyle(3, 0xff4757, 1);
-      cardBg.strokeRoundedRect(-160 / 2, -142 / 2, 160, 142, 14);
-
-      this.scene.tweens.add({
-        targets: card,
-        x: card.x + 8,
-        duration: 35,
-        yoyo: true,
-        repeat: 4,
-        ease: 'Linear'
-      });
+      this.handleIncorrect(cardObj);
     }
+  }
+
+  handleCorrect(cardObj) {
+    if (this.audioSystem) this.audioSystem.playCorrect();
+
+    // 1. Highlight selected card with green border & emerald checkmark
+    this.drawCardBorder(cardObj.cardBg, 160, 142, 0x2ed573, 0xffffff);
+
+    cardObj.pillBg.clear();
+    cardObj.pillBg.fillStyle(0x2ed573, 1);
+    cardObj.pillBg.fillRoundedRect(-160 / 2 + 12, 142 / 2 - 36, 160 - 24, 28, 8);
+
+    cardObj.checkSprite.setVisible(true);
+    cardObj.checkSprite.setScale(0.2);
+    this.scene.tweens.add({
+      targets: cardObj.checkSprite,
+      scale: 1,
+      duration: 250,
+      ease: 'Back.easeOut'
+    });
+
+    // 2. Confetti Burst Shower
+    this.spawnConfetti();
+
+    // 3. Show Celebratory Reward Banner
+    const rewardName = this.currentQuestion.reward || 'FIREBALL';
+    let bannerColor = 0xeb3b5a; // Red/Fire
+    let bannerText = `🎉 CORRECT! 🔥 ${rewardName} UNLOCKED!`;
+
+    if (rewardName === 'SHIELD') {
+      bannerColor = 0xf59e0b;
+      bannerText = `🎉 CORRECT! 🛡️ SHIELD UNLOCKED!`;
+    } else if (rewardName === 'HEAL') {
+      bannerColor = 0x20bf6b;
+      bannerText = `🎉 CORRECT! 💚 HEAL UNLOCKED!`;
+    }
+
+    this.feedbackBg.clear();
+    this.feedbackBg.fillStyle(bannerColor, 1);
+    this.feedbackBg.fillRoundedRect(-200, -18, 400, 36, 12);
+    this.feedbackBg.lineStyle(2, 0xffffff, 1);
+    this.feedbackBg.strokeRoundedRect(-200, -18, 400, 36, 12);
+
+    this.feedbackText.setText(bannerText);
+    this.feedbackBanner.setVisible(true);
+    this.feedbackBanner.setScale(0.8);
+    this.scene.tweens.add({
+      targets: this.feedbackBanner,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 220,
+      ease: 'Back.easeOut'
+    });
+
+    // 4. Notify reward granted immediately
+    if (this.onRewardGranted) {
+      this.onRewardGranted(rewardName.toLowerCase());
+    }
+
+    // 5. Wait 800ms, then slide out challenge and restore arena
+    this.scene.time.delayedCall(850, () => {
+      this.scene.tweens.add({
+        targets: this.modalBox,
+        y: -320,
+        alpha: 0,
+        duration: 320,
+        ease: 'Cubic.easeIn',
+        onComplete: () => {
+          this.container.setVisible(false);
+          this.modalBox.y = 195;
+          if (this.onModalClosed) {
+            this.onModalClosed(rewardName.toLowerCase());
+          }
+        }
+      });
+    });
+  }
+
+  handleIncorrect(cardObj) {
+    if (this.audioSystem) this.audioSystem.playWrong();
+
+    // 1. Red highlight on wrong card
+    this.drawCardBorder(cardObj.cardBg, 160, 142, 0xff4757, 0xffffff);
+
+    // 2. "TRY AGAIN!" Feedback Banner
+    this.feedbackBg.clear();
+    this.feedbackBg.fillStyle(0xff4757, 1);
+    this.feedbackBg.fillRoundedRect(-140, -18, 280, 36, 12);
+    this.feedbackBg.lineStyle(2, 0xffffff, 1);
+    this.feedbackBg.strokeRoundedRect(-140, -18, 280, 36, 12);
+
+    this.feedbackText.setText('❌ TRY AGAIN!');
+    this.feedbackBanner.setVisible(true);
+
+    // 3. Shake animation on wrong card
+    const originX = cardObj.baseX;
+    this.scene.tweens.add({
+      targets: cardObj.container,
+      x: originX + 10,
+      duration: 40,
+      yoyo: true,
+      repeat: 4,
+      ease: 'Linear',
+      onComplete: () => {
+        cardObj.container.x = originX;
+
+        // Wait brief delay, reset card style, and unlock for another attempt!
+        this.scene.time.delayedCall(400, () => {
+          this.drawCardBorder(cardObj.cardBg, 160, 142, 0xdcdde1, 0xffffff);
+          this.feedbackBanner.setVisible(false);
+          cardObj.container.setScale(1.0);
+          this.isLocked = false; // UNLOCKED for next attempt!
+        });
+      }
+    });
   }
 
   spawnConfetti() {
@@ -288,5 +321,6 @@ export default class QuestionModal {
 
   close() {
     this.container.setVisible(false);
+    this.isLocked = false;
   }
 }
