@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="140" height="140">
+  <defs>
+    <radialGradient id="redBodyGrad" cx="50%" cy="42%" r="58%">
+      <stop offset="0%" stop-color="#ff6b6b"/>
+      <stop offset="65%" stop-color="#ee5253"/>
+      <stop offset="100%" stop-color="#b33939"/>
+    </radialGradient>
+    <linearGradient id="redHornGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff9f43"/>
+      <stop offset="60%" stop-color="#feca57"/>
+      <stop offset="100%" stop-color="#fffa65"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Ground Shadow -->
+  <ellipse cx="70" cy="132" rx="54" ry="8" fill="#5c1919" opacity="0.4"/>
+
+  <!-- Curved Fiery Horns -->
+  <path d="M 28 44 C 14 26, 8 10, 22 4 C 36 0, 44 22, 44 38 Z" fill="url(#redHornGrad)" stroke="#841515" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 112 44 C 126 26, 132 10, 118 4 C 104 0, 96 22, 96 38 Z" fill="url(#redHornGrad)" stroke="#841515" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- Round Chubby Body -->
+  <path d="M 70 24
+           C 106 24, 126 48, 126 78
+           C 126 108, 108 126, 70 126
+           C 32 126, 14 108, 14 78
+           C 14 48, 34 24, 70 24 Z"
+        fill="url(#redBodyGrad)" stroke="#5c1919" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Fiery Tail Tip Peeking -->
+  <path d="M 118 90 C 135 92, 138 78, 130 72 C 122 76, 118 84, 118 90 Z" fill="#feca57" stroke="#b33939" stroke-width="2"/>
+
+  <!-- Highlights & Warm Shading -->
+  <path d="M 40 30 C 56 26, 84 26, 100 30 C 90 27, 50 27, 40 30 Z" fill="#ffb8b8" opacity="0.75"/>
+  <ellipse cx="36" cy="85" rx="8" ry="5" fill="#f39c12" opacity="0.65"/>
+  <ellipse cx="104" cy="85" rx="8" ry="5" fill="#f39c12" opacity="0.65"/>
+</svg>

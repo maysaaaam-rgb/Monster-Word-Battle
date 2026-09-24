@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30" width="50" height="30">
+  <defs>
+    <linearGradient id="footGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#48dbfb"/>
+      <stop offset="60%" stop-color="#0abde3"/>
+      <stop offset="100%" stop-color="#006280"/>
+    </linearGradient>
+  </defs>
+  <!-- Chubby Monster Foot -->
+  <path d="M 6 12
+           C 6 4, 22 2, 36 6
+           C 46 9, 48 20, 44 26
+           C 36 29, 14 29, 6 24 Z"
+        fill="url(#footGrad)" stroke="#0c2461" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Toes -->
+  <circle cx="34" cy="20" r="3.5" fill="#c7ecee" opacity="0.6"/>
+  <circle cx="24" cy="21" r="3.5" fill="#c7ecee" opacity="0.6"/>
+  <circle cx="14" cy="20" r="3.5" fill="#c7ecee" opacity="0.6"/>
+</svg>

@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="140" height="140">
+  <defs>
+    <radialGradient id="blueBodyGrad" cx="45%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#48dbfb"/>
+      <stop offset="60%" stop-color="#0abde3"/>
+      <stop offset="100%" stop-color="#0086b3"/>
+    </radialGradient>
+    <linearGradient id="hornGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#feca57"/>
+      <stop offset="100%" stop-color="#ff9f43"/>
+    </linearGradient>
+    <linearGradient id="crestGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#1dd1a1"/>
+      <stop offset="100%" stop-color="#10ac84"/>
+    </linearGradient>
+    <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Ground Ambient Shadow -->
+  <ellipse cx="70" cy="132" rx="55" ry="8" fill="#0c2461" opacity="0.35"/>
+
+  <!-- Back Horns / Ears -->
+  <path d="M 32 40 C 22 20, 10 15, 20 8 C 34 5, 42 22, 45 35 Z" fill="url(#hornGrad)" stroke="#c0392b" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M 108 40 C 118 20, 130 15, 120 8 C 106 5, 98 22, 95 35 Z" fill="url(#hornGrad)" stroke="#c0392b" stroke-width="2.5" stroke-linejoin="round"/>
+
+  <!-- Center Crest Spikes -->
+  <path d="M 60 22 L 70 8 L 80 22 Z" fill="url(#crestGrad)" stroke="#0984e3" stroke-width="2"/>
+  <path d="M 46 28 L 52 16 L 60 28 Z" fill="url(#crestGrad)" stroke="#0984e3" stroke-width="2"/>
+  <path d="M 94 28 L 88 16 L 80 28 Z" fill="url(#crestGrad)" stroke="#0984e3" stroke-width="2"/>
+
+  <!-- Main Chubby Body (Pear Silhouette) -->
+  <path d="M 70 20
+           C 105 20, 124 45, 124 78
+           C 124 108, 108 126, 70 126
+           C 32 126, 16 108, 16 78
+           C 16 45, 35 20, 70 20 Z"
+        fill="url(#blueBodyGrad)" stroke="#0c2461" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Fur Highlights & Specular Rim -->
+  <path d="M 40 26 C 55 22, 85 22, 100 26 C 90 23, 50 23, 40 26 Z" fill="#c7ecee" opacity="0.8"/>
+  <path d="M 22 65 C 20 80, 24 98, 38 112 C 26 98, 22 80, 24 65 Z" fill="#ffffff" opacity="0.35"/>
+
+  <!-- Rosy Cute Blush Cheeks -->
+  <ellipse cx="34" cy="84" rx="9" ry="5" fill="#ff7675" opacity="0.7"/>
+  <ellipse cx="106" cy="84" rx="9" ry="5" fill="#ff7675" opacity="0.7"/>
+</svg>

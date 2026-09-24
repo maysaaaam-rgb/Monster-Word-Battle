@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="shieldCardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#74b9ff"/>
+      <stop offset="60%" stop-color="#0984e3"/>
+      <stop offset="100%" stop-color="#0c2461"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="10" fill="url(#shieldCardBg)" stroke="#feca57" stroke-width="2.5"/>
+  <path d="M 6 6 L 42 6 C 36 14, 12 14, 6 6 Z" fill="#ffffff" opacity="0.35"/>
+  <!-- Shield Icon -->
+  <path d="M 24 10 L 34 14 L 34 24 C 34 32, 24 38, 24 38 C 24 38, 14 32, 14 24 L 14 14 Z" fill="#ffffff" stroke="#0984e3" stroke-width="1.5"/>
+  <path d="M 24 13 L 31 16 L 31 23 C 31 29, 24 34, 24 34 C 24 34, 17 29, 17 23 L 17 16 Z" fill="#74b9ff"/>
+</svg>

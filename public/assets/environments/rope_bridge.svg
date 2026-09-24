@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 70" width="260" height="70">
+  <defs>
+    <linearGradient id="woodPlankGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#cd853f"/>
+      <stop offset="60%" stop-color="#8b5a2b"/>
+      <stop offset="100%" stop-color="#5c3818"/>
+    </linearGradient>
+    <linearGradient id="ropeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#eccc68"/>
+      <stop offset="50%" stop-color="#ffa502"/>
+      <stop offset="100%" stop-color="#cc8e35"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Left & Right Wooden Anchors -->
+  <g transform="translate(10, 10)">
+    <rect x="-8" y="0" width="16" height="50" rx="3" fill="#5c3818" stroke="#2f1a04" stroke-width="2"/>
+    <circle cx="0" cy="8" r="4" fill="#a4b0be" stroke="#2f1a04" stroke-width="1.5"/>
+  </g>
+  <g transform="translate(250, 10)">
+    <rect x="-8" y="0" width="16" height="50" rx="3" fill="#5c3818" stroke="#2f1a04" stroke-width="2"/>
+    <circle cx="0" cy="8" r="4" fill="#a4b0be" stroke="#2f1a04" stroke-width="1.5"/>
+  </g>
+
+  <!-- Upper Sagging Rope Cable -->
+  <path d="M 10 18 Q 130 46, 250 18" fill="none" stroke="url(#ropeGrad)" stroke-width="4.5" stroke-linecap="round"/>
+  <path d="M 10 18 Q 130 46, 250 18" fill="none" stroke="#845012" stroke-width="1.5" stroke-dasharray="4,3"/>
+
+  <!-- Vertical Suspension Droppers -->
+  <line x1="45" y1="26" x2="45" y2="46" stroke="#cc8e35" stroke-width="2"/>
+  <line x1="85" y1="32" x2="85" y2="52" stroke="#cc8e35" stroke-width="2"/>
+  <line x1="130" y1="36" x2="130" y2="55" stroke="#cc8e35" stroke-width="2"/>
+  <line x1="175" y1="32" x2="175" y2="52" stroke="#cc8e35" stroke-width="2"/>
+  <line x1="215" y1="26" x2="215" y2="46" stroke="#cc8e35" stroke-width="2"/>
+
+  <!-- Lower Sagging Walkway Planks -->
+  <!-- Plank 1 -->
+  <rect x="25" y="38" width="18" height="9" rx="2" fill="url(#woodPlankGrad)" stroke="#381c00" stroke-width="1.5"/>
+  <!-- Plank 2 -->
+  <rect x="52" y="44" width="18" height="9" rx="2" fill="url(#woodPlankGrad)" stroke="#381c00" stroke-width="1.5"/>
+  <!-- Plank 3 -->
+  <rect x="79" y="49" width="18" height="9" rx="2" fill="url(#woodPlankGrad)" stroke="#381c00" stroke-width="1.5"/>
+  <!-- Plank 4 (Center lowest) -->
+  <rect x="106" y="52" width="20" height="9" rx="2" fill="url(#woodPlankGrad)" stroke="#381c00" stroke-width="1.5"/>
+  <!-- Plank 5 -->
+  <rect x="134" y="52" width="20" height="9" rx="2" fill="url(#woodPlankGrad)" stroke="#381c00" stroke-width="1.5"/>
+  <!-- Plank 6 -->
+  <rect x="162" y="49" width="18" height="9" rx="2" fill="url(#woodPlankGrad)" stroke="#381c00" stroke-width="1.5"/>
+  <!-- Plank 7 -->
+  <rect x="189" y="44" width="18" height="9" rx="2" fill="url(#woodPlankGrad)" stroke="#381c00" stroke-width="1.5"/>
+  <!-- Plank 8 -->
+  <rect x="216" y="38" width="18" height="9" rx="2" fill="url(#woodPlankGrad)" stroke="#381c00" stroke-width="1.5"/>
+
+  <!-- Nails on planks -->
+  <circle cx="34" cy="42" r="1.5" fill="#2f1a04"/>
+  <circle cx="116" cy="56" r="1.5" fill="#2f1a04"/>
+  <circle cx="144" cy="56" r="1.5" fill="#2f1a04"/>
+  <circle cx="225" cy="42" r="1.5" fill="#2f1a04"/>
+</svg>

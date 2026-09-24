@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 40" width="50" height="40">
+  <defs>
+    <linearGradient id="armGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#48dbfb"/>
+      <stop offset="100%" stop-color="#0abde3"/>
+    </linearGradient>
+  </defs>
+  <!-- Arm & Hand with 3 fingers -->
+  <path d="M 6 18
+           C 10 10, 24 6, 36 12
+           C 44 16, 48 24, 46 32
+           C 44 38, 36 40, 28 36
+           C 20 32, 10 32, 6 24 Z"
+        fill="url(#armGrad)" stroke="#0c2461" stroke-width="3" stroke-linejoin="round"/>
+  <!-- Finger creases -->
+  <path d="M 38 22 C 34 26, 36 32, 42 32" stroke="#0086b3" stroke-width="2" stroke-linecap="round"/>
+</svg>

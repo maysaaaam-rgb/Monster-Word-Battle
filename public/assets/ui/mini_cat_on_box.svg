@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" width="160" height="100">
+  <defs>
+    <linearGradient id="crateWood" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e59866"/>
+      <stop offset="60%" stop-color="#c87a27"/>
+      <stop offset="100%" stop-color="#873600"/>
+    </linearGradient>
+    <radialGradient id="catTabby2" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#dcdde1"/>
+      <stop offset="100%" stop-color="#718093"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground Drop Shadow -->
+  <ellipse cx="80" cy="94" rx="55" ry="6" fill="#2c1d0c" opacity="0.3"/>
+
+  <!-- Wooden Crate Body -->
+  <g transform="translate(42, 46)">
+    <rect x="0" y="0" width="76" height="46" rx="3" fill="url(#crateWood)" stroke="#532d04" stroke-width="2.5"/>
+    <line x1="0" y1="15" x2="76" y2="15" stroke="#532d04" stroke-width="1.5"/>
+    <line x1="0" y1="31" x2="76" y2="31" stroke="#532d04" stroke-width="1.5"/>
+    <!-- Diagonal brace -->
+    <line x1="4" y1="4" x2="72" y2="42" stroke="#6e2c00" stroke-width="3"/>
+    <!-- Iron Corner brackets -->
+    <rect x="0" y="0" width="10" height="10" fill="#718093" stroke="#2f3542" stroke-width="1"/>
+    <rect x="66" y="0" width="10" height="10" fill="#718093" stroke="#2f3542" stroke-width="1"/>
+    <rect x="0" y="36" width="10" height="10" fill="#718093" stroke="#2f3542" stroke-width="1"/>
+    <rect x="66" y="36" width="10" height="10" fill="#718093" stroke="#2f3542" stroke-width="1"/>
+  </g>
+
+  <!-- Cat Sitting ON Top of the Crate -->
+  <g transform="translate(80, 26)">
+    <!-- Curled Tail -->
+    <path d="M 18 16 C 28 14, 32 4, 25 0 C 20 -3, 18 3, 20 8" fill="none" stroke="#718093" stroke-width="3.5" stroke-linecap="round"/>
+
+    <!-- Body -->
+    <ellipse cx="0" cy="10" rx="15" ry="12" fill="url(#catTabby2)" stroke="#2f3542" stroke-width="2"/>
+
+    <!-- Paws on top of box -->
+    <ellipse cx="-6" cy="20" rx="4.5" ry="3" fill="#ffffff" stroke="#2f3542" stroke-width="1.5"/>
+    <ellipse cx="6" cy="20" rx="4.5" ry="3" fill="#ffffff" stroke="#2f3542" stroke-width="1.5"/>
+
+    <!-- Ears -->
+    <polygon points="-12,-2 -18,-18 -4,-10" fill="#a4b0be" stroke="#2f3542" stroke-width="1.5"/>
+    <polygon points="-12,-4 -16,-15 -6,-9" fill="#ff6b81"/>
+    <polygon points="12,-2 18,-18 4,-10" fill="#a4b0be" stroke="#2f3542" stroke-width="1.5"/>
+    <polygon points="12,-4 16,-15 6,-9" fill="#ff6b81"/>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="0" rx="16" ry="14" fill="url(#catTabby2)" stroke="#2f3542" stroke-width="2"/>
+
+    <!-- Eyes -->
+    <ellipse cx="-6" cy="-2" rx="4" ry="5" fill="#2ed573" stroke="#2f3542" stroke-width="1.5"/>
+    <circle cx="-6" cy="-2" r="2.5" fill="#000000"/>
+    <circle cx="-7" cy="-4" r="1.2" fill="#ffffff"/>
+
+    <ellipse cx="6" cy="-2" rx="4" ry="5" fill="#2ed573" stroke="#2f3542" stroke-width="1.5"/>
+    <circle cx="6" cy="-2" r="2.5" fill="#000000"/>
+    <circle cx="5" cy="-4" r="1.2" fill="#ffffff"/>
+
+    <!-- Nose & Whiskers -->
+    <polygon points="0,4 -2,2 2,2" fill="#ff4757"/>
+    <line x1="-3" y1="4" x2="-14" y2="3" stroke="#2f3542" stroke-width="1.2"/>
+    <line x1="-3" y1="6" x2="-12" y2="8" stroke="#2f3542" stroke-width="1.2"/>
+    <line x1="3" y1="4" x2="14" y2="3" stroke="#2f3542" stroke-width="1.2"/>
+    <line x1="3" y1="6" x2="12" y2="8" stroke="#2f3542" stroke-width="1.2"/>
+  </g>
+</svg>

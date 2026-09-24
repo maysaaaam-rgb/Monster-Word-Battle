@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 42" width="80" height="42">
+  <defs>
+    <radialGradient id="irisGrad" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#38ada9"/>
+      <stop offset="50%" stop-color="#1e3799"/>
+      <stop offset="100%" stop-color="#0c2461"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Left Eye -->
+  <g transform="translate(18, 21)">
+    <!-- Sclera -->
+    <ellipse cx="0" cy="0" rx="16" ry="19" fill="#ffffff" stroke="#0c2461" stroke-width="3"/>
+    <!-- Iris -->
+    <ellipse cx="1" cy="1" rx="11" ry="14" fill="url(#irisGrad)"/>
+    <!-- Pupil -->
+    <ellipse cx="2" cy="1" rx="7" ry="9" fill="#000000"/>
+    <!-- Gloss Highlights -->
+    <circle cx="-2" cy="-4" r="4.5" fill="#ffffff"/>
+    <circle cx="5" cy="4" r="2.2" fill="#ffffff"/>
+    <ellipse cx="1" cy="7" rx="6" ry="2" fill="#78e08f" opacity="0.6"/>
+  </g>
+
+  <!-- Right Eye -->
+  <g transform="translate(62, 21)">
+    <!-- Sclera -->
+    <ellipse cx="0" cy="0" rx="16" ry="19" fill="#ffffff" stroke="#0c2461" stroke-width="3"/>
+    <!-- Iris -->
+    <ellipse cx="1" cy="1" rx="11" ry="14" fill="url(#irisGrad)"/>
+    <!-- Pupil -->
+    <ellipse cx="2" cy="1" rx="7" ry="9" fill="#000000"/>
+    <!-- Gloss Highlights -->
+    <circle cx="-2" cy="-4" r="4.5" fill="#ffffff"/>
+    <circle cx="5" cy="4" r="2.2" fill="#ffffff"/>
+    <ellipse cx="1" cy="7" rx="6" ry="2" fill="#78e08f" opacity="0.6"/>
+  </g>
+</svg>

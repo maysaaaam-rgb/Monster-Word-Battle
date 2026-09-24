@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 50" width="50" height="50">
+  <defs>
+    <linearGradient id="rockGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#a4b0be"/>
+      <stop offset="45%" stop-color="#718093"/>
+      <stop offset="100%" stop-color="#2f3542"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Faceted Boulder Silhouette -->
+  <polygon points="25,4 42,12 46,32 34,46 16,46 4,32 8,14" fill="url(#rockGrad)" stroke="#1e272e" stroke-width="3" stroke-linejoin="round"/>
+
+  <!-- Interior Chisel Facets -->
+  <line x1="25" y1="4" x2="28" y2="24" stroke="#a4b0be" stroke-width="2"/>
+  <line x1="42" y1="12" x2="28" y2="24" stroke="#a4b0be" stroke-width="1.5"/>
+  <line x1="28" y1="24" x2="34" y2="46" stroke="#1e272e" stroke-width="2"/>
+  <line x1="28" y1="24" x2="4" y2="32" stroke="#1e272e" stroke-width="2"/>
+
+  <!-- Highlight Specks -->
+  <circle cx="20" cy="14" r="2.5" fill="#ffffff" opacity="0.6"/>
+  <circle cx="34" cy="18" r="1.5" fill="#ffffff" opacity="0.6"/>
+</svg>

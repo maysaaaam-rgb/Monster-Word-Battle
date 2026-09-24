@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36">
+  <defs>
+    <radialGradient id="heartGrad" cx="35%" cy="35%" r="65%">
+      <stop offset="0%" stop-color="#ff9ff3"/>
+      <stop offset="60%" stop-color="#ff4757"/>
+      <stop offset="100%" stop-color="#c23616"/>
+    </radialGradient>
+  </defs>
+  <!-- Heart Silhouette -->
+  <path d="M 18 32
+           C 6 22, 0 16, 0 9
+           C 0 4, 4 0, 9 0
+           C 13 0, 16 3, 18 6
+           C 20 3, 23 0, 27 0
+           C 32 0, 36 4, 36 9
+           C 36 16, 30 22, 18 32 Z"
+        fill="url(#heartGrad)" stroke="#ffffff" stroke-width="2"/>
+  <!-- Gloss highlight -->
+  <ellipse cx="9" cy="8" rx="4" ry="2.5" fill="#ffffff" opacity="0.6"/>
+</svg>

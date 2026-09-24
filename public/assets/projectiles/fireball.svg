@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <defs>
+    <radialGradient id="fireCore" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="35%" stop-color="#fff200"/>
+      <stop offset="70%" stop-color="#ff4757"/>
+      <stop offset="100%" stop-color="#c23616" stop-opacity="0.8"/>
+    </radialGradient>
+    <radialGradient id="fireOuterGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ffa502" stop-opacity="0.8"/>
+      <stop offset="60%" stop-color="#ff4757" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#ff4757" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Outer Fire Aura -->
+  <circle cx="30" cy="30" r="28" fill="url(#fireOuterGlow)"/>
+
+  <!-- Flame Tongues -->
+  <g fill="#ff7f50" opacity="0.9">
+    <path d="M 30 4 Q 38 18, 36 28 Q 28 22, 30 4 Z"/>
+    <path d="M 56 30 Q 42 38, 32 36 Q 38 28, 56 30 Z"/>
+    <path d="M 30 56 Q 22 42, 24 32 Q 32 38, 30 56 Z"/>
+    <path d="M 4 30 Q 18 22, 28 24 Q 22 32, 4 30 Z"/>
+    <!-- Diagonal Tongues -->
+    <path d="M 48 12 Q 38 24, 30 26 Q 36 18, 48 12 Z"/>
+    <path d="M 48 48 Q 36 38, 34 30 Q 42 36, 48 48 Z"/>
+    <path d="M 12 48 Q 24 38, 26 30 Q 18 36, 12 48 Z"/>
+    <path d="M 12 12 Q 22 24, 30 24 Q 24 16, 12 12 Z"/>
+  </g>
+
+  <!-- Bright Core Orb -->
+  <circle cx="30" cy="30" r="16" fill="url(#fireCore)" stroke="#fffa65" stroke-width="2"/>
+
+  <!-- Center White Starburst -->
+  <polygon points="30,18 33,27 42,30 33,33 30,42 27,33 18,30 27,27" fill="#ffffff"/>
+</svg>

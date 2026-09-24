@@ -1,0 +1,71 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 220" width="340" height="220">
+  <defs>
+    <linearGradient id="stoneGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#718093"/>
+      <stop offset="50%" stop-color="#4b6584"/>
+      <stop offset="100%" stop-color="#2c3a47"/>
+    </linearGradient>
+    <linearGradient id="cliffGrassGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#7bed9f"/>
+      <stop offset="45%" stop-color="#2ed573"/>
+      <stop offset="100%" stop-color="#1e824c"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Main Stone Cliff Body -->
+  <path d="M 0 32
+           L 320 32
+           C 330 32, 335 42, 330 55
+           L 300 135
+           C 295 150, 310 180, 290 220
+           L 0 220 Z"
+        fill="url(#stoneGrad)" stroke="#1e272e" stroke-width="4.5" stroke-linejoin="round"/>
+
+  <!-- Chiseled Stone Blocks & Cracks -->
+  <path d="M 20 75 L 310 75" stroke="#2c3a47" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 15 130 L 295 130" stroke="#2c3a47" stroke-width="3" stroke-linecap="round"/>
+  <path d="M 10 180 L 285 180" stroke="#2c3a47" stroke-width="3" stroke-linecap="round"/>
+
+  <path d="M 110 32 L 105 75" stroke="#2c3a47" stroke-width="3"/>
+  <path d="M 220 32 L 225 75" stroke="#2c3a47" stroke-width="3"/>
+  <path d="M 60 75 L 65 130" stroke="#2c3a47" stroke-width="3"/>
+  <path d="M 180 75 L 175 130" stroke="#2c3a47" stroke-width="3"/>
+  <path d="M 130 130 L 135 180" stroke="#2c3a47" stroke-width="3"/>
+
+  <!-- Jagged Rock Highlight Lines -->
+  <path d="M 22 72 L 100 72" stroke="#a4b0be" stroke-width="2"/>
+  <path d="M 115 72 L 215 72" stroke="#a4b0be" stroke-width="2"/>
+  <path d="M 68 127 L 172 127" stroke="#a4b0be" stroke-width="2"/>
+
+  <!-- Lush Overhanging Grass Layer -->
+  <path d="M -5 20
+           C 40 18, 90 20, 140 18
+           C 200 16, 260 20, 325 18
+           C 338 18, 342 28, 335 38
+           C 328 48, 310 44, 298 52
+           C 285 62, 275 42, 255 52
+           C 235 62, 225 40, 205 50
+           C 185 60, 170 42, 150 52
+           C 130 62, 115 42, 95 52
+           C 75 62, 60 40, 40 50
+           C 20 60, 10 42, -5 50 Z"
+        fill="url(#cliffGrassGrad)" stroke="#10ac84" stroke-width="3.5" stroke-linejoin="round"/>
+
+  <!-- Wildflowers & Berries on Grass -->
+  <g transform="translate(45, 16)">
+    <circle cx="0" cy="0" r="4.5" fill="#ff4757"/>
+    <circle cx="0" cy="0" r="2" fill="#fed330"/>
+  </g>
+  <g transform="translate(110, 14)">
+    <circle cx="0" cy="0" r="4.5" fill="#feca57"/>
+    <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+  </g>
+  <g transform="translate(185, 16)">
+    <circle cx="0" cy="0" r="4.5" fill="#ff6b81"/>
+    <circle cx="0" cy="0" r="2" fill="#fed330"/>
+  </g>
+  <g transform="translate(265, 14)">
+    <circle cx="0" cy="0" r="4.5" fill="#54a0ff"/>
+    <circle cx="0" cy="0" r="2" fill="#ffffff"/>
+  </g>
+</svg>

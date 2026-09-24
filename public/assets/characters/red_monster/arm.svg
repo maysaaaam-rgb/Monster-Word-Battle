@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 40" width="50" height="40">
+  <defs>
+    <linearGradient id="redArmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ff6b6b"/>
+      <stop offset="100%" stop-color="#ee5253"/>
+    </linearGradient>
+  </defs>
+  <path d="M 6 18
+           C 10 10, 24 6, 36 12
+           C 44 16, 48 24, 46 32
+           C 44 38, 36 40, 28 36
+           C 20 32, 10 32, 6 24 Z"
+        fill="url(#redArmGrad)" stroke="#5c1919" stroke-width="3" stroke-linejoin="round"/>
+</svg>

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="rockCardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#a4b0be"/>
+      <stop offset="60%" stop-color="#57606f"/>
+      <stop offset="100%" stop-color="#2f3542"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="10" fill="url(#rockCardBg)" stroke="#feca57" stroke-width="2.5"/>
+  <path d="M 6 6 L 42 6 C 36 14, 12 14, 6 6 Z" fill="#ffffff" opacity="0.35"/>
+  <!-- Rock Icon -->
+  <polygon points="24,14 34,18 36,28 28,34 18,34 12,26 16,18" fill="#dfe4ea" stroke="#2f3542" stroke-width="1.5"/>
+</svg>

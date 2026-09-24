@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 42" width="80" height="42">
+  <!-- Left Dizzy Eye -->
+  <g transform="translate(18, 21)">
+    <circle cx="0" cy="0" rx="14" ry="14" fill="#ffffff" stroke="#0c2461" stroke-width="3"/>
+    <path d="M -8 -8 L 8 8 M 8 -8 L -8 8" stroke="#eb3b5a" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+  <!-- Right Dizzy Eye -->
+  <g transform="translate(62, 21)">
+    <circle cx="0" cy="0" rx="14" ry="14" fill="#ffffff" stroke="#0c2461" stroke-width="3"/>
+    <path d="M -8 -8 L 8 8 M 8 -8 L -8 8" stroke="#eb3b5a" stroke-width="4.5" stroke-linecap="round"/>
+  </g>
+</svg>

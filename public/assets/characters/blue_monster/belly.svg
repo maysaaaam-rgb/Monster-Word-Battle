@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 70" width="80" height="70">
+  <defs>
+    <radialGradient id="bellyGrad" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#7bed9f"/>
+      <stop offset="70%" stop-color="#2ed573"/>
+      <stop offset="100%" stop-color="#1e90ff"/>
+    </radialGradient>
+  </defs>
+  <!-- Fluffy Belly Patch -->
+  <path d="M 40 4
+           C 62 4, 76 22, 76 42
+           C 76 60, 58 68, 40 68
+           C 22 68, 4 60, 4 42
+           C 4 22, 18 4, 40 4 Z"
+        fill="url(#bellyGrad)" stroke="#10ac84" stroke-width="2.5" opacity="0.95"/>
+  <!-- Belly Rim Highlight -->
+  <path d="M 20 22 C 32 10, 48 10, 60 22 C 48 14, 32 14, 20 22 Z" fill="#ffffff" opacity="0.4"/>
+</svg>

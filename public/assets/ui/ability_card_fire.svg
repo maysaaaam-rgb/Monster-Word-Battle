@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="48" height="48">
+  <defs>
+    <linearGradient id="fireCardBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff7675"/>
+      <stop offset="60%" stop-color="#d63031"/>
+      <stop offset="100%" stop-color="#781010"/>
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="44" height="44" rx="10" fill="url(#fireCardBg)" stroke="#feca57" stroke-width="2.5"/>
+  <!-- Specular -->
+  <path d="M 6 6 L 42 6 C 36 14, 12 14, 6 6 Z" fill="#ffffff" opacity="0.35"/>
+  <!-- Flame Icon -->
+  <path d="M 24 10 C 26 18, 34 20, 32 30 C 30 38, 18 38, 16 30 C 14 24, 20 20, 24 10 Z" fill="#feca57" stroke="#fffa65" stroke-width="1.5"/>
+  <path d="M 24 22 C 26 26, 30 28, 28 32 C 26 36, 22 36, 20 32 C 19 29, 22 26, 24 22 Z" fill="#ffffff"/>
+</svg>

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 180" width="1280" height="180">
+  <defs>
+    <linearGradient id="riverBaseGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#00a8ff"/>
+      <stop offset="30%" stop-color="#0984e3"/>
+      <stop offset="70%" stop-color="#192a56"/>
+      <stop offset="100%" stop-color="#0c2461"/>
+    </linearGradient>
+    <linearGradient id="foamGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#70a1ff" stop-opacity="0.2"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Deep River Bed Base -->
+  <rect x="0" y="0" width="1280" height="180" fill="url(#riverBaseGrad)"/>
+
+  <!-- Flowing Stylized Wave Crests -->
+  <path d="M 0 15
+           Q 60 5, 120 15 T 240 15 T 360 15 T 480 15 T 600 15
+           T 720 15 T 840 15 T 960 15 T 1080 15 T 1200 15 T 1280 15
+           L 1280 32 L 0 32 Z"
+        fill="url(#foamGrad)"/>
+
+  <!-- Mid-depth shimmering caustics -->
+  <path d="M 0 55
+           C 100 45, 180 65, 280 55
+           C 380 45, 460 65, 560 55
+           C 660 45, 740 65, 840 55
+           C 940 45, 1020 65, 1120 55
+           C 1200 45, 1250 60, 1280 55"
+        stroke="#54a0ff" stroke-width="3" fill="none" opacity="0.45"/>
+
+  <path d="M 0 95
+           C 120 85, 220 105, 340 95
+           C 460 85, 560 105, 680 95
+           C 800 85, 900 105, 1020 95
+           C 1140 85, 1220 100, 1280 95"
+        stroke="#48dbfb" stroke-width="2.5" fill="none" opacity="0.35"/>
+</svg>

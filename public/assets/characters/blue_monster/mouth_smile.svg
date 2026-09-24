@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 50 30" width="50" height="30">
+  <!-- Joyful smiling open mouth with pink tongue -->
+  <path d="M 6 8 C 14 26, 36 26, 44 8 C 30 14, 20 14, 6 8 Z" fill="#b71540" stroke="#0c2461" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Cute little teeth -->
+  <path d="M 18 10 L 22 14 L 26 10 Z" fill="#ffffff"/>
+  <!-- Pink Tongue -->
+  <path d="M 16 18 C 22 14, 28 14, 34 18 C 32 23, 18 23, 16 18 Z" fill="#ff6b81"/>
+</svg>

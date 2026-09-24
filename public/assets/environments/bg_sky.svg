@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <defs>
+    <linearGradient id="skyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#48dbfb"/>
+      <stop offset="45%" stop-color="#70a1ff"/>
+      <stop offset="80%" stop-color="#ffeaa7"/>
+      <stop offset="100%" stop-color="#fab1a0"/>
+    </linearGradient>
+    <radialGradient id="sunGlow" cx="50%" cy="20%" r="50%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="1"/>
+      <stop offset="25%" stop-color="#fff9d2" stop-opacity="0.9"/>
+      <stop offset="55%" stop-color="#fffa65" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#fffa65" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Sky Base -->
+  <rect x="0" y="0" width="1280" height="720" fill="url(#skyGrad)"/>
+
+  <!-- Radiant Sun Glow & Beams -->
+  <circle cx="640" cy="120" r="260" fill="url(#sunGlow)"/>
+  <circle cx="640" cy="120" r="65" fill="#fff9d2"/>
+  <circle cx="640" cy="120" r="50" fill="#ffffff"/>
+
+  <!-- Distant atmospheric haze band -->
+  <rect x="0" y="420" width="1280" height="150" fill="#ffffff" opacity="0.18"/>
+</svg>

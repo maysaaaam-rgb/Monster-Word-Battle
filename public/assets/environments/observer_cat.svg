@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" width="60" height="60">
+  <defs>
+    <radialGradient id="catBodyGrad" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#f1f2f6"/>
+      <stop offset="60%" stop-color="#ced6e0"/>
+      <stop offset="100%" stop-color="#a4b0be"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Curled Tail -->
+  <path d="M 45 48 C 55 46, 58 35, 52 30 C 48 26, 45 32, 46 36 C 47 40, 42 45, 36 46" fill="none" stroke="#747d8c" stroke-width="4.5" stroke-linecap="round"/>
+
+  <!-- Body -->
+  <ellipse cx="30" cy="42" rx="16" ry="14" fill="url(#catBodyGrad)" stroke="#2f3542" stroke-width="2.5"/>
+
+  <!-- Paws resting in front -->
+  <ellipse cx="23" cy="52" rx="5" ry="3.5" fill="#f1f2f6" stroke="#2f3542" stroke-width="1.5"/>
+  <ellipse cx="37" cy="52" rx="5" ry="3.5" fill="#f1f2f6" stroke="#2f3542" stroke-width="1.5"/>
+
+  <!-- Pointy Ears with Pink Inner -->
+  <polygon points="18,22 10,6 26,14" fill="#ced6e0" stroke="#2f3542" stroke-width="2" stroke-linejoin="round"/>
+  <polygon points="18,20 13,9 23,15" fill="#ff6b81"/>
+
+  <polygon points="42,22 50,6 34,14" fill="#ced6e0" stroke="#2f3542" stroke-width="2" stroke-linejoin="round"/>
+  <polygon points="42,20 47,9 37,15" fill="#ff6b81"/>
+
+  <!-- Head -->
+  <circle cx="30" cy="24" r="16" fill="url(#catBodyGrad)" stroke="#2f3542" stroke-width="2.5"/>
+
+  <!-- Eyes with Highlights -->
+  <ellipse cx="23" cy="22" rx="4.5" ry="5.5" fill="#2ed573" stroke="#2f3542" stroke-width="1.5"/>
+  <circle cx="23" cy="22" r="3" fill="#000000"/>
+  <circle cx="22" cy="20" r="1.5" fill="#ffffff"/>
+
+  <ellipse cx="37" cy="22" rx="4.5" ry="5.5" fill="#2ed573" stroke="#2f3542" stroke-width="1.5"/>
+  <circle cx="37" cy="22" r="3" fill="#000000"/>
+  <circle cx="36" cy="20" r="1.5" fill="#ffffff"/>
+
+  <!-- Pink Nose & Whiskers -->
+  <polygon points="30,28 28,26 32,26" fill="#ff4757"/>
+  <line x1="26" y1="28" x2="12" y2="27" stroke="#2f3542" stroke-width="1.5"/>
+  <line x1="26" y1="30" x2="14" y2="32" stroke="#2f3542" stroke-width="1.5"/>
+  <line x1="34" y1="28" x2="48" y2="27" stroke="#2f3542" stroke-width="1.5"/>
+  <line x1="34" y1="30" x2="46" y2="32" stroke="#2f3542" stroke-width="1.5"/>
+</svg>

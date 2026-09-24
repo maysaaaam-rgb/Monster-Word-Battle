@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 36 36" width="36" height="36">
+  <defs>
+    <radialGradient id="checkGrad" cx="40%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#2ed573"/>
+      <stop offset="70%" stop-color="#10ac84"/>
+      <stop offset="100%" stop-color="#006266"/>
+    </radialGradient>
+  </defs>
+  <!-- Drop Shadow -->
+  <circle cx="18" cy="19" r="16" fill="#0c1829" opacity="0.4"/>
+  <!-- Circle Badge -->
+  <circle cx="18" cy="18" r="16" fill="url(#checkGrad)" stroke="#ffffff" stroke-width="2.5"/>
+  <!-- White Tick -->
+  <path d="M 10 18 L 16 24 L 26 12" fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

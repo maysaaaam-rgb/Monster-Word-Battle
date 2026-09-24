@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 70" width="80" height="70">
+  <defs>
+    <radialGradient id="redBellyGrad" cx="50%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#fffa65"/>
+      <stop offset="70%" stop-color="#feca57"/>
+      <stop offset="100%" stop-color="#ff9f43"/>
+    </radialGradient>
+  </defs>
+  <path d="M 40 4
+           C 62 4, 76 22, 76 42
+           C 76 60, 58 68, 40 68
+           C 22 68, 4 60, 4 42
+           C 4 22, 18 4, 40 4 Z"
+        fill="url(#redBellyGrad)" stroke="#e67e22" stroke-width="2.5" opacity="0.95"/>
+  <!-- Belly highlight -->
+  <path d="M 22 22 C 34 10, 48 10, 58 22 C 48 14, 34 14, 22 22 Z" fill="#ffffff" opacity="0.45"/>
+</svg>

@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 100" width="160" height="100">
+  <defs>
+    <linearGradient id="boxTiltWood" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e59866"/>
+      <stop offset="60%" stop-color="#c87a27"/>
+      <stop offset="100%" stop-color="#873600"/>
+    </linearGradient>
+    <radialGradient id="catTabby3" cx="50%" cy="40%" r="50%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="60%" stop-color="#dcdde1"/>
+      <stop offset="100%" stop-color="#718093"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground Drop Shadow -->
+  <ellipse cx="80" cy="92" rx="60" ry="7" fill="#2c1d0c" opacity="0.3"/>
+
+  <!-- Shadow Under the Tilted Box where Cat Hides -->
+  <polygon points="40,90 125,90 120,40 50,60" fill="#2c1d0c" opacity="0.45"/>
+
+  <!-- Cat Tucked UNDER the Box -->
+  <g transform="translate(75, 70)">
+    <!-- Ears -->
+    <polygon points="-12,-2 -18,-16 -4,-10" fill="#a4b0be" stroke="#2f3542" stroke-width="1.5"/>
+    <polygon points="-12,-4 -16,-13 -6,-9" fill="#ff6b81"/>
+    <polygon points="12,-2 18,-16 4,-10" fill="#a4b0be" stroke="#2f3542" stroke-width="1.5"/>
+    <polygon points="12,-4 16,-13 6,-9" fill="#ff6b81"/>
+
+    <!-- Head -->
+    <ellipse cx="0" cy="0" rx="16" ry="14" fill="url(#catTabby3)" stroke="#2f3542" stroke-width="2"/>
+
+    <!-- Large Inquisitive Glowing Eyes -->
+    <ellipse cx="-6" cy="-2" rx="5" ry="6" fill="#2ed573" stroke="#2f3542" stroke-width="1.5"/>
+    <circle cx="-6" cy="-2" r="3" fill="#000000"/>
+    <circle cx="-7" cy="-4" r="1.5" fill="#ffffff"/>
+
+    <ellipse cx="6" cy="-2" rx="5" ry="6" fill="#2ed573" stroke="#2f3542" stroke-width="1.5"/>
+    <circle cx="6" cy="-2" r="3" fill="#000000"/>
+    <circle cx="5" cy="-4" r="1.5" fill="#ffffff"/>
+
+    <!-- Nose & Whiskers -->
+    <polygon points="0,4 -2,2 2,2" fill="#ff4757"/>
+    <line x1="-3" y1="4" x2="-14" y2="3" stroke="#2f3542" stroke-width="1.2"/>
+    <line x1="3" y1="4" x2="14" y2="3" stroke="#2f3542" stroke-width="1.2"/>
+
+    <!-- Paws on Ground -->
+    <ellipse cx="-8" cy="14" rx="4.5" ry="3" fill="#ffffff" stroke="#2f3542" stroke-width="1.5"/>
+    <ellipse cx="8" cy="14" rx="4.5" ry="3" fill="#ffffff" stroke="#2f3542" stroke-width="1.5"/>
+  </g>
+
+  <!-- Propping Wooden Stick on Left -->
+  <line x1="42" y1="42" x2="38" y2="90" stroke="#532d04" stroke-width="4" stroke-linecap="round"/>
+
+  <!-- Tilted Wooden Box Covering Cat -->
+  <g transform="rotate(-18 80 50)">
+    <rect x="42" y="24" width="76" height="46" rx="3" fill="url(#boxTiltWood)" stroke="#532d04" stroke-width="2.5"/>
+    <line x1="42" y1="39" x2="118" y2="39" stroke="#532d04" stroke-width="1.5"/>
+    <line x1="42" y1="55" x2="118" y2="55" stroke="#532d04" stroke-width="1.5"/>
+    <line x1="46" y1="28" x2="114" y2="66" stroke="#6e2c00" stroke-width="3"/>
+  </g>
+</svg>

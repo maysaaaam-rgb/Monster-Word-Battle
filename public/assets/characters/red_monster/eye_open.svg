@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 42" width="80" height="42">
+  <defs>
+    <radialGradient id="redIrisGrad" cx="45%" cy="40%" r="55%">
+      <stop offset="0%" stop-color="#fffa65"/>
+      <stop offset="55%" stop-color="#e67e22"/>
+      <stop offset="100%" stop-color="#841515"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Left Eye -->
+  <g transform="translate(18, 21)">
+    <ellipse cx="0" cy="0" rx="16" ry="19" fill="#ffffff" stroke="#5c1919" stroke-width="3"/>
+    <ellipse cx="1" cy="1" rx="11" ry="14" fill="url(#redIrisGrad)"/>
+    <ellipse cx="2" cy="1" rx="7" ry="9" fill="#000000"/>
+    <circle cx="-2" cy="-4" r="4.5" fill="#ffffff"/>
+    <circle cx="5" cy="4" r="2.2" fill="#ffffff"/>
+  </g>
+
+  <!-- Right Eye -->
+  <g transform="translate(62, 21)">
+    <ellipse cx="0" cy="0" rx="16" ry="19" fill="#ffffff" stroke="#5c1919" stroke-width="3"/>
+    <ellipse cx="1" cy="1" rx="11" ry="14" fill="url(#redIrisGrad)"/>
+    <ellipse cx="2" cy="1" rx="7" ry="9" fill="#000000"/>
+    <circle cx="-2" cy="-4" r="4.5" fill="#ffffff"/>
+    <circle cx="5" cy="4" r="2.2" fill="#ffffff"/>
+  </g>
+</svg>

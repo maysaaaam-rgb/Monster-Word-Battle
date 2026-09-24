@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 70" width="70" height="70">
+  <defs>
+    <linearGradient id="crateBaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e19747"/>
+      <stop offset="60%" stop-color="#c87a27"/>
+      <stop offset="100%" stop-color="#8e4c0d"/>
+    </linearGradient>
+    <linearGradient id="ironGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#718093"/>
+      <stop offset="100%" stop-color="#2f3640"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Drop Shadow -->
+  <rect x="3" y="5" width="64" height="64" rx="4" fill="#1e1305" opacity="0.35"/>
+
+  <!-- Main Crate Body -->
+  <rect x="2" y="2" width="66" height="66" rx="4" fill="url(#crateBaseGrad)" stroke="#532d04" stroke-width="3"/>
+
+  <!-- Planks Inner Panel -->
+  <rect x="8" y="8" width="54" height="54" rx="2" fill="#d98632" stroke="#532d04" stroke-width="2"/>
+  <line x1="8" y1="26" x2="62" y2="26" stroke="#532d04" stroke-width="2"/>
+  <line x1="8" y1="44" x2="62" y2="44" stroke="#532d04" stroke-width="2"/>
+
+  <!-- Diagonal Braces -->
+  <line x1="10" y1="10" x2="60" y2="60" stroke="#7e4307" stroke-width="4.5"/>
+  <line x1="10" y1="10" x2="60" y2="60" stroke="#ffa502" stroke-width="1.5"/>
+
+  <!-- Iron Corner Brackets -->
+  <polygon points="2,2 14,2 14,8 8,8 8,14 2,14" fill="url(#ironGrad)" stroke="#1e272e" stroke-width="1"/>
+  <circle cx="6" cy="6" r="1.5" fill="#f1f2f6"/>
+
+  <polygon points="68,2 56,2 56,8 62,8 62,14 68,14" fill="url(#ironGrad)" stroke="#1e272e" stroke-width="1"/>
+  <circle cx="64" cy="6" r="1.5" fill="#f1f2f6"/>
+
+  <polygon points="2,68 14,68 14,62 8,62 8,56 2,56" fill="url(#ironGrad)" stroke="#1e272e" stroke-width="1"/>
+  <circle cx="6" cy="64" r="1.5" fill="#f1f2f6"/>
+
+  <polygon points="68,68 56,68 56,62 62,62 62,56 68,56" fill="url(#ironGrad)" stroke="#1e272e" stroke-width="1"/>
+  <circle cx="64" cy="64" r="1.5" fill="#f1f2f6"/>
+</svg>

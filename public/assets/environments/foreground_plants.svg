@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 80" width="1280" height="80">
+  <defs>
+    <linearGradient id="foreGrassGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#006266"/>
+      <stop offset="50%" stop-color="#10ac84"/>
+      <stop offset="100%" stop-color="#2ed573"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Grass Blades Clumps -->
+  <g fill="url(#foreGrassGrad)" opacity="0.95">
+    <!-- Left clump -->
+    <path d="M 0 80 Q 20 20, 35 10 Q 30 35, 45 80 Z"/>
+    <path d="M 30 80 Q 55 15, 70 5 Q 65 30, 80 80 Z"/>
+    <path d="M 65 80 Q 95 25, 110 15 Q 105 45, 120 80 Z"/>
+    <path d="M 105 80 Q 140 30, 160 20 Q 150 50, 175 80 Z"/>
+
+    <!-- Mid clump 1 -->
+    <path d="M 320 80 Q 345 20, 360 8 Q 355 35, 375 80 Z"/>
+    <path d="M 360 80 Q 390 15, 410 5 Q 400 40, 420 80 Z"/>
+
+    <!-- Center Bridge area clump -->
+    <path d="M 580 80 Q 610 25, 625 15 Q 620 45, 640 80 Z"/>
+    <path d="M 630 80 Q 660 20, 680 10 Q 670 45, 695 80 Z"/>
+
+    <!-- Mid clump 2 -->
+    <path d="M 880 80 Q 905 18, 925 8 Q 920 38, 940 80 Z"/>
+    <path d="M 925 80 Q 955 15, 975 6 Q 965 40, 990 80 Z"/>
+
+    <!-- Right clump -->
+    <path d="M 1120 80 Q 1150 25, 1170 12 Q 1160 45, 1185 80 Z"/>
+    <path d="M 1170 80 Q 1205 15, 1225 5 Q 1215 35, 1240 80 Z"/>
+    <path d="M 1220 80 Q 1250 20, 1270 10 Q 1260 45, 1280 80 Z"/>
+  </g>
+
+  <!-- Foreground Wildflowers -->
+  <g transform="translate(60, 45)">
+    <circle cx="0" cy="0" r="5" fill="#ff4757"/>
+    <circle cx="0" cy="0" r="2.2" fill="#fed330"/>
+  </g>
+  <g transform="translate(390, 40)">
+    <circle cx="0" cy="0" r="5" fill="#feca57"/>
+    <circle cx="0" cy="0" r="2.2" fill="#ffffff"/>
+  </g>
+  <g transform="translate(660, 48)">
+    <circle cx="0" cy="0" r="5" fill="#ff6b81"/>
+    <circle cx="0" cy="0" r="2.2" fill="#fed330"/>
+  </g>
+  <g transform="translate(950, 42)">
+    <circle cx="0" cy="0" r="5" fill="#54a0ff"/>
+    <circle cx="0" cy="0" r="2.2" fill="#ffffff"/>
+  </g>
+  <g transform="translate(1200, 45)">
+    <circle cx="0" cy="0" r="5" fill="#ff4757"/>
+    <circle cx="0" cy="0" r="2.2" fill="#fed330"/>
+  </g>
+</svg>

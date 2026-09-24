@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 24" width="200" height="24">
+  <defs>
+    <linearGradient id="frameGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#57606f"/>
+      <stop offset="100%" stop-color="#2f3542"/>
+    </linearGradient>
+  </defs>
+  <!-- Frame Background -->
+  <rect x="1" y="1" width="198" height="22" rx="11" fill="url(#frameGrad)" stroke="#1e272e" stroke-width="2"/>
+  <!-- Inner Track -->
+  <rect x="4" y="4" width="192" height="16" rx="8" fill="#131e3a"/>
+  <!-- Subtle Top Specular Shine -->
+  <line x1="12" y1="4" x2="188" y2="4" stroke="#ffffff" stroke-width="1.5" opacity="0.4"/>
+</svg>
