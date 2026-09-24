@@ -16,8 +16,8 @@ export default class QuestionModal {
     this.container = scene.add.container(0, 0).setDepth(40);
     this.container.setVisible(false);
 
-    // 1. Interactive Input Blocker (Dims slightly to keep battlefield visible behind it)
-    this.blocker = scene.add.rectangle(0, 0, 1280, 720, 0x050f1e, 0.28)
+    // 1. Interactive Input Blocker (Dims subtly at 0.15 to keep full battlefield clearly visible)
+    this.blocker = scene.add.rectangle(0, 0, 1280, 720, 0x050f1e, 0.15)
       .setOrigin(0, 0)
       .setInteractive();
 
@@ -27,54 +27,54 @@ export default class QuestionModal {
     });
     this.container.add(this.blocker);
 
-    // 2. Floating Plaque Box (Upper center at x: 640, y: 195)
-    this.modalBox = scene.add.container(640, 195);
+    // 2. Floating Plaque Box (Upper center at x: 640, y: 125)
+    this.modalBox = scene.add.container(640, 125);
     this.container.add(this.modalBox);
 
     this.createEventFrame();
   }
 
   createEventFrame() {
-    // Ornate Wooden Plaque Frame
-    if (this.scene.textures.exists('challenge_scroll')) {
-      this.scrollFrame = this.scene.add.image(0, 0, 'challenge_scroll').setOrigin(0.5, 0.5);
-      this.modalBox.add(this.scrollFrame);
-    }
+    // Compact Header Banner Pill
+    this.bannerBg = this.scene.add.graphics();
+    this.bannerBg.fillStyle(0x131e3a, 0.94);
+    this.bannerBg.fillRoundedRect(-220, -68, 440, 36, 12);
+    this.bannerBg.lineStyle(2, 0xf39c12, 1);
+    this.bannerBg.strokeRoundedRect(-220, -68, 440, 36, 12);
+    this.modalBox.add(this.bannerBg);
 
     // Question Prompt Text in Plaque Banner Ribbon
-    this.promptText = this.scene.add.text(0, -96, 'Where is the cat?', {
+    this.promptText = this.scene.add.text(0, -50, '🎯 Where is the cat?', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '22px',
+      fontSize: '16px',
       fontStyle: '900',
-      color: '#3d2005'
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 3
     }).setOrigin(0.5);
     this.modalBox.add(this.promptText);
 
     // Container for Answer Cards
-    this.cardsContainer = this.scene.add.container(0, 14);
+    this.cardsContainer = this.scene.add.container(0, 8);
     this.modalBox.add(this.cardsContainer);
 
-    // Debug Indicator Text below the cards
-    this.debugIndicator = this.scene.add.text(0, 96, 'ANSWER CLICKED: NONE', {
+    // Debug Indicator Text below the cards (Hidden from view to keep canvas pristine)
+    this.debugIndicator = this.scene.add.text(0, 68, 'ANSWER CLICKED: NONE', {
       fontFamily: 'monospace, system-ui, sans-serif',
-      fontSize: '14px',
+      fontSize: '12px',
       fontStyle: '900',
-      color: '#feca57',
-      stroke: '#000000',
-      strokeThickness: 3,
-      backgroundColor: '#1e272edd',
-      padding: { x: 10, y: 3 }
-    }).setOrigin(0.5);
+      color: '#feca57'
+    }).setOrigin(0.5).setVisible(false);
     this.modalBox.add(this.debugIndicator);
 
-    // Status / Feedback Banner below debug indicator
-    this.feedbackBanner = this.scene.add.container(0, 134);
+    // Status / Feedback Banner below cards
+    this.feedbackBanner = this.scene.add.container(0, 68);
     this.feedbackBg = this.scene.add.graphics();
     this.feedbackBanner.add(this.feedbackBg);
 
     this.feedbackText = this.scene.add.text(0, 0, '', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '17px',
+      fontSize: '14px',
       fontStyle: '900',
       color: '#ffffff'
     }).setOrigin(0.5);
@@ -93,14 +93,14 @@ export default class QuestionModal {
     // Reset debug indicator to initial state
     this.debugIndicator.setText('ANSWER CLICKED: NONE');
 
-    this.promptText.setText(question.prompt);
+    this.promptText.setText(`🎯 ${question.prompt}`);
     this.cardsContainer.removeAll(true);
     this.cards = [];
 
     const choices = question.choices || [];
-    const cardW = 160;
-    const cardH = 142;
-    const spacing = 175;
+    const cardW = 105;
+    const cardH = 92;
+    const spacing = 118;
     const startX = -spacing;
 
     choices.forEach((choice, i) => {
@@ -124,7 +124,7 @@ export default class QuestionModal {
     this.container.setVisible(true);
     this.modalBox.setScale(0.7);
     this.modalBox.setAlpha(0);
-    this.modalBox.y = 195;
+    this.modalBox.y = 125;
 
     this.scene.tweens.add({
       targets: this.modalBox,
@@ -205,7 +205,7 @@ export default class QuestionModal {
         ease: 'Cubic.easeIn',
         onComplete: () => {
           this.container.setVisible(false);
-          this.modalBox.y = 195;
+          this.modalBox.y = 125;
           this.modalBox.setAlpha(1);
           this.isLocked = false;
           this.isCorrectRewardPending = false;

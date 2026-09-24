@@ -423,13 +423,13 @@ export default class GameScene extends Phaser.Scene {
         const gravity = PHYSICS.gravity;
         const windAcc = this.windSystem.getAcceleration();
 
-        // Calculate accurate ballistic trajectory toward Player 1 at (180, 485)
-        // dx = -860, dy = 0.
-        // At angle 55° (125° towards left): speed ~ 640 px/s
+        // Calculate accurate ballistic trajectory toward Player 1 at (180, 500)
+        // dx = -920, dy = 0.
+        // At angle 55° (125° towards left): speed ~ 685 px/s
         const angleRad = Phaser.Math.DegToRad(125);
-        const baseSpeed = 640;
-        // Minor human-like variance (-20 to +20)
-        const variance = Phaser.Math.Between(-18, 18);
+        const baseSpeed = 685;
+        // Minor human-like variance (-15 to +15)
+        const variance = Phaser.Math.Between(-15, 15);
         const speed = baseSpeed + variance - (windAcc * 0.35);
 
         const vx = Math.cos(angleRad) * speed;
@@ -492,28 +492,25 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // ==========================================
-  // MULTI-LAYER PARALLAX BRIGHT ENVIRONMENT
+  // CLEAN CLASSIC ARCADE ENVIRONMENT
   // ==========================================
   createLivingEnvironment(width, height) {
-    // Layer 0: Sky with Warm Sun
+    // Layer 0: Sky with Warm Sunlight
     this.sky = this.add.image(width / 2, height / 2, 'bg_sky_bright').setDepth(0);
 
-    // Layer 1: Mountains
-    this.mountains = this.add.image(width / 2, 380, 'bg_mountains_bright').setDepth(1);
+    // Layer 1: Simple Distant Rolling Green Hills
+    this.hills = this.add.image(width / 2, 450, 'bg_hills_bright').setDepth(1).setAlpha(0.85);
 
-    // Layer 2: Rolling Hills & Cottages
-    this.hills = this.add.image(width / 2, 440, 'bg_hills_bright').setDepth(2);
-
-    // Drifting Fluffy Clouds
+    // Layer 2: 3 Soft Drifting Clouds (Massive open sky above)
     this.clouds = [];
     const cloudConfigs = [
-      { x: 180, y: 80, scale: 1.1, speed: 10 },
-      { x: 620, y: 65, scale: 0.85, speed: 8 },
-      { x: 1040, y: 95, scale: 1.25, speed: 12 }
+      { x: 180, y: 75, scale: 1.1, speed: 10 },
+      { x: 640, y: 60, scale: 0.85, speed: 8 },
+      { x: 1080, y: 90, scale: 1.25, speed: 12 }
     ];
     cloudConfigs.forEach(c => {
       const cloudGfx = this.add.graphics().setDepth(2);
-      cloudGfx.fillStyle(0xffffff, 0.9);
+      cloudGfx.fillStyle(0xffffff, 0.88);
       cloudGfx.fillCircle(0, 0, 30 * c.scale);
       cloudGfx.fillCircle(-25 * c.scale, 6 * c.scale, 22 * c.scale);
       cloudGfx.fillCircle(25 * c.scale, 6 * c.scale, 22 * c.scale);
@@ -524,117 +521,102 @@ export default class GameScene extends Phaser.Scene {
       this.clouds.push(cloudGfx);
     });
 
-    // Soaring Bird
-    this.bird = this.add.image(200, 140, 'bird').setDepth(3).setScale(0.9);
-    this.tweens.add({
-      targets: this.bird,
-      x: 1350,
-      y: 110,
-      duration: 18000,
-      repeat: -1,
-      onRepeat: () => {
-        this.bird.x = -60;
-        this.bird.y = Phaser.Math.Between(100, 180);
-      }
-    });
-
-    // Layer 3: Center River Canyon & Water
-    const riverBed = this.add.graphics().setDepth(3);
-    riverBed.fillStyle(0x0284c7, 1);
-    riverBed.fillRect(0, 560, width, height - 560);
-
-    this.riverWater = this.add.image(width / 2, 650, 'river_water').setDepth(3);
-    this.waveRipples = this.add.graphics().setDepth(3);
-
-    // Layer 4: Central Tactical Obstacle
-    this.centerRock = this.add.image(640, 520, 'terrain_center_rock').setDepth(4).setScale(1.1);
-
-    const crate1 = this.add.image(490, 545, 'wooden_crate').setDepth(4).setScale(0.75);
-    const crate2 = this.add.image(790, 545, 'wooden_crate').setDepth(4).setScale(0.75);
-
-    const bridge = this.add.image(640, 545, 'rope_bridge').setDepth(4).setScale(1.05);
-
-    // Observer Kitten
-    this.observerCat = this.add.image(725, 455, 'observer_cat').setDepth(5).setScale(0.75);
-    this.tweens.add({
-      targets: this.observerCat,
-      y: 452,
-      scaleY: 0.77,
-      duration: 1100,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
-
-    // Layer 5: Left & Right Elevated Cliff Platforms
-    const cliffL = this.add.image(180, 600, 'cliff_left').setDepth(5);
-    const cliffR = this.add.image(1100, 600, 'cliff_right').setDepth(5);
-
-    // Butterflies
-    this.createButterflies();
-
-    // Foreground Foliage
-    this.forePlants = this.add.image(width / 2, 705, 'foreground_plants').setDepth(19);
-
-    // Ambient Sparkles
-    this.createAmbientSparkles(width, height);
-  }
-
-  createButterflies() {
-    this.butterflies = [];
-    const positions = [
-      { x: 330, y: 500, dur: 3200 },
-      { x: 960, y: 510, dur: 3800 }
-    ];
-
-    positions.forEach(pos => {
-      const b = this.add.image(pos.x, pos.y, 'butterfly').setDepth(6).setScale(0.85);
-
-      this.tweens.add({
-        targets: b,
-        scaleX: 0.45,
-        duration: 180,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Linear'
-      });
-
-      this.tweens.add({
-        targets: b,
-        x: pos.x + 40,
-        y: pos.y - 30,
-        duration: pos.dur,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut'
-      });
-
-      this.butterflies.push(b);
-    });
-  }
-
-  createAmbientSparkles(width, height) {
-    this.sparkles = [];
-    for (let i = 0; i < 18; i++) {
-      const sp = this.add.graphics().setDepth(17);
-      sp.fillStyle(0xfffa65, 0.75);
-      sp.fillCircle(0, 0, Phaser.Math.Between(2, 4));
-      sp.x = Phaser.Math.Between(40, width - 40);
-      sp.y = Phaser.Math.Between(150, 650);
-      sp.baseY = sp.y;
-      sp.speedX = Phaser.Math.FloatBetween(8, 22);
-      sp.driftSpeed = Phaser.Math.FloatBetween(1.2, 2.5);
-      this.sparkles.push(sp);
+    // Layer 3: Continuous Green Battlefield Ground (Depth 3)
+    this.groundGfx = this.add.graphics().setDepth(3);
+    // Dark earthy base
+    this.groundGfx.fillStyle(0x4a3728, 1);
+    this.groundGfx.fillRect(0, 580, width, height - 580);
+    // Earth-grass transition line
+    this.groundGfx.fillStyle(0x3a291d, 1);
+    this.groundGfx.fillRect(0, 578, width, 4);
+    // Vibrant green grass top
+    this.groundGfx.fillStyle(0x2ed573, 1);
+    this.groundGfx.fillRect(0, 560, width, 20);
+    // Grass crest scalloped edge
+    this.groundGfx.fillStyle(0x26af61, 1);
+    for (let gx = 0; gx < width; gx += 28) {
+      this.groundGfx.fillCircle(gx + 14, 560, 5);
     }
+
+    // Left & Right Combatant Platforms (Depth 3)
+    this.createCombatPlatform(180, 542, 180, 38);
+    this.createCombatPlatform(1100, 542, 180, 38);
+
+    // Layer 4: Central Tactical Obstacle - Classic Low Wooden Fence (Depth 4)
+    // Matches PHYSICS.obstacle: xMin 570, xMax 710, yMin 490
+    this.createCenterFence();
+  }
+
+  createCombatPlatform(cx, cy, w, h) {
+    const gfx = this.add.graphics().setDepth(3);
+    // Drop shadow
+    gfx.fillStyle(0x0c1829, 0.35);
+    gfx.fillRoundedRect(cx - w / 2, cy - h / 2 + 5, w, h, 10);
+    // Solid stone/earth plinth body
+    gfx.fillStyle(0x57606f, 1);
+    gfx.fillRoundedRect(cx - w / 2, cy - h / 2, w, h, 10);
+    gfx.lineStyle(3, 0x2f3542, 1);
+    gfx.strokeRoundedRect(cx - w / 2, cy - h / 2, w, h, 10);
+    // Bright grass cap
+    gfx.fillStyle(0x2ed573, 1);
+    gfx.fillRoundedRect(cx - w / 2 + 3, cy - h / 2 + 2, w - 6, 12, 6);
+  }
+
+  createCenterFence() {
+    const fenceGfx = this.add.graphics().setDepth(4);
+    // Posts at 585, 640, 695
+    const posts = [585, 640, 695];
+    posts.forEach(px => {
+      // Post shadow
+      fenceGfx.fillStyle(0x3e2723, 0.4);
+      fenceGfx.fillRect(px - 9, 492, 20, 88);
+      // Wood post body
+      fenceGfx.fillStyle(0x8b5a2b, 1);
+      fenceGfx.fillRect(px - 10, 490, 20, 90);
+      // Wood post pointed tip
+      fenceGfx.beginPath();
+      fenceGfx.moveTo(px - 10, 490);
+      fenceGfx.lineTo(px, 476);
+      fenceGfx.lineTo(px + 10, 490);
+      fenceGfx.closePath();
+      fenceGfx.fillPath();
+      // Border outline
+      fenceGfx.lineStyle(2, 0x4e342e, 1);
+      fenceGfx.strokeRect(px - 10, 490, 20, 90);
+      fenceGfx.beginPath();
+      fenceGfx.moveTo(px - 10, 490);
+      fenceGfx.lineTo(px, 476);
+      fenceGfx.lineTo(px + 10, 490);
+      fenceGfx.strokePath();
+    });
+
+    // Horizontal rails
+    const rails = [512, 546];
+    rails.forEach(ry => {
+      fenceGfx.fillStyle(0xa0522d, 1);
+      fenceGfx.fillRoundedRect(568, ry, 144, 16, 4);
+      fenceGfx.lineStyle(2, 0x4e342e, 1);
+      fenceGfx.strokeRoundedRect(568, ry, 144, 16, 4);
+
+      // Wood grain highlight
+      fenceGfx.lineStyle(1, 0xcd853f, 0.7);
+      fenceGfx.lineBetween(574, ry + 4, 706, ry + 4);
+
+      // Nails on posts
+      posts.forEach(px => {
+        fenceGfx.fillStyle(0x2f3542, 1);
+        fenceGfx.fillCircle(px, ry + 8, 2.5);
+      });
+    });
   }
 
   createCharacters() {
-    // Left Mascot (Player 1 / Blue) at (180, 485)
-    this.playerMonster = new Monster(this, 180, 485, 'player');
+    // Left Mascot (Player 1 / Blue) at (180, 500)
+    this.playerMonster = new Monster(this, 180, 500, 'player');
     this.playerMonster.setDepth(6);
 
-    // Right Mascot (Player 2 / Red) at (1100, 485)
-    this.opponentMonster = new Monster(this, 1100, 485, 'opponent');
+    // Right Mascot (Player 2 / Red) at (1100, 500)
+    this.opponentMonster = new Monster(this, 1100, 500, 'opponent');
     this.opponentMonster.setDepth(6);
   }
 
@@ -674,46 +656,12 @@ export default class GameScene extends Phaser.Scene {
       this.renderDebugOverlay();
     }
 
-    // 3. Animate Water Waves & Shimmer
-    this.waterTimer = (this.waterTimer || 0) + delta;
-    if (this.waterTimer > 50) {
-      this.waterTimer = 0;
-      this.waterOffset = ((this.waterOffset || 0) + 1.8) % 120;
-
-      this.waveRipples.clear();
-      this.waveRipples.lineStyle(2, 0xffffff, 0.6);
-      for (let x = -60; x < 1340; x += 110) {
-        const wx = x + (this.waterOffset % 110);
-        this.waveRipples.beginPath();
-        this.waveRipples.arc(wx, 565, 26, Math.PI * 0.15, Math.PI * 0.85, false);
-        this.waveRipples.strokePath();
-      }
-    }
-
-    // 4. Drifting Clouds
+    // 3. Drifting Clouds
     if (this.clouds) {
       this.clouds.forEach(cloud => {
         cloud.x += (cloud.speed * delta) / 1000;
         if (cloud.x > 1400) cloud.x = -150;
       });
-    }
-
-    // 5. Ambient Sparkles Drift
-    if (this.sparkles) {
-      const dt = delta / 1000;
-      this.sparkles.forEach(sp => {
-        sp.x += sp.speedX * dt;
-        sp.y = sp.baseY + Math.sin(time * 0.002 * sp.driftSpeed) * 14;
-        if (sp.x > 1300) {
-          sp.x = -20;
-          sp.baseY = Phaser.Math.Between(150, 650);
-        }
-      });
-    }
-
-    // 6. Foreground Foliage
-    if (this.forePlants) {
-      this.forePlants.x = 640 + Math.sin(time * 0.0018) * 4;
     }
   }
 

@@ -20,8 +20,8 @@ export default class Monster extends Phaser.GameObjects.Container {
     this.setupBreathingIdle();
     this.setupBlinkingTimer();
 
-    // Scale up mascot size for cartoon presence
-    this.setScale(1.35);
+    // Scale mascot size to compact arcade character (approx 160-175px tall)
+    this.setScale(1.05);
 
     scene.add.existing(this);
   }
@@ -30,7 +30,7 @@ export default class Monster extends Phaser.GameObjects.Container {
     // 1. Ground Drop Shadow
     this.shadow = this.scene.add.graphics();
     this.shadow.fillStyle(0x0c1829, 0.4);
-    this.shadow.fillEllipse(0, 10, 110, 24);
+    this.shadow.fillEllipse(0, 10, 85, 20);
     this.add(this.shadow);
 
     // 2. Torso Rig Container (bobs & squashes independently during breathing/throw)

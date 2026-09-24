@@ -18,159 +18,140 @@ export default class HUD {
   }
 
   createPlayer1HUD() {
-    const x = 160;
-    const y = 48;
+    const cx = 130;
+    const cy = 30;
+    const w = 185;
+    const h = 40;
 
-    // Card background
+    // Compact Pill Background
     const bg = this.scene.add.graphics();
     bg.fillStyle(0x131e3a, 0.92);
-    bg.fillRoundedRect(x - 130, y - 36, 260, 68, 16);
-    bg.lineStyle(3, 0x0984e3, 1);
-    bg.strokeRoundedRect(x - 130, y - 36, 260, 68, 16);
+    bg.fillRoundedRect(cx - w / 2, cy - h / 2, w, h, 12);
+    bg.lineStyle(2, 0x0984e3, 1);
+    bg.strokeRoundedRect(cx - w / 2, cy - h / 2, w, h, 12);
     this.container.add(bg);
 
-    // Golden Beveled Avatar Frame
-    const frame = this.scene.add.image(x - 95, y - 2, 'avatar_frame').setScale(0.85);
-    this.container.add(frame);
-
-    // Mini Avatar inside frame
-    const avatar = this.scene.add.image(x - 95, y - 2, 'blue_body').setScale(0.35);
-    this.container.add(avatar);
-
     // Player 1 Name
-    const name = this.scene.add.text(x - 55, y - 28, 'PLAYER 1', {
+    const name = this.scene.add.text(cx - 82, cy - 14, 'PLAYER', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '15px',
+      fontSize: '13px',
       fontStyle: '900',
-      color: '#ffffff'
+      color: '#feca57',
+      stroke: '#000000',
+      strokeThickness: 3
     });
     this.container.add(name);
 
     // Hearts
-    this.p1Hearts = this.scene.add.text(x + 45, y - 30, '❤️❤️❤️', {
-      fontSize: '13px'
+    this.p1Hearts = this.scene.add.text(cx + 18, cy - 14, '❤️❤️❤️', {
+      fontSize: '11px'
     });
     this.container.add(this.p1Hearts);
 
-    // HP Bar Frame
-    const barFrame = this.scene.add.image(x + 28, y + 4, 'hp_bar_frame').setScale(0.85, 0.85);
-    this.container.add(barFrame);
+    // HP Bar Track
+    const barWidth = 105;
+    const barHeight = 8;
+    const barX = cx - 82;
+    const barY = cy + 5;
+
+    const track = this.scene.add.graphics();
+    track.fillStyle(0x1e272e, 1);
+    track.fillRoundedRect(barX, barY, barWidth, barHeight, 4);
+    this.container.add(track);
 
     // HP Bar Fill
-    const barWidth = 160;
-    const barHeight = 12;
-    const barX = x - 52;
-    const barY = y - 2;
-
     this.p1BarFill = this.scene.add.graphics();
     this.drawHPBar(this.p1BarFill, barX, barY, barWidth, barHeight, 1, 0x2ed573);
     this.container.add(this.p1BarFill);
 
     // HP Numerical Readout
-    this.p1HpText = this.scene.add.text(barX + barWidth / 2, barY + barHeight / 2, '100 HP', {
+    this.p1HpText = this.scene.add.text(barX + barWidth + 14, barY + barHeight / 2, '100 HP', {
       fontFamily: 'system-ui, sans-serif',
-      fontSize: '11px',
-      fontStyle: '900',
+      fontSize: '10px',
+      fontStyle: 'bold',
       color: '#ffffff'
-    }).setOrigin(0.5);
+    }).setOrigin(0, 0.5);
     this.container.add(this.p1HpText);
 
     this.p1BarConfig = { x: barX, y: barY, w: barWidth, h: barHeight };
-
-    // Collectible Ability Badges: [🔥] [🛡️] [💚] [🪨]
-    this.p1Abilities = this.createAbilityBadges(x - 130, y + 40, ['ability_fire', 'ability_shield', 'ability_heal', 'ability_rock'], 0);
+    this.p1Abilities = [];
   }
 
   createPlayer2HUD() {
-    const x = 1120;
-    const y = 48;
+    const cx = 1150;
+    const cy = 30;
+    const w = 185;
+    const h = 40;
 
-    // Card background
+    // Compact Pill Background
     const bg = this.scene.add.graphics();
     bg.fillStyle(0x131e3a, 0.92);
-    bg.fillRoundedRect(x - 130, y - 36, 260, 68, 16);
-    bg.lineStyle(3, 0xeb3b5a, 1);
-    bg.strokeRoundedRect(x - 130, y - 36, 260, 68, 16);
+    bg.fillRoundedRect(cx - w / 2, cy - h / 2, w, h, 12);
+    bg.lineStyle(2, 0xeb3b5a, 1);
+    bg.strokeRoundedRect(cx - w / 2, cy - h / 2, w, h, 12);
     this.container.add(bg);
 
-    // Golden Avatar Frame
-    const frame = this.scene.add.image(x - 95, y - 2, 'avatar_frame').setScale(0.85);
-    this.container.add(frame);
-
-    // Mini Avatar inside frame
-    const avatar = this.scene.add.image(x - 95, y - 2, 'red_body').setScale(0.35);
-    this.container.add(avatar);
-
     // Player 2 Name
-    const name = this.scene.add.text(x - 55, y - 28, 'PLAYER 2', {
+    const name = this.scene.add.text(cx - 82, cy - 14, 'ENEMY', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '15px',
+      fontSize: '13px',
       fontStyle: '900',
-      color: '#ffffff'
+      color: '#ff6b6b',
+      stroke: '#000000',
+      strokeThickness: 3
     });
     this.container.add(name);
 
     // Hearts
-    this.p2Hearts = this.scene.add.text(x + 45, y - 30, '❤️❤️❤️', {
-      fontSize: '13px'
+    this.p2Hearts = this.scene.add.text(cx + 18, cy - 14, '❤️❤️❤️', {
+      fontSize: '11px'
     });
     this.container.add(this.p2Hearts);
 
-    // HP Bar Frame
-    const barFrame = this.scene.add.image(x + 28, y + 4, 'hp_bar_frame').setScale(0.85, 0.85);
-    this.container.add(barFrame);
+    // HP Bar Track
+    const barWidth = 105;
+    const barHeight = 8;
+    const barX = cx - 82;
+    const barY = cy + 5;
+
+    const track = this.scene.add.graphics();
+    track.fillStyle(0x1e272e, 1);
+    track.fillRoundedRect(barX, barY, barWidth, barHeight, 4);
+    this.container.add(track);
 
     // HP Bar Fill
-    const barWidth = 160;
-    const barHeight = 12;
-    const barX = x - 52;
-    const barY = y - 2;
-
     this.p2BarFill = this.scene.add.graphics();
     this.drawHPBar(this.p2BarFill, barX, barY, barWidth, barHeight, 1, 0xeb3b5a);
     this.container.add(this.p2BarFill);
 
-    this.p2HpText = this.scene.add.text(barX + barWidth / 2, barY + barHeight / 2, '100 HP', {
+    // HP Numerical Readout
+    this.p2HpText = this.scene.add.text(barX + barWidth + 14, barY + barHeight / 2, '100 HP', {
       fontFamily: 'system-ui, sans-serif',
-      fontSize: '11px',
-      fontStyle: '900',
+      fontSize: '10px',
+      fontStyle: 'bold',
       color: '#ffffff'
-    }).setOrigin(0.5);
+    }).setOrigin(0, 0.5);
     this.container.add(this.p2HpText);
 
     this.p2BarConfig = { x: barX, y: barY, w: barWidth, h: barHeight };
-
-    // Ability Badges
-    this.p2Abilities = this.createAbilityBadges(x - 130, y + 40, ['ability_rock', 'ability_shield', 'ability_heal', 'ability_fire'], 0);
-  }
-
-  createAbilityBadges(startX, startY, iconKeys, activeIndex = 0) {
-    const badges = [];
-    iconKeys.forEach((key, i) => {
-      const bx = startX + 22 + i * 36;
-      const by = startY + 12;
-
-      const badge = this.scene.add.image(bx, by, key)
-        .setScale(0.68)
-        .setAlpha(i === activeIndex ? 1 : 0.65);
-
-      this.container.add(badge);
-      badges.push(badge);
-    });
-    return badges;
+    this.p2Abilities = [];
   }
 
   createWindIndicator() {
     const x = 640;
-    const y = 48;
+    const y = 30;
 
-    // Metallic Wind Badge
-    const badge = this.scene.add.image(x, y, 'wind_gauge_badge').setScale(1.1);
-    this.container.add(badge);
+    // Compact Metallic Wind Badge
+    const bg = this.scene.add.graphics();
+    bg.fillStyle(0x131e3a, 0.92);
+    bg.fillRoundedRect(x - 65, y - 16, 130, 32, 10);
+    bg.lineStyle(2, 0xf39c12, 1);
+    bg.strokeRoundedRect(x - 65, y - 16, 130, 32, 10);
+    this.container.add(bg);
 
-    this.windText = this.scene.add.text(x, y, '💨 WIND ➔ 0', {
+    this.windText = this.scene.add.text(x, y, '💨 WIND 0', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '14px',
+      fontSize: '13px',
       fontStyle: '900',
       color: '#ffffff'
     }).setOrigin(0.5);

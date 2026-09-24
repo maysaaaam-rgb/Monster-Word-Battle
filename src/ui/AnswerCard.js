@@ -31,9 +31,9 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
     this.badgeBg = scene.add.graphics();
     this.add(this.badgeBg);
 
-    this.letterBadge = scene.add.text(-width / 2 + 16, -height / 2 + 16, this.letter, {
+    this.letterBadge = scene.add.text(-width / 2 + 12, -height / 2 + 12, this.letter, {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '13px',
+      fontSize: '10px',
       fontStyle: '900',
       color: '#718093'
     }).setOrigin(0.5);
@@ -41,8 +41,8 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
 
     // 3. Illustrated Picture Mini-Scene (Upper area)
     if (choice.image && scene.textures.exists(choice.image)) {
-      this.sceneImg = scene.add.image(0, -18, choice.image).setOrigin(0.5, 0.5);
-      this.sceneImg.setScale(0.92);
+      this.sceneImg = scene.add.image(0, -12, choice.image).setOrigin(0.5, 0.5);
+      this.sceneImg.setScale(0.60);
       this.add(this.sceneImg);
     } else {
       this.sceneImg = null;
@@ -52,9 +52,9 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
     this.pillBg = scene.add.graphics();
     this.add(this.pillBg);
 
-    this.pillTxt = scene.add.text(0, height / 2 - 24, choice.label || '', {
+    this.pillTxt = scene.add.text(0, height / 2 - 14, choice.label || '', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '16px',
+      fontSize: '12px',
       fontStyle: '900',
       color: '#ffffff'
     }).setOrigin(0.5);
@@ -62,8 +62,9 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
 
     // 5. Emerald Checkmark Badge (Hidden initially)
     if (scene.textures.exists('card_checkmark')) {
-      this.checkSprite = scene.add.image(width / 2 - 14, -height / 2 + 14, 'card_checkmark')
+      this.checkSprite = scene.add.image(width / 2 - 12, -height / 2 + 12, 'card_checkmark')
         .setOrigin(0.5, 0.5)
+        .setScale(0.7)
         .setVisible(false);
       this.add(this.checkSprite);
     } else {
@@ -219,33 +220,33 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
     this.cardBg.clear();
 
     // Drop shadow
-    this.cardBg.fillStyle(0x000000, 0.12);
-    this.cardBg.fillRoundedRect(-w / 2 + 2, -h / 2 + 4, w, h, 14);
+    this.cardBg.fillStyle(0x000000, 0.14);
+    this.cardBg.fillRoundedRect(-w / 2 + 2, -h / 2 + 3, w, h, 10);
 
     // Card Surface
     this.cardBg.fillStyle(fillColor, 1);
-    this.cardBg.fillRoundedRect(-w / 2, -h / 2, w, h, 14);
+    this.cardBg.fillRoundedRect(-w / 2, -h / 2, w, h, 10);
 
     // Outline Border
     this.cardBg.lineStyle(borderWidth, borderColor, 1);
-    this.cardBg.strokeRoundedRect(-w / 2, -h / 2, w, h, 14);
+    this.cardBg.strokeRoundedRect(-w / 2, -h / 2, w, h, 10);
   }
 
   drawLetterBadge(bgColor, textColor) {
-    const x = -this.cardWidth / 2 + 16;
-    const y = -this.cardHeight / 2 + 16;
+    const x = -this.cardWidth / 2 + 12;
+    const y = -this.cardHeight / 2 + 12;
     this.badgeBg.clear();
     this.badgeBg.fillStyle(bgColor, 1);
-    this.badgeBg.fillCircle(x, y, 11);
+    this.badgeBg.fillCircle(x, y, 8);
     this.letterBadge.setColor(textColor);
   }
 
   drawPill(fillColor) {
-    const w = this.cardWidth - 24;
-    const h = 28;
-    const y = this.cardHeight / 2 - 24;
+    const w = this.cardWidth - 14;
+    const h = 20;
+    const y = this.cardHeight / 2 - 14;
     this.pillBg.clear();
     this.pillBg.fillStyle(fillColor, 1);
-    this.pillBg.fillRoundedRect(-w / 2, y - h / 2, w, h, 8);
+    this.pillBg.fillRoundedRect(-w / 2, y - h / 2, w, h, 6);
   }
 }
