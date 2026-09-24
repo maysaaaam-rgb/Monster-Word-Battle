@@ -1,5 +1,14 @@
 import Phaser from 'phaser';
 
+/**
+ * Controls Tray Component
+ * 
+ * Classic Arcade Cat-vs-Dog inspired battle control panel:
+ * - Angle adjustment: [ ◀ ] ANGLE 45° [ ▶ ] (supports click & hold)
+ * - Power Meter: Live animated charging meter with color gradient
+ * - Ability selectors: Rock, Fireball, Shield, Heal
+ * - Press & Hold Action Button: Power charges while held, launches on release!
+ */
 export default class Controls {
   constructor(scene, initialAngle = 45, initialPower = 65, audioSystem = null, callbacks = {}) {
     this.scene = scene;
@@ -11,6 +20,14 @@ export default class Controls {
     this.activeAction = 'rock'; // 'rock', 'fireball', 'shield', 'heal'
     this.unlockedAbilities = { rock: true, fireball: false, shield: false, heal: false };
 
+    // Charge State
+    this.isCharging = false;
+    this.chargeDir = 1;
+    this.chargeSpeed = 65; // ~1.2s to traverse 20 -> 100
+    this.holdingAngleLeft = false;
+    this.holdingAngleRight = false;
+    this.angleHoldTimer = 0;
+
     this.container = scene.add.container(640, 655);
     this.container.setDepth(20);
 
@@ -19,6 +36,7 @@ export default class Controls {
     this.createPowerControls();
     this.createAbilitySelectors();
     this.createActionButton();
+    this.setupGlobalPointerUp();
   }
 
   setUnlockedAbilities(abilities) {
@@ -37,7 +55,7 @@ export default class Controls {
 
   createPanel() {
     const bg = this.scene.add.graphics();
-    // Rounded dark slate tray with gold outline (as in reference image)
+    // Rounded dark arcade slate tray with gold outline
     bg.fillStyle(0x131e3a, 0.94);
     bg.fillRoundedRect(-380, -46, 760, 92, 18);
     bg.lineStyle(4, 0xf39c12, 1);
@@ -62,12 +80,15 @@ export default class Controls {
     this.container.add(label);
 
     // [ ◀ ] Button
-    const leftBtn = this.createButton(x - 55, 6, '◀', () => {
+    this.leftBtn = this.createButton(x - 55, 6, '◀', () => {
       if (!this.isEnabled) return;
       if (this.audioSystem) this.audioSystem.playClick();
       this.setAngle(this.angle - 5);
     });
-    this.container.add(leftBtn);
+    this.leftBtn.on('pointerdown', () => { if (this.isEnabled) this.holdingAngleLeft = true; });
+    this.leftBtn.on('pointerup', () => { this.holdingAngleLeft = false; });
+    this.leftBtn.on('pointerout', () => { this.holdingAngleLeft = false; });
+    this.container.add(this.leftBtn);
 
     // Angle Display Text
     this.angleText = this.scene.add.text(x, 6, `${this.angle}°`, {
@@ -79,19 +100,22 @@ export default class Controls {
     this.container.add(this.angleText);
 
     // [ ▶ ] Button
-    const rightBtn = this.createButton(x + 55, 6, '▶', () => {
+    this.rightBtn = this.createButton(x + 55, 6, '▶', () => {
       if (!this.isEnabled) return;
       if (this.audioSystem) this.audioSystem.playClick();
       this.setAngle(this.angle + 5);
     });
-    this.container.add(rightBtn);
+    this.rightBtn.on('pointerdown', () => { if (this.isEnabled) this.holdingAngleRight = true; });
+    this.rightBtn.on('pointerup', () => { this.holdingAngleRight = false; });
+    this.rightBtn.on('pointerout', () => { this.holdingAngleRight = false; });
+    this.container.add(this.rightBtn);
   }
 
   createPowerControls() {
     const x = -35;
 
     // Label
-    this.powerLabel = this.scene.add.text(x, -30, `POWER`, {
+    this.powerLabel = this.scene.add.text(x, -30, `POWER: ${Math.round(this.power)}%`, {
       fontFamily: 'system-ui, -apple-system, sans-serif',
       fontSize: '13px',
       fontStyle: '900',
@@ -101,7 +125,7 @@ export default class Controls {
 
     // Slider Track
     const trackWidth = 170;
-    const trackHeight = 16;
+    const trackHeight = 18;
     const trackY = 6;
 
     this.sliderTrack = this.scene.add.graphics();
@@ -118,7 +142,7 @@ export default class Controls {
     this.drawSlider();
 
     const updateFromPointer = (pointer) => {
-      if (!this.isEnabled) return;
+      if (!this.isEnabled || this.isCharging) return;
       const localX = pointer.x - (640 + x);
       const ratio = Phaser.Math.Clamp((localX + trackWidth / 2) / trackWidth, 0, 1);
       const newPower = Math.round(20 + ratio * 80);
@@ -161,7 +185,7 @@ export default class Controls {
       container.add(hit);
 
       hit.on('pointerdown', () => {
-        if (!this.isEnabled) return;
+        if (!this.isEnabled || this.isCharging) return;
         if (!this.unlockedAbilities[ab.key] && ab.key !== 'rock') return;
         if (this.audioSystem) this.audioSystem.playClick();
         this.setAction(ab.key);
@@ -204,21 +228,32 @@ export default class Controls {
     const ratio = (this.power - 20) / 80;
 
     this.sliderTrack.clear();
-    this.sliderTrack.fillStyle(0x2d3436, 1);
+    // Track Backing
+    this.sliderTrack.fillStyle(0x1a2530, 1);
     this.sliderTrack.fillRoundedRect(x - w / 2, y - h / 2, w, h, 8);
-    this.sliderTrack.lineStyle(2, 0x636e72, 1);
+    this.sliderTrack.lineStyle(2, 0x475569, 1);
     this.sliderTrack.strokeRoundedRect(x - w / 2, y - h / 2, w, h, 8);
 
-    const fillW = Math.max(10, w * ratio);
-    this.sliderTrack.fillStyle(0xf39c12, 1);
+    // Dynamic Color Fill: Green -> Gold -> Red
+    let fillColor = 0x2ed573;
+    if (ratio > 0.7) fillColor = 0xff4757;
+    else if (ratio > 0.4) fillColor = 0xf39c12;
+
+    const fillW = Math.max(8, w * ratio);
+    this.sliderTrack.fillStyle(fillColor, 1);
     this.sliderTrack.fillRoundedRect(x - w / 2, y - h / 2, fillW, h, 8);
 
+    // Glowing Thumb
     this.sliderThumb.clear();
     const thumbX = x - w / 2 + fillW;
     this.sliderThumb.fillStyle(0xffffff, 1);
-    this.sliderThumb.lineStyle(3, 0xd35400, 1);
+    this.sliderThumb.lineStyle(3, fillColor, 1);
     this.sliderThumb.fillCircle(thumbX, y, 12);
     this.sliderThumb.strokeCircle(thumbX, y, 12);
+
+    if (this.powerLabel) {
+      this.powerLabel.setText(`POWER: ${Math.round(this.power)}%`);
+    }
   }
 
   createActionButton() {
@@ -227,8 +262,8 @@ export default class Controls {
 
     this.actionBtnContainer = this.scene.add.container(x, y);
 
-    const btnWidth = 145;
-    const btnHeight = 56;
+    const btnWidth = 150;
+    const btnHeight = 58;
 
     this.btnShadow = this.scene.add.graphics();
     this.actionBtnContainer.add(this.btnShadow);
@@ -236,71 +271,159 @@ export default class Controls {
     this.btnBody = this.scene.add.graphics();
     this.actionBtnContainer.add(this.btnBody);
 
-    this.btnText = this.scene.add.text(0, 0, '🪨 THROW!', {
+    this.btnText = this.scene.add.text(0, -6, '🪨 THROW!', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '22px',
+      fontSize: '20px',
       fontStyle: '900',
       color: '#ffffff',
       shadow: { blur: 6, color: '#000000', fill: true }
     }).setOrigin(0.5);
     this.actionBtnContainer.add(this.btnText);
 
-    const hitArea = this.scene.add.rectangle(0, 0, btnWidth, btnHeight, 0x000000, 0)
+    this.btnSubText = this.scene.add.text(0, 16, 'HOLD TO CHARGE', {
+      fontFamily: 'system-ui, -apple-system, sans-serif',
+      fontSize: '10px',
+      fontStyle: 'bold',
+      color: '#feca57'
+    }).setOrigin(0.5);
+    this.actionBtnContainer.add(this.btnSubText);
+
+    this.hitArea = this.scene.add.rectangle(0, 0, btnWidth, btnHeight, 0x000000, 0)
       .setInteractive({ useHandCursor: true });
-    this.actionBtnContainer.add(hitArea);
+    this.actionBtnContainer.add(this.hitArea);
 
-    hitArea.on('pointerover', () => {
+    this.hitArea.on('pointerover', () => {
       if (!this.isEnabled) return;
-      this.actionBtnContainer.setScale(1.05);
+      this.actionBtnContainer.setScale(1.04);
     });
 
-    hitArea.on('pointerout', () => {
-      this.actionBtnContainer.setScale(1.0);
-    });
-
-    hitArea.on('pointerdown', (pointer, localX, localY, event) => {
-      if (event && event.stopPropagation) event.stopPropagation();
-      if (!this.isEnabled) return;
-      this.setEnabled(false); // Immediately lock to prevent duplicate throws!
-      if (this.audioSystem) this.audioSystem.playClick();
-      this.actionBtnContainer.setScale(0.96);
-      if (this.callbacks.onAction) {
-        this.callbacks.onAction(this.activeAction);
+    this.hitArea.on('pointerout', () => {
+      if (!this.isCharging) {
+        this.actionBtnContainer.setScale(1.0);
       }
     });
 
-    hitArea.on('pointerup', () => {
-      this.actionBtnContainer.setScale(1.0);
+    this.hitArea.on('pointerdown', (pointer, localX, localY, event) => {
+      if (event && event.stopPropagation) event.stopPropagation();
+      if (!this.isEnabled) return;
+
+      if (this.activeAction === 'shield' || this.activeAction === 'heal') {
+        // Instant actions deploy immediately
+        this.setEnabled(false);
+        if (this.audioSystem) this.audioSystem.playClick();
+        if (this.callbacks.onAction) {
+          this.callbacks.onAction(this.activeAction, this.power);
+        }
+      } else {
+        // Classic Cat-vs-Dog: HOLD TO CHARGE POWER!
+        this.startCharging();
+      }
     });
 
     this.container.add(this.actionBtnContainer);
     this.updateActionButton();
   }
 
+  setupGlobalPointerUp() {
+    // Release anywhere on screen executes the throw!
+    this.scene.input.on('pointerup', () => {
+      if (this.isCharging) {
+        this.stopChargingAndThrow();
+      }
+    });
+  }
+
+  startCharging() {
+    if (!this.isEnabled || this.isCharging) return;
+    this.isCharging = true;
+    this.chargeDir = 1;
+    this.power = 20; // Start charge from base
+    this.setPower(this.power);
+    this.actionBtnContainer.setScale(0.95);
+
+    if (this.audioSystem) this.audioSystem.playClick();
+
+    if (this.callbacks.onChargeStart) {
+      this.callbacks.onChargeStart(this.power);
+    }
+  }
+
+  stopChargingAndThrow() {
+    if (!this.isCharging) return;
+    this.isCharging = false;
+    this.setEnabled(false); // Lock controls during flight
+    this.actionBtnContainer.setScale(1.0);
+
+    const finalPower = Math.round(this.power);
+    console.log(`[CHARGE] Released at power: ${finalPower}%`);
+
+    if (this.callbacks.onAction) {
+      this.callbacks.onAction(this.activeAction, finalPower);
+    }
+  }
+
+  update(delta) {
+    // Handle Angle Hold
+    if (this.holdingAngleLeft || this.holdingAngleRight) {
+      this.angleHoldTimer += delta;
+      if (this.angleHoldTimer > 100) {
+        this.angleHoldTimer = 0;
+        if (this.holdingAngleLeft) this.setAngle(this.angle - 2);
+        if (this.holdingAngleRight) this.setAngle(this.angle + 2);
+      }
+    } else {
+      this.angleHoldTimer = 0;
+    }
+
+    // Handle Power Charging (Classic Cat-vs-Dog ping-pong meter)
+    if (this.isCharging && this.isEnabled) {
+      const step = (this.chargeSpeed * delta) / 1000;
+      this.power += step * this.chargeDir;
+
+      if (this.power >= 100) {
+        this.power = 100;
+        this.chargeDir = -1; // Bounce back down
+      } else if (this.power <= 20) {
+        this.power = 20;
+        this.chargeDir = 1; // Bounce back up
+      }
+
+      this.setPower(Math.round(this.power));
+
+      if (this.callbacks.onCharging) {
+        this.callbacks.onCharging(this.power);
+      }
+    }
+  }
+
   updateActionButton() {
-    const btnWidth = 145;
-    const btnHeight = 56;
+    const btnWidth = 150;
+    const btnHeight = 58;
 
     const isFire = this.activeAction === 'fireball';
     const isShield = this.activeAction === 'shield';
     const isHeal = this.activeAction === 'heal';
 
-    let color = 0x4b6584;
-    let shadowColor = 0x2d3436;
+    let color = 0x3b82f6;
+    let shadowColor = 0x1d4ed8;
     let label = '🪨 THROW!';
+    let sub = 'HOLD TO CHARGE';
 
     if (isFire) {
       color = 0xeb3b5a;
       shadowColor = 0x991b1b;
       label = '🔥 THROW!';
+      sub = 'HOLD TO CHARGE';
     } else if (isShield) {
       color = 0xf59e0b;
       shadowColor = 0xb45309;
       label = '🛡️ SHIELD!';
+      sub = 'INSTANT CAST';
     } else if (isHeal) {
       color = 0x20bf6b;
       shadowColor = 0x0f7940;
       label = '💚 HEAL!';
+      sub = 'INSTANT CAST';
     }
 
     this.btnShadow.clear();
@@ -314,6 +437,7 @@ export default class Controls {
     this.btnBody.strokeRoundedRect(-btnWidth / 2, -btnHeight / 2, btnWidth, btnHeight, 18);
 
     this.btnText.setText(label);
+    this.btnSubText.setText(sub);
   }
 
   createButton(x, y, symbol, onClick) {
@@ -367,6 +491,11 @@ export default class Controls {
 
   setEnabled(enabled) {
     this.isEnabled = enabled;
+    if (!enabled) {
+      this.isCharging = false;
+      this.holdingAngleLeft = false;
+      this.holdingAngleRight = false;
+    }
     this.container.setAlpha(enabled ? 1 : 0.45);
   }
 }

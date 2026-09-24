@@ -12,15 +12,18 @@ import QuestionModal from '../ui/QuestionModal.js';
 import { questions } from '../data/questions.js';
 
 export const GAME_STATE = {
-  QUESTION: 'QUESTION',
-  AIM: 'AIM',
-  FLYING: 'FLYING',
-  RESULT: 'RESULT',
+  PLAYER_QUESTION: 'PLAYER_QUESTION',
+  PLAYER_AIM: 'PLAYER_AIM',
+  PLAYER_CHARGE: 'PLAYER_CHARGE',
+  PLAYER_FLYING: 'PLAYER_FLYING',
+  PLAYER_RESULT: 'PLAYER_RESULT',
   ENEMY_TURN: 'ENEMY_TURN',
-  PLAYER_QUESTION: 'QUESTION',
-  PLAYER_AIM: 'AIM',
-  PLAYER_FLYING: 'FLYING',
-  PLAYER_RESULT: 'RESULT'
+  // Short aliases
+  QUESTION: 'PLAYER_QUESTION',
+  AIM: 'PLAYER_AIM',
+  CHARGE: 'PLAYER_CHARGE',
+  FLYING: 'PLAYER_FLYING',
+  RESULT: 'PLAYER_RESULT'
 };
 
 export default class GameScene extends Phaser.Scene {
@@ -64,16 +67,29 @@ export default class GameScene extends Phaser.Scene {
 
     this.controls = new Controls(this, this.aimSystem.angle, this.aimSystem.power, this.audioSystem, {
       onAngleChange: (angle) => {
-        if (this.gameState !== GAME_STATE.AIM) return;
+        if (this.gameState !== GAME_STATE.PLAYER_AIM && this.gameState !== GAME_STATE.PLAYER_CHARGE) return;
         this.aimSystem.setAngle(angle);
         this.playerMonster.setAimAngle(angle);
       },
       onPowerChange: (power) => {
-        if (this.gameState !== GAME_STATE.AIM) return;
+        if (this.gameState !== GAME_STATE.PLAYER_AIM && this.gameState !== GAME_STATE.PLAYER_CHARGE) return;
         this.aimSystem.setPower(power);
       },
+      onChargeStart: (power) => {
+        if (this.gameState === GAME_STATE.PLAYER_AIM) {
+          this.setGameState(GAME_STATE.PLAYER_CHARGE);
+          this.playerMonster.setCharging(true);
+        }
+      },
+      onCharging: (power) => {
+        if (this.gameState === GAME_STATE.PLAYER_CHARGE) {
+          const ratio = (power - 20) / 80;
+          this.playerMonster.updateChargingPose(ratio);
+          this.aimSystem.setPower(power);
+        }
+      },
       onActionChange: (actionType) => {
-        if (this.gameState !== GAME_STATE.AIM) return;
+        if (this.gameState !== GAME_STATE.PLAYER_AIM) return;
         if (actionType === 'heal' || actionType === 'shield') {
           this.aimSystem.hide();
           this.playerMonster.setHeldItem(null);
@@ -83,8 +99,18 @@ export default class GameScene extends Phaser.Scene {
           this.playerMonster.setAimAngle(this.aimSystem.angle);
         }
       },
-      onAction: (actionType) => {
-        this.executePlayerAction(actionType);
+      onAction: (actionType, power) => {
+        this.executePlayerAction(actionType, power);
+      }
+    });
+
+    // Make Player Monster interactive for classic Cat-vs-Dog press & hold charging
+    this.playerMonster.setSize(130, 160);
+    this.playerMonster.setInteractive(new Phaser.Geom.Rectangle(-65, -130, 130, 160), Phaser.Geom.Rectangle.Contains);
+    this.playerMonster.on('pointerdown', (pointer, localX, localY, event) => {
+      if (this.gameState === GAME_STATE.PLAYER_AIM && this.controls.isEnabled) {
+        if (event && event.stopPropagation) event.stopPropagation();
+        this.controls.startCharging();
       }
     });
 
@@ -142,10 +168,11 @@ export default class GameScene extends Phaser.Scene {
     this.gameState = newState;
 
     switch (newState) {
-      case GAME_STATE.QUESTION:
+      case GAME_STATE.PLAYER_QUESTION:
         this.controls.setEnabled(false);
         this.aimSystem.hide();
         this.playerMonster.setHeldItem(null);
+        this.playerMonster.setCharging(false);
 
         // Announce Player Turn then display question
         this.showTurnBanner('⚡ YOUR TURN', () => {
@@ -155,7 +182,7 @@ export default class GameScene extends Phaser.Scene {
         });
         break;
 
-      case GAME_STATE.AIM:
+      case GAME_STATE.PLAYER_AIM:
         this.controls.setEnabled(true);
         this.controls.setUnlockedAbilities(this.rewardSystem.inventory);
 
@@ -172,20 +199,28 @@ export default class GameScene extends Phaser.Scene {
         }
         break;
 
-      case GAME_STATE.FLYING:
-        this.controls.setEnabled(false);
-        this.aimSystem.hide();
+      case GAME_STATE.PLAYER_CHARGE:
+        // Charging: Trajectory remains visible and dynamically updates with charging power
+        this.aimSystem.show();
         break;
 
-      case GAME_STATE.RESULT:
+      case GAME_STATE.PLAYER_FLYING:
         this.controls.setEnabled(false);
         this.aimSystem.hide();
+        this.playerMonster.setCharging(false);
+        break;
+
+      case GAME_STATE.PLAYER_RESULT:
+        this.controls.setEnabled(false);
+        this.aimSystem.hide();
+        this.playerMonster.setCharging(false);
         this.resetCamera();
         break;
 
       case GAME_STATE.ENEMY_TURN:
         this.controls.setEnabled(false);
         this.aimSystem.hide();
+        this.playerMonster.setCharging(false);
 
         this.showTurnBanner('👾 ENEMY TURN', () => {
           this.executeEnemyTurn();
@@ -257,20 +292,20 @@ export default class GameScene extends Phaser.Scene {
   }
 
   onModalClosed(rewardName) {
-    // Challenge is closed, now transition to AIM state
-    this.setGameState(GAME_STATE.AIM);
+    // Challenge is closed, now transition to PLAYER_AIM state
+    this.setGameState(GAME_STATE.PLAYER_AIM);
   }
 
-  executePlayerAction(actionType) {
-    // Verify player is in AIM state
-    if (this.gameState !== GAME_STATE.AIM) {
-      console.warn("Cannot execute action outside AIM state!");
+  executePlayerAction(actionType, power = null) {
+    // Verify player is in AIM or CHARGE state
+    if (this.gameState !== GAME_STATE.PLAYER_AIM && this.gameState !== GAME_STATE.PLAYER_CHARGE) {
+      console.warn("Cannot execute action outside AIM or CHARGE state!");
       return;
     }
 
     if (actionType === 'shield') {
       // Deploy Shield immediately
-      this.setGameState(GAME_STATE.RESULT);
+      this.setGameState(GAME_STATE.PLAYER_RESULT);
       this.playerMonster.activateShield();
       this.rewardSystem.consumeReward();
       this.controls.setUnlockedAbilities(this.rewardSystem.inventory);
@@ -281,7 +316,7 @@ export default class GameScene extends Phaser.Scene {
       });
     } else if (actionType === 'heal') {
       // Heal immediately
-      this.setGameState(GAME_STATE.RESULT);
+      this.setGameState(GAME_STATE.PLAYER_RESULT);
       this.audioSystem.playHeal();
       this.playerMonster.heal(30);
       this.hud.updateP1Health(this.playerMonster.hp);
@@ -293,14 +328,17 @@ export default class GameScene extends Phaser.Scene {
         this.setGameState(GAME_STATE.ENEMY_TURN);
       });
     } else {
-      // Throw Projectile (Rock or Fireball)
+      // Throw Projectile with charged power (Rock or Fireball)
+      if (power !== null) {
+        this.aimSystem.setPower(power);
+      }
       this.executePlayerThrow(actionType);
     }
   }
 
   executePlayerThrow(weaponType = 'fireball') {
     // Transition to FLYING state
-    this.setGameState(GAME_STATE.FLYING);
+    this.setGameState(GAME_STATE.PLAYER_FLYING);
 
     // 1. Play Monster Throw Squash & Stretch Animation
     this.playerMonster.playThrowAnimation(() => {
@@ -339,7 +377,7 @@ export default class GameScene extends Phaser.Scene {
 
   onPlayerProjectileResult(hitMonster, hx, hy, damage, isShieldBlocked) {
     this.activeProjectile = null;
-    this.setGameState(GAME_STATE.RESULT);
+    this.setGameState(GAME_STATE.PLAYER_RESULT);
 
     if (hitMonster && !isShieldBlocked) {
       this.opponentMonster.takeDamage(damage);
@@ -440,7 +478,7 @@ export default class GameScene extends Phaser.Scene {
       if (this.isGameOver) return;
       this.windSystem.randomize();
       this.hud.updateWind(this.windSystem.getWind());
-      this.setGameState(GAME_STATE.QUESTION);
+      this.setGameState(GAME_STATE.PLAYER_QUESTION);
     });
   }
 
@@ -612,10 +650,15 @@ export default class GameScene extends Phaser.Scene {
     this.controls.setAction('rock');
     this.windSystem.setWind(0);
     this.hud.updateWind(0);
-    this.setGameState(GAME_STATE.QUESTION);
+    this.setGameState(GAME_STATE.PLAYER_QUESTION);
   }
 
   update(time, delta) {
+    // 0. Update Controls (continuous angle hold and power charging)
+    if (this.controls) {
+      this.controls.update(delta);
+    }
+
     // 1. Update Projectile physics if flying
     if (this.activeProjectile && !this.activeProjectile.isDead) {
       this.activeProjectile.update(delta);

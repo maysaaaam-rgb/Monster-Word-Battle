@@ -106,7 +106,7 @@ export default class Monster extends Phaser.GameObjects.Container {
 
   setupBreathingIdle() {
     // Gentle sine-wave breathing & bobbing animation
-    this.scene.tweens.add({
+    this.idleTween = this.scene.tweens.add({
       targets: this.torso,
       scaleY: 1.04,
       scaleX: 0.98,
@@ -167,8 +167,32 @@ export default class Monster extends Phaser.GameObjects.Container {
 
   setAimAngle(angleDeg) {
     if (this.type !== 'player') return;
-    // Rotate arm slightly with angle
-    this.armLeft.setRotation(-0.3 - (angleDeg / 90) * 0.35);
+    // Visibly lean monster body and rotate throwing arm toward target
+    const angleRatio = (angleDeg - 45) / 45;
+    this.torso.setRotation(-angleRatio * 0.12);
+    this.armLeft.setRotation(-0.35 - (angleDeg / 90) * 0.38);
+  }
+
+  setCharging(isCharging) {
+    this.isCharging = isCharging;
+    if (isCharging) {
+      if (this.idleTween) this.idleTween.pause();
+      this.torso.setScale(1.08, 0.92);
+      this.torso.setRotation(this.type === 'player' ? -0.1 : 0.1);
+      this.armLeft.setRotation(-0.6);
+    } else {
+      if (this.idleTween) this.idleTween.resume();
+    }
+  }
+
+  updateChargingPose(ratio) {
+    if (!this.isCharging) return;
+    const isPlayer = this.type === 'player';
+    const lean = isPlayer ? -1 : 1;
+    // Compresses body & pulls weapon further back as power charges up
+    this.torso.setScale(1.05 + ratio * 0.15, 0.95 - ratio * 0.18);
+    this.torso.setRotation(lean * (0.08 + ratio * 0.12));
+    this.armLeft.setRotation(-0.5 - ratio * 0.35);
   }
 
   activateShield() {

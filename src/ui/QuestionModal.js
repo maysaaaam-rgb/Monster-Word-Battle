@@ -9,14 +9,15 @@ export default class QuestionModal {
     this.onModalClosed = onModalClosed;
     this.currentQuestion = null;
     this.isLocked = false;
+    this.isCorrectRewardPending = false;
     this.cards = [];
 
     // Root Container
     this.container = scene.add.container(0, 0).setDepth(40);
     this.container.setVisible(false);
 
-    // 1. Full-screen Interactive Input Blocker (Prevents ANY pointer events passing to arena/monsters/controls)
-    this.blocker = scene.add.rectangle(0, 0, 1280, 720, 0x050f1e, 0.42)
+    // 1. Interactive Input Blocker (Dims slightly to keep battlefield visible behind it)
+    this.blocker = scene.add.rectangle(0, 0, 1280, 720, 0x050f1e, 0.28)
       .setOrigin(0, 0)
       .setInteractive();
 
@@ -86,6 +87,7 @@ export default class QuestionModal {
   showQuestion(question) {
     this.currentQuestion = question;
     this.isLocked = false;
+    this.isCorrectRewardPending = false;
     this.feedbackBanner.setVisible(false);
 
     // Reset debug indicator to initial state
@@ -129,19 +131,19 @@ export default class QuestionModal {
       scaleX: 1,
       scaleY: 1,
       alpha: 1,
-      duration: 280,
+      duration: 250,
       ease: 'Back.easeOut'
     });
   }
 
   handleCardClicked(selectedIndex, cardComponent) {
-    // 1. Double-click lockout: register ONLY ONE answer event
-    if (this.isLocked) {
+    // If locked, reject click
+    if (this.isLocked || this.isCorrectRewardPending) {
       return;
     }
     this.isLocked = true;
 
-    // 2. Debug indicator update & console log
+    // Debug indicator update & console log
     const letters = ['A', 'B', 'C'];
     const letter = letters[selectedIndex] || `${selectedIndex + 1}`;
     this.debugIndicator.setText(`ANSWER CLICKED: ${letter}`);
@@ -157,9 +159,10 @@ export default class QuestionModal {
   }
 
   handleCorrect(cardComponent) {
+    this.isCorrectRewardPending = true;
     if (this.audioSystem) this.audioSystem.playCorrect();
 
-    // 1. Highlight card with green state
+    // 1. Highlight clicked card with green state
     cardComponent.setStateCorrect();
 
     // 2. Disable all other cards
@@ -185,22 +188,7 @@ export default class QuestionModal {
       bannerText = `🎉 CORRECT! 💚 HEAL UNLOCKED!`;
     }
 
-    this.feedbackBg.clear();
-    this.feedbackBg.fillStyle(bannerColor, 1);
-    this.feedbackBg.fillRoundedRect(-200, -18, 400, 36, 12);
-    this.feedbackBg.lineStyle(2, 0xffffff, 1);
-    this.feedbackBg.strokeRoundedRect(-200, -18, 400, 36, 12);
-
-    this.feedbackText.setText(bannerText);
-    this.feedbackBanner.setVisible(true);
-    this.feedbackBanner.setScale(0.8);
-    this.scene.tweens.add({
-      targets: this.feedbackBanner,
-      scaleX: 1,
-      scaleY: 1,
-      duration: 220,
-      ease: 'Back.easeOut'
-    });
+    this.showFeedback(bannerText, bannerColor);
 
     // 5. Grant in-game ability
     if (this.onRewardGranted) {
@@ -213,12 +201,14 @@ export default class QuestionModal {
         targets: this.modalBox,
         y: -320,
         alpha: 0,
-        duration: 320,
+        duration: 280,
         ease: 'Cubic.easeIn',
         onComplete: () => {
           this.container.setVisible(false);
           this.modalBox.y = 195;
           this.modalBox.setAlpha(1);
+          this.isLocked = false;
+          this.isCorrectRewardPending = false;
           if (this.onModalClosed) {
             this.onModalClosed(rewardName.toLowerCase());
           }
@@ -231,19 +221,46 @@ export default class QuestionModal {
     if (this.audioSystem) this.audioSystem.playWrong();
 
     // 1. Show TRY AGAIN feedback banner
-    this.feedbackBg.clear();
-    this.feedbackBg.fillStyle(0xff4757, 1);
-    this.feedbackBg.fillRoundedRect(-140, -18, 280, 36, 12);
-    this.feedbackBg.lineStyle(2, 0xffffff, 1);
-    this.feedbackBg.strokeRoundedRect(-140, -18, 280, 36, 12);
+    this.showFeedback('❌ TRY AGAIN!', 0xff4757);
 
-    this.feedbackText.setText('❌ TRY AGAIN!');
-    this.feedbackBanner.setVisible(true);
-
-    // 2. Card turns RED, shakes, shows "TRY AGAIN", returns to normal, then unlocks
+    // 2. Card turns RED, shakes, shows "TRY AGAIN", then resets
     cardComponent.setStateIncorrect(() => {
-      this.feedbackBanner.setVisible(false);
-      this.isLocked = false; // Child CAN TRY AGAIN!
+      this.resetAllCards();
+    });
+
+    // Safety watchdog: guarantees unlock after 550ms if anything interrupted the tween
+    this.scene.time.delayedCall(550, () => {
+      if (this.isLocked && !this.isCorrectRewardPending) {
+        this.resetAllCards();
+      }
+    });
+  }
+
+  resetAllCards() {
+    this.cards.forEach(card => {
+      card.resetToNormal();
+    });
+    this.feedbackBanner.setVisible(false);
+    this.isLocked = false;
+  }
+
+  showFeedback(text, color) {
+    this.feedbackBg.clear();
+    this.feedbackBg.fillStyle(color, 1);
+    this.feedbackBg.fillRoundedRect(-180, -18, 360, 36, 12);
+    this.feedbackBg.lineStyle(2, 0xffffff, 1);
+    this.feedbackBg.strokeRoundedRect(-180, -18, 360, 36, 12);
+
+    this.feedbackText.setText(text);
+    this.feedbackBanner.setVisible(true);
+    this.feedbackBanner.setScale(0.85);
+
+    this.scene.tweens.add({
+      targets: this.feedbackBanner,
+      scaleX: 1,
+      scaleY: 1,
+      duration: 200,
+      ease: 'Back.easeOut'
     });
   }
 
@@ -276,5 +293,6 @@ export default class QuestionModal {
   close() {
     this.container.setVisible(false);
     this.isLocked = false;
+    this.isCorrectRewardPending = false;
   }
 }

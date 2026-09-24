@@ -4,10 +4,9 @@ import Phaser from 'phaser';
  * AnswerCard Component
  * 
  * Reusable interactive picture card component for ESL challenges.
- * - Entire card area is interactive (image, text, and card background).
- * - Full pointer events: pointerover, pointerout, pointerdown, pointerup.
+ * - Entire card area is interactive via top hitZone.
  * - States: normal, hover, selected, correct, incorrect, disabled.
- * - Synchronous click-lockout to prevent rapid duplicate events.
+ * - Full protection against getting stuck in incorrect or selected state.
  */
 export default class AnswerCard extends Phaser.GameObjects.Container {
   constructor(scene, x, y, width = 160, height = 142, choice = {}, index = 0, onClick = null) {
@@ -72,12 +71,8 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
     }
 
     // 6. Interactive Hit Area
-    // Interactivity set on Container AND an explicit top transparent hitZone
+    // Interactivity set on transparent top hitZone covering the full card bounds
     this.setSize(width, height);
-    this.setInteractive(
-      new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
-      Phaser.Geom.Rectangle.Contains
-    );
 
     this.hitZone = scene.add.rectangle(0, 0, width, height, 0x000000, 0.0001)
       .setOrigin(0.5, 0.5)
@@ -87,57 +82,47 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
     // Initial Appearance
     this.setStateNormal();
 
-    // Setup Pointer Event Listeners
+    // Setup Pointer Event Listeners on hitZone exclusively
     this.setupInteractivity();
   }
 
   setupInteractivity() {
-    // Hover: Enter
-    const onOver = () => {
+    this.hitZone.on('pointerover', () => {
       if (this.isLocked || this.currentState === 'disabled' || this.currentState === 'correct') return;
       this.setStateHover();
-    };
+    });
 
-    // Hover: Exit
-    const onOut = () => {
+    this.hitZone.on('pointerout', () => {
       if (this.isLocked || this.currentState === 'disabled' || this.currentState === 'correct') return;
       this.setStateNormal();
-    };
+    });
 
-    // Pointer Down (Click / Tap)
-    const onDown = (pointer, localX, localY, event) => {
+    this.hitZone.on('pointerdown', (pointer, localX, localY, event) => {
       if (event && event.stopPropagation) event.stopPropagation();
       if (this.isLocked || this.currentState === 'disabled' || this.currentState === 'correct') return;
       this.triggerClick(pointer);
-    };
+    });
 
-    // Pointer Up
-    const onUp = () => {
+    this.hitZone.on('pointerup', () => {
       if (this.isLocked || this.currentState === 'disabled' || this.currentState === 'correct') return;
       this.setStateHover();
-    };
-
-    // Attach to hitZone
-    this.hitZone.on('pointerover', onOver);
-    this.hitZone.on('pointerout', onOut);
-    this.hitZone.on('pointerdown', onDown);
-    this.hitZone.on('pointerup', onUp);
-
-    // Also attach to Container as fallback
-    this.on('pointerover', onOver);
-    this.on('pointerout', onOut);
-    this.on('pointerdown', onDown);
-    this.on('pointerup', onUp);
+    });
   }
 
   triggerClick(pointer) {
     if (this.isLocked || this.currentState === 'disabled' || this.currentState === 'correct') return;
-    this.isLocked = true; // Synchronous lockout prevents rapid duplicate events
     this.setStateSelected();
 
     if (this.onClick) {
       this.onClick(this.index, this);
     }
+  }
+
+  resetToNormal() {
+    this.scene.tweens.killTweensOf(this);
+    this.x = this.baseX;
+    this.y = this.baseY;
+    this.setStateNormal();
   }
 
   setStateNormal() {
@@ -199,6 +184,7 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
 
     // Shake animation
     const originX = this.baseX;
+    this.scene.tweens.killTweensOf(this);
     this.scene.tweens.add({
       targets: this,
       x: originX + 8,
@@ -208,9 +194,8 @@ export default class AnswerCard extends Phaser.GameObjects.Container {
       ease: 'Linear',
       onComplete: () => {
         this.x = originX;
-        // Wait ~250ms, then restore normal state and unlock (total duration ~530ms)
-        this.scene.time.delayedCall(250, () => {
-          this.setStateNormal();
+        // Wait ~200ms, then trigger callback
+        this.scene.time.delayedCall(200, () => {
           if (onResetComplete) onResetComplete();
         });
       }

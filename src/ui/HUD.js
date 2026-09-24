@@ -178,9 +178,10 @@ export default class HUD {
   }
 
   updateWind(wind) {
-    const arrow = wind > 0 ? '➔' : wind < 0 ? '⬅' : '●';
+    const arrow = wind > 0 ? '→' : wind < 0 ? '←' : '0';
     const absSpeed = Math.abs(wind);
-    this.windText.setText(`💨 WIND ${arrow} ${absSpeed}`);
+    const text = wind === 0 ? '🌬 WIND 0' : `🌬 WIND ${arrow} ${absSpeed}`;
+    this.windText.setText(text);
 
     if (wind > 0) this.windText.setColor('#ff9ff3');
     else if (wind < 0) this.windText.setColor('#48dbfb');
