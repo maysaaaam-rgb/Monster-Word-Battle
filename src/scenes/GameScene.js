@@ -423,13 +423,13 @@ export default class GameScene extends Phaser.Scene {
         const gravity = PHYSICS.gravity;
         const windAcc = this.windSystem.getAcceleration();
 
-        // Calculate accurate ballistic trajectory toward Player 1 at (180, 500)
-        // dx = -920, dy = 0.
-        // At angle 55° (125° towards left): speed ~ 685 px/s
+        // Calculate accurate ballistic trajectory toward Player Cat at (230, 550)
+        // dx = -820, dy = 0.
+        // At angle 55° (125° towards left): speed ~ 648 px/s
         const angleRad = Phaser.Math.DegToRad(125);
-        const baseSpeed = 685;
-        // Minor human-like variance (-15 to +15)
-        const variance = Phaser.Math.Between(-15, 15);
+        const baseSpeed = 648;
+        // Minor human-like variance (-14 to +14)
+        const variance = Phaser.Math.Between(-14, 14);
         const speed = baseSpeed + variance - (windAcc * 0.35);
 
         const vx = Math.cos(angleRad) * speed;
@@ -492,25 +492,32 @@ export default class GameScene extends Phaser.Scene {
   }
 
   // ==========================================
-  // CLEAN CLASSIC ARCADE ENVIRONMENT
+  // BRIGHT CARTOON BACKYARD ENVIRONMENT
   // ==========================================
   createLivingEnvironment(width, height) {
-    // Layer 0: Sky with Warm Sunlight
+    // Layer 0: Sunny Outdoor Backyard Sky
     this.sky = this.add.image(width / 2, height / 2, 'bg_sky_bright').setDepth(0);
+
+    // Subtle Warm Sunburst Glow
+    const sunGlow = this.add.graphics().setDepth(0);
+    sunGlow.fillStyle(0xfff9e6, 0.45);
+    sunGlow.fillCircle(640, 75, 75);
+    sunGlow.fillStyle(0xffffff, 0.7);
+    sunGlow.fillCircle(640, 75, 45);
 
     // Layer 1: Simple Distant Rolling Green Hills
     this.hills = this.add.image(width / 2, 450, 'bg_hills_bright').setDepth(1).setAlpha(0.85);
 
-    // Layer 2: 3 Soft Drifting Clouds (Massive open sky above)
+    // Layer 2: 3 Soft White Drifting Clouds
     this.clouds = [];
     const cloudConfigs = [
       { x: 180, y: 75, scale: 1.1, speed: 10 },
-      { x: 640, y: 60, scale: 0.85, speed: 8 },
-      { x: 1080, y: 90, scale: 1.25, speed: 12 }
+      { x: 640, y: 55, scale: 0.85, speed: 8 },
+      { x: 1080, y: 85, scale: 1.25, speed: 12 }
     ];
     cloudConfigs.forEach(c => {
       const cloudGfx = this.add.graphics().setDepth(2);
-      cloudGfx.fillStyle(0xffffff, 0.88);
+      cloudGfx.fillStyle(0xffffff, 0.9);
       cloudGfx.fillCircle(0, 0, 30 * c.scale);
       cloudGfx.fillCircle(-25 * c.scale, 6 * c.scale, 22 * c.scale);
       cloudGfx.fillCircle(25 * c.scale, 6 * c.scale, 22 * c.scale);
@@ -521,102 +528,94 @@ export default class GameScene extends Phaser.Scene {
       this.clouds.push(cloudGfx);
     });
 
-    // Layer 3: Continuous Green Battlefield Ground (Depth 3)
+    // Layer 2.5: Simple Backyard Bushes along the Horizon
+    this.bushesGfx = this.add.graphics().setDepth(2);
+    const bushPositions = [110, 420, 860, 1190];
+    bushPositions.forEach(bx => {
+      this.bushesGfx.fillStyle(0x10ac84, 0.85);
+      this.bushesGfx.fillCircle(bx, 546, 22);
+      this.bushesGfx.fillStyle(0x1dd1a1, 0.9);
+      this.bushesGfx.fillCircle(bx - 12, 550, 16);
+      this.bushesGfx.fillCircle(bx + 12, 550, 16);
+    });
+
+    // Layer 3: Continuous Vibrant Green Backyard Lawn & Warm Soil
     this.groundGfx = this.add.graphics().setDepth(3);
-    // Dark earthy base
-    this.groundGfx.fillStyle(0x4a3728, 1);
-    this.groundGfx.fillRect(0, 580, width, height - 580);
+    // Warm natural earth/soil base
+    this.groundGfx.fillStyle(0x8c531b, 1);
+    this.groundGfx.fillRect(0, 574, width, height - 574);
     // Earth-grass transition line
-    this.groundGfx.fillStyle(0x3a291d, 1);
-    this.groundGfx.fillRect(0, 578, width, 4);
-    // Vibrant green grass top
+    this.groundGfx.fillStyle(0x704214, 1);
+    this.groundGfx.fillRect(0, 570, width, 4);
+    // Bright vibrant green grass lawn
     this.groundGfx.fillStyle(0x2ed573, 1);
-    this.groundGfx.fillRect(0, 560, width, 20);
-    // Grass crest scalloped edge
+    this.groundGfx.fillRect(0, 550, width, 22);
+    // Scalloped lawn edge
     this.groundGfx.fillStyle(0x26af61, 1);
-    for (let gx = 0; gx < width; gx += 28) {
-      this.groundGfx.fillCircle(gx + 14, 560, 5);
+    for (let gx = 0; gx < width; gx += 20) {
+      this.groundGfx.fillCircle(gx + 10, 550, 4);
     }
 
-    // Left & Right Combatant Platforms (Depth 3)
-    this.createCombatPlatform(180, 542, 180, 38);
-    this.createCombatPlatform(1100, 542, 180, 38);
-
-    // Layer 4: Central Tactical Obstacle - Classic Low Wooden Fence (Depth 4)
+    // Layer 4: Central Tactical Obstacle - Classic Wooden Backyard Fence
     // Matches PHYSICS.obstacle: xMin 570, xMax 710, yMin 490
     this.createCenterFence();
   }
 
-  createCombatPlatform(cx, cy, w, h) {
-    const gfx = this.add.graphics().setDepth(3);
-    // Drop shadow
-    gfx.fillStyle(0x0c1829, 0.35);
-    gfx.fillRoundedRect(cx - w / 2, cy - h / 2 + 5, w, h, 10);
-    // Solid stone/earth plinth body
-    gfx.fillStyle(0x57606f, 1);
-    gfx.fillRoundedRect(cx - w / 2, cy - h / 2, w, h, 10);
-    gfx.lineStyle(3, 0x2f3542, 1);
-    gfx.strokeRoundedRect(cx - w / 2, cy - h / 2, w, h, 10);
-    // Bright grass cap
-    gfx.fillStyle(0x2ed573, 1);
-    gfx.fillRoundedRect(cx - w / 2 + 3, cy - h / 2 + 2, w - 6, 12, 6);
-  }
-
   createCenterFence() {
     const fenceGfx = this.add.graphics().setDepth(4);
-    // Posts at 585, 640, 695
-    const posts = [585, 640, 695];
-    posts.forEach(px => {
-      // Post shadow
-      fenceGfx.fillStyle(0x3e2723, 0.4);
-      fenceGfx.fillRect(px - 9, 492, 20, 88);
-      // Wood post body
-      fenceGfx.fillStyle(0x8b5a2b, 1);
-      fenceGfx.fillRect(px - 10, 490, 20, 90);
-      // Wood post pointed tip
+    // 5 vertical wooden fence pickets spanning 575 to 705
+    const pickets = [585, 612, 640, 668, 695];
+    pickets.forEach(px => {
+      // Picket shadow
+      fenceGfx.fillStyle(0x3e2723, 0.3);
+      fenceGfx.fillRect(px - 9, 497, 20, 63);
+      // Wood picket body
+      fenceGfx.fillStyle(0xd38d49, 1);
+      fenceGfx.fillRect(px - 10, 495, 20, 65);
+      // Pointed picket top
       fenceGfx.beginPath();
-      fenceGfx.moveTo(px - 10, 490);
-      fenceGfx.lineTo(px, 476);
-      fenceGfx.lineTo(px + 10, 490);
+      fenceGfx.moveTo(px - 10, 495);
+      fenceGfx.lineTo(px, 482);
+      fenceGfx.lineTo(px + 10, 495);
       fenceGfx.closePath();
       fenceGfx.fillPath();
-      // Border outline
-      fenceGfx.lineStyle(2, 0x4e342e, 1);
-      fenceGfx.strokeRect(px - 10, 490, 20, 90);
+      // Picket outline
+      fenceGfx.lineStyle(2, 0x8c531b, 1);
+      fenceGfx.strokeRect(px - 10, 495, 20, 65);
       fenceGfx.beginPath();
-      fenceGfx.moveTo(px - 10, 490);
-      fenceGfx.lineTo(px, 476);
-      fenceGfx.lineTo(px + 10, 490);
+      fenceGfx.moveTo(px - 10, 495);
+      fenceGfx.lineTo(px, 482);
+      fenceGfx.lineTo(px + 10, 495);
       fenceGfx.strokePath();
     });
 
-    // Horizontal rails
-    const rails = [512, 546];
+    // 2 horizontal wooden cross-rails
+    const rails = [512, 540];
     rails.forEach(ry => {
-      fenceGfx.fillStyle(0xa0522d, 1);
-      fenceGfx.fillRoundedRect(568, ry, 144, 16, 4);
-      fenceGfx.lineStyle(2, 0x4e342e, 1);
-      fenceGfx.strokeRoundedRect(568, ry, 144, 16, 4);
+      fenceGfx.fillStyle(0xcd7f32, 1);
+      fenceGfx.fillRoundedRect(572, ry, 136, 14, 4);
+      fenceGfx.lineStyle(2, 0x8c531b, 1);
+      fenceGfx.strokeRoundedRect(572, ry, 136, 14, 4);
 
       // Wood grain highlight
-      fenceGfx.lineStyle(1, 0xcd853f, 0.7);
-      fenceGfx.lineBetween(574, ry + 4, 706, ry + 4);
+      fenceGfx.lineStyle(1, 0xf5cd79, 0.6);
+      fenceGfx.lineBetween(576, ry + 3, 704, ry + 3);
 
-      // Nails on posts
-      posts.forEach(px => {
+      // Dark nail studs on pickets
+      pickets.forEach(px => {
         fenceGfx.fillStyle(0x2f3542, 1);
-        fenceGfx.fillCircle(px, ry + 8, 2.5);
+        fenceGfx.fillCircle(px, ry + 7, 2);
       });
     });
   }
 
   createCharacters() {
-    // Left Mascot (Player 1 / Blue) at (180, 500)
-    this.playerMonster = new Monster(this, 180, 500, 'player');
+    // Left Combatant (Blue Cat) at (230, 550) - 18% from left edge, feet planted on grass
+    this.playerMonster = new Monster(this, 230, 550, 'player');
     this.playerMonster.setDepth(6);
 
-    // Right Mascot (Player 2 / Red) at (1100, 500)
-    this.opponentMonster = new Monster(this, 1100, 500, 'opponent');
+    // Right Combatant (Orange Dog) at (1050, 550) - 82% from left edge, feet planted on grass
+    this.opponentMonster = new Monster(this, 1050, 550, 'opponent');
     this.opponentMonster.setDepth(6);
   }
 

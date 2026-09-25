@@ -1,49 +1,66 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="140" height="140">
   <defs>
-    <radialGradient id="blueBodyGrad" cx="45%" cy="40%" r="60%">
-      <stop offset="0%" stop-color="#48dbfb"/>
-      <stop offset="60%" stop-color="#0abde3"/>
-      <stop offset="100%" stop-color="#0086b3"/>
+    <radialGradient id="catBlueGrad" cx="45%" cy="38%" r="62%">
+      <stop offset="0%" stop-color="#54a0ff"/>
+      <stop offset="60%" stop-color="#2e86de"/>
+      <stop offset="100%" stop-color="#0952a5"/>
     </radialGradient>
-    <linearGradient id="hornGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#feca57"/>
-      <stop offset="100%" stop-color="#ff9f43"/>
+    <linearGradient id="catEarGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#2e86de"/>
+      <stop offset="100%" stop-color="#54a0ff"/>
     </linearGradient>
-    <linearGradient id="crestGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#1dd1a1"/>
-      <stop offset="100%" stop-color="#10ac84"/>
+    <linearGradient id="catInnerEar" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#ff9ff3"/>
+      <stop offset="100%" stop-color="#feca57"/>
     </linearGradient>
-    <filter id="softGlow" x="-10%" y="-10%" width="120%" height="120%">
-      <feGaussianBlur stdDeviation="3" result="blur"/>
-      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
-    </filter>
   </defs>
 
-  <!-- Ground Ambient Shadow -->
-  <ellipse cx="70" cy="132" rx="55" ry="8" fill="#0c2461" opacity="0.35"/>
+  <!-- Curving Cat Tail (Behind body, curls up on left) -->
+  <path d="M 28 92 C 8 86, -2 68, 6 52 C 14 36, 26 40, 20 52 C 14 62, 18 76, 32 84 Z"
+        fill="url(#catBlueGrad)" stroke="#0c2461" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Fluffy White Tail Tip -->
+  <path d="M 6 52 C 14 36, 26 40, 20 52 C 16 58, 12 58, 6 52 Z"
+        fill="#f8f9fa" stroke="#0c2461" stroke-width="2.5"/>
 
-  <!-- Back Horns / Ears -->
-  <path d="M 32 40 C 22 20, 10 15, 20 8 C 34 5, 42 22, 45 35 Z" fill="url(#hornGrad)" stroke="#c0392b" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 108 40 C 118 20, 130 15, 120 8 C 106 5, 98 22, 95 35 Z" fill="url(#hornGrad)" stroke="#c0392b" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Left Cat Ear (Triangular, Pointy, Cute) -->
+  <path d="M 26 48 L 14 12 C 18 10, 36 18, 48 34 Z"
+        fill="url(#catEarGrad)" stroke="#0c2461" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Left Inner Ear Cushion (Pink) -->
+  <path d="M 26 42 L 18 18 C 22 17, 32 23, 40 32 Z"
+        fill="url(#catInnerEar)" opacity="0.9"/>
 
-  <!-- Center Crest Spikes -->
-  <path d="M 60 22 L 70 8 L 80 22 Z" fill="url(#crestGrad)" stroke="#0984e3" stroke-width="2"/>
-  <path d="M 46 28 L 52 16 L 60 28 Z" fill="url(#crestGrad)" stroke="#0984e3" stroke-width="2"/>
-  <path d="M 94 28 L 88 16 L 80 28 Z" fill="url(#crestGrad)" stroke="#0984e3" stroke-width="2"/>
+  <!-- Right Cat Ear (Triangular, Pointy, Cute) -->
+  <path d="M 114 48 L 126 12 C 122 10, 104 18, 92 34 Z"
+        fill="url(#catEarGrad)" stroke="#0c2461" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Right Inner Ear Cushion (Pink) -->
+  <path d="M 114 42 L 122 18 C 118 17, 108 23, 100 32 Z"
+        fill="url(#catInnerEar)" opacity="0.9"/>
 
-  <!-- Main Chubby Body (Pear Silhouette) -->
+  <!-- Main Cat Body (Chubby Arcade Mascot with Cheek Fur Tufts) -->
   <path d="M 70 20
-           C 105 20, 124 45, 124 78
-           C 124 108, 108 126, 70 126
-           C 32 126, 16 108, 16 78
-           C 16 45, 35 20, 70 20 Z"
-        fill="url(#blueBodyGrad)" stroke="#0c2461" stroke-width="4.5" stroke-linejoin="round"/>
+           C 96 20, 116 34, 122 56
+           C 126 62, 134 66, 128 76
+           C 134 82, 126 92, 122 96
+           C 118 116, 98 126, 70 126
+           C 42 126, 22 116, 18 96
+           C 14 92, 6 82, 12 76
+           C 6 66, 14 62, 18 56
+           C 24 34, 44 20, 70 20 Z"
+        fill="url(#catBlueGrad)" stroke="#0c2461" stroke-width="4.5" stroke-linejoin="round"/>
 
-  <!-- Fur Highlights & Specular Rim -->
-  <path d="M 40 26 C 55 22, 85 22, 100 26 C 90 23, 50 23, 40 26 Z" fill="#c7ecee" opacity="0.8"/>
-  <path d="M 22 65 C 20 80, 24 98, 38 112 C 26 98, 22 80, 24 65 Z" fill="#ffffff" opacity="0.35"/>
+  <!-- Forehead Highlights -->
+  <path d="M 44 26 C 58 22, 82 22, 96 26 C 88 23, 52 23, 44 26 Z" fill="#c7ecee" opacity="0.75"/>
 
-  <!-- Rosy Cute Blush Cheeks -->
-  <ellipse cx="34" cy="84" rx="9" ry="5" fill="#ff7675" opacity="0.7"/>
-  <ellipse cx="106" cy="84" rx="9" ry="5" fill="#ff7675" opacity="0.7"/>
+  <!-- Cute Cat Whiskers -->
+  <path d="M 14 74 L 32 78" stroke="#0c2461" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 12 84 L 30 84" stroke="#0c2461" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 126 74 L 108 78" stroke="#0c2461" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M 128 84 L 110 84" stroke="#0c2461" stroke-width="2.5" stroke-linecap="round"/>
+
+  <!-- Cute Pink Cat Nose -->
+  <polygon points="70,72 65,65 75,65" fill="#ff6b81" stroke="#0c2461" stroke-width="1.8" stroke-linejoin="round"/>
+
+  <!-- Rosy Blush Cheeks -->
+  <ellipse cx="36" cy="85" rx="8" ry="4.5" fill="#ff7675" opacity="0.65"/>
+  <ellipse cx="104" cy="85" rx="8" ry="4.5" fill="#ff7675" opacity="0.65"/>
 </svg>

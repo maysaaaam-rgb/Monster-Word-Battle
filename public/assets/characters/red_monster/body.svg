@@ -1,37 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 140 140" width="140" height="140">
   <defs>
-    <radialGradient id="redBodyGrad" cx="50%" cy="42%" r="58%">
-      <stop offset="0%" stop-color="#ff6b6b"/>
-      <stop offset="65%" stop-color="#ee5253"/>
+    <radialGradient id="dogOrangeGrad" cx="48%" cy="40%" r="60%">
+      <stop offset="0%" stop-color="#ff9f43"/>
+      <stop offset="60%" stop-color="#ee5253"/>
       <stop offset="100%" stop-color="#b33939"/>
     </radialGradient>
-    <linearGradient id="redHornGrad" x1="0%" y1="100%" x2="0%" y2="0%">
-      <stop offset="0%" stop-color="#ff9f43"/>
-      <stop offset="60%" stop-color="#feca57"/>
-      <stop offset="100%" stop-color="#fffa65"/>
+    <linearGradient id="dogEarGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff793f"/>
+      <stop offset="60%" stop-color="#cd6133"/>
+      <stop offset="100%" stop-color="#841515"/>
     </linearGradient>
   </defs>
 
-  <!-- Ground Shadow -->
-  <ellipse cx="70" cy="132" rx="54" ry="8" fill="#5c1919" opacity="0.4"/>
+  <!-- Wagging Puppy Tail (curls up on right side) -->
+  <path d="M 112 92 C 128 88, 140 76, 136 62 C 130 54, 122 62, 124 72 C 126 80, 118 86, 112 92 Z"
+        fill="url(#dogOrangeGrad)" stroke="#5c1919" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- White Puppy Tail Tip -->
+  <path d="M 136 62 C 130 54, 122 62, 124 72 C 128 72, 134 68, 136 62 Z"
+        fill="#f8f9fa" stroke="#5c1919" stroke-width="2"/>
 
-  <!-- Curved Fiery Horns -->
-  <path d="M 28 44 C 14 26, 8 10, 22 4 C 36 0, 44 22, 44 38 Z" fill="url(#redHornGrad)" stroke="#841515" stroke-width="2.5" stroke-linejoin="round"/>
-  <path d="M 112 44 C 126 26, 132 10, 118 4 C 104 0, 96 22, 96 38 Z" fill="url(#redHornGrad)" stroke="#841515" stroke-width="2.5" stroke-linejoin="round"/>
+  <!-- Left Floppy Dog Ear (Drooping down side of head) -->
+  <path d="M 32 30 C 18 26, 8 40, 8 60 C 8 78, 20 86, 28 82 C 34 78, 36 50, 32 30 Z"
+        fill="url(#dogEarGrad)" stroke="#5c1919" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Left Inner Ear Crease -->
+  <path d="M 24 40 C 18 48, 18 68, 24 74" stroke="#ffb8b8" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
 
-  <!-- Round Chubby Body -->
-  <path d="M 70 24
-           C 106 24, 126 48, 126 78
-           C 126 108, 108 126, 70 126
-           C 32 126, 14 108, 14 78
-           C 14 48, 34 24, 70 24 Z"
-        fill="url(#redBodyGrad)" stroke="#5c1919" stroke-width="4.5" stroke-linejoin="round"/>
+  <!-- Right Floppy Dog Ear (Drooping down side of head) -->
+  <path d="M 108 30 C 122 26, 132 40, 132 60 C 132 78, 120 86, 112 82 C 106 78, 104 50, 108 30 Z"
+        fill="url(#dogEarGrad)" stroke="#5c1919" stroke-width="3.5" stroke-linejoin="round"/>
+  <!-- Right Inner Ear Crease -->
+  <path d="M 116 40 C 122 48, 122 68, 116 74" stroke="#ffb8b8" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.6"/>
 
-  <!-- Fiery Tail Tip Peeking -->
-  <path d="M 118 90 C 135 92, 138 78, 130 72 C 122 76, 118 84, 118 90 Z" fill="#feca57" stroke="#b33939" stroke-width="2"/>
+  <!-- Main Puppy Body (Chubby Mascot) -->
+  <path d="M 70 22
+           C 98 22, 118 36, 122 60
+           C 126 84, 116 110, 98 122
+           C 88 126, 52 126, 42 122
+           C 24 110, 14 84, 18 60
+           C 22 36, 42 22, 70 22 Z"
+        fill="url(#dogOrangeGrad)" stroke="#5c1919" stroke-width="4.5" stroke-linejoin="round"/>
 
-  <!-- Highlights & Warm Shading -->
-  <path d="M 40 30 C 56 26, 84 26, 100 30 C 90 27, 50 27, 40 30 Z" fill="#ffb8b8" opacity="0.75"/>
-  <ellipse cx="36" cy="85" rx="8" ry="5" fill="#f39c12" opacity="0.65"/>
-  <ellipse cx="104" cy="85" rx="8" ry="5" fill="#f39c12" opacity="0.65"/>
+  <!-- Forehead Fur Highlight -->
+  <path d="M 44 28 C 58 24, 82 24, 96 28 C 88 25, 52 25, 44 28 Z" fill="#ffb8b8" opacity="0.65"/>
+
+  <!-- Puppy Muzzle / Snout Base (Lighter Cream/Peach) -->
+  <ellipse cx="70" cy="74" rx="20" ry="14" fill="#f8a5c2" opacity="0.45"/>
+  <ellipse cx="60" cy="74" rx="10" ry="8" fill="#ffeaa7" opacity="0.85"/>
+  <ellipse cx="80" cy="74" rx="10" ry="8" fill="#ffeaa7" opacity="0.85"/>
+
+  <!-- Shiny Black Dog Nose -->
+  <ellipse cx="70" cy="67" rx="7" ry="5" fill="#2d3436" stroke="#1e272e" stroke-width="1.5"/>
+  <ellipse cx="68" cy="65.5" rx="2" ry="1.2" fill="#ffffff" opacity="0.8"/>
+
+  <!-- Cute Puppy Whiskers Dots -->
+  <circle cx="56" cy="73" r="1.5" fill="#5c1919"/>
+  <circle cx="54" cy="77" r="1.5" fill="#5c1919"/>
+  <circle cx="84" cy="73" r="1.5" fill="#5c1919"/>
+  <circle cx="86" cy="77" r="1.5" fill="#5c1919"/>
+
+  <!-- Rosy Cheeks -->
+  <ellipse cx="36" cy="85" rx="8" ry="4.5" fill="#f39c12" opacity="0.7"/>
+  <ellipse cx="104" cy="85" rx="8" ry="4.5" fill="#f39c12" opacity="0.7"/>
 </svg>

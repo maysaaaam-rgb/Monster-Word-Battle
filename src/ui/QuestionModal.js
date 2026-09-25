@@ -35,22 +35,20 @@ export default class QuestionModal {
   }
 
   createEventFrame() {
-    // Compact Header Banner Pill
+    // Compact Header Banner Pill (Bright Cartoon Arcade Style)
     this.bannerBg = this.scene.add.graphics();
-    this.bannerBg.fillStyle(0x131e3a, 0.94);
+    this.bannerBg.fillStyle(0xffffff, 0.94);
     this.bannerBg.fillRoundedRect(-220, -68, 440, 36, 12);
-    this.bannerBg.lineStyle(2, 0xf39c12, 1);
+    this.bannerBg.lineStyle(2.5, 0xff9f43, 1);
     this.bannerBg.strokeRoundedRect(-220, -68, 440, 36, 12);
     this.modalBox.add(this.bannerBg);
 
     // Question Prompt Text in Plaque Banner Ribbon
     this.promptText = this.scene.add.text(0, -50, '🎯 Where is the cat?', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
-      fontSize: '16px',
+      fontSize: '15px',
       fontStyle: '900',
-      color: '#ffffff',
-      stroke: '#000000',
-      strokeThickness: 3
+      color: '#2d3436'
     }).setOrigin(0.5);
     this.modalBox.add(this.promptText);
 

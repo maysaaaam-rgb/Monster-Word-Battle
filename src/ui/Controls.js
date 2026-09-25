@@ -55,27 +55,24 @@ export default class Controls {
 
   createPanel() {
     const bg = this.scene.add.graphics();
-    // Compact floating arcade bar with gold outline
-    bg.fillStyle(0x131e3a, 0.94);
-    bg.fillRoundedRect(-235, -28, 470, 56, 16);
-    bg.lineStyle(3, 0xf39c12, 1);
-    bg.strokeRoundedRect(-235, -28, 470, 56, 16);
-
-    bg.lineStyle(1, 0xffffff, 0.2);
-    bg.strokeRoundedRect(-231, -24, 462, 48, 12);
+    // Bright floating cartoon arcade bar with orange border
+    bg.fillStyle(0xffffff, 0.94);
+    bg.fillRoundedRect(-260, -28, 520, 56, 16);
+    bg.lineStyle(3, 0xff9f43, 1);
+    bg.strokeRoundedRect(-260, -28, 520, 56, 16);
 
     this.container.add(bg);
   }
 
   createAngleControls() {
-    const x = -155;
+    const x = -170;
 
     // Mini Label
     const label = this.scene.add.text(x, -18, 'ANGLE', {
       fontFamily: 'system-ui, -apple-system, sans-serif',
       fontSize: '10px',
       fontStyle: '900',
-      color: '#f1c40f'
+      color: '#718093'
     }).setOrigin(0.5);
     this.container.add(label);
 
@@ -94,8 +91,8 @@ export default class Controls {
     this.angleText = this.scene.add.text(x, 5, `${this.angle}°`, {
       fontFamily: 'system-ui, monospace',
       fontSize: '17px',
-      fontStyle: 'bold',
-      color: '#ffffff'
+      fontStyle: '900',
+      color: '#0984e3'
     }).setOrigin(0.5);
     this.container.add(this.angleText);
 
@@ -112,14 +109,14 @@ export default class Controls {
   }
 
   createPowerControls() {
-    const x = -20;
+    const x = -30;
 
     // Mini Label
     this.powerLabel = this.scene.add.text(x, -18, `POWER: ${Math.round(this.power)}%`, {
       fontFamily: 'system-ui, -apple-system, sans-serif',
       fontSize: '10px',
       fontStyle: '900',
-      color: '#f1c40f'
+      color: '#718093'
     }).setOrigin(0.5);
     this.container.add(this.powerLabel);
 
@@ -165,10 +162,10 @@ export default class Controls {
   createAbilitySelectors() {
     this.abilityButtons = {};
     const abilities = [
-      { key: 'rock', icon: 'ability_rock', x: 62, y: -10 },
-      { key: 'fireball', icon: 'ability_fire', x: 86, y: -10 },
-      { key: 'shield', icon: 'ability_shield', x: 62, y: 12 },
-      { key: 'heal', icon: 'ability_heal', x: 86, y: 12 }
+      { key: 'rock', icon: 'ability_rock', x: 56, y: -10 },
+      { key: 'fireball', icon: 'ability_fire', x: 84, y: -10 },
+      { key: 'shield', icon: 'ability_shield', x: 56, y: 12 },
+      { key: 'heal', icon: 'ability_heal', x: 84, y: 12 }
     ];
 
     abilities.forEach(ab => {
@@ -180,7 +177,7 @@ export default class Controls {
       const icon = this.scene.add.image(0, 0, ab.icon).setDisplaySize(18, 18);
       container.add(icon);
 
-      const hit = this.scene.add.rectangle(0, 0, 22, 20, 0x000000, 0)
+      const hit = this.scene.add.rectangle(0, 0, 24, 20, 0x000000, 0)
         .setInteractive({ useHandCursor: true });
       container.add(hit);
 
@@ -207,18 +204,18 @@ export default class Controls {
 
       btn.bg.clear();
       if (isSelected) {
-        btn.bg.fillStyle(0xf1c40f, 0.45);
-        btn.bg.fillRoundedRect(-11, -10, 22, 20, 5);
-        btn.bg.lineStyle(2, 0xffd700, 1);
-        btn.bg.strokeRoundedRect(-11, -10, 22, 20, 5);
+        btn.bg.fillStyle(0xfffa65, 1);
+        btn.bg.fillRoundedRect(-12, -10, 24, 20, 6);
+        btn.bg.lineStyle(2, 0xff9f43, 1);
+        btn.bg.strokeRoundedRect(-12, -10, 24, 20, 6);
       } else {
-        btn.bg.fillStyle(0x1e272e, 0.6);
-        btn.bg.fillRoundedRect(-11, -10, 22, 20, 5);
-        btn.bg.lineStyle(1, 0x57606f, 0.7);
-        btn.bg.strokeRoundedRect(-11, -10, 22, 20, 5);
+        btn.bg.fillStyle(0xf1f2f6, 0.95);
+        btn.bg.fillRoundedRect(-12, -10, 24, 20, 6);
+        btn.bg.lineStyle(1.5, 0xdcdde1, 1);
+        btn.bg.strokeRoundedRect(-12, -10, 24, 20, 6);
       }
 
-      btn.container.setAlpha(isUnlocked ? 1.0 : 0.3);
+      btn.container.setAlpha(isUnlocked ? 1.0 : 0.35);
       btn.icon.setScale(isSelected ? 1.15 : 1.0);
     });
   }
@@ -229,15 +226,15 @@ export default class Controls {
 
     this.sliderTrack.clear();
     // Track Backing
-    this.sliderTrack.fillStyle(0x1a2530, 1);
+    this.sliderTrack.fillStyle(0xdcdde1, 1);
     this.sliderTrack.fillRoundedRect(x - w / 2, y - h / 2, w, h, 6);
-    this.sliderTrack.lineStyle(2, 0x475569, 1);
+    this.sliderTrack.lineStyle(1.5, 0xb2bec3, 1);
     this.sliderTrack.strokeRoundedRect(x - w / 2, y - h / 2, w, h, 6);
 
     // Dynamic Color Fill: Green -> Gold -> Red
     let fillColor = 0x2ed573;
     if (ratio > 0.7) fillColor = 0xff4757;
-    else if (ratio > 0.4) fillColor = 0xf39c12;
+    else if (ratio > 0.4) fillColor = 0xff9f43;
 
     const fillW = Math.max(6, w * ratio);
     this.sliderTrack.fillStyle(fillColor, 1);
@@ -257,12 +254,12 @@ export default class Controls {
   }
 
   createActionButton() {
-    const x = 166;
+    const x = 186;
     const y = 0;
 
     this.actionBtnContainer = this.scene.add.container(x, y);
 
-    const btnWidth = 112;
+    const btnWidth = 114;
     const btnHeight = 44;
 
     this.btnShadow = this.scene.add.graphics();
@@ -397,7 +394,7 @@ export default class Controls {
   }
 
   updateActionButton() {
-    const btnWidth = 112;
+    const btnWidth = 114;
     const btnHeight = 44;
 
     const isFire = this.activeAction === 'fireball';

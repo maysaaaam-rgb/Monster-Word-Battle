@@ -10,11 +10,11 @@ export const PHYSICS = {
   gravity: 480, // px/s^2 (clean, predictable cartoon artillery gravity)
   speedMultiplier: 10.0, // speed = power * speedMultiplier (power 20..100 -> speed 200..1000)
   windScale: 12.0, // windAcc = wind * windScale
-  groundY: 580, // Elevation of canyon floor/water
+  groundY: 570, // Elevation of lawn grass
   playerHitbox: {
     offsetX: 0,
     offsetY: -75,
-    radius: 70
+    radius: 75
   },
   obstacle: {
     xMin: 570,
