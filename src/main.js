@@ -89,11 +89,38 @@ const rimLight = new THREE.DirectionalLight(0x80deea, 0.8);
 rimLight.position.set(-15, 10, -8);
 scene.add(rimLight);
 
+// --- إنشاء تدرج لوني كرتوني ذي خطوتين فقط (ضوء وظل حاد / 2-Tone Cel-Shading) ---
+const format = THREE.RGBAFormat;
+const colors = new Uint8Array([
+  80, 80, 80, 255,   // لون الظل الكرتوني
+  255, 255, 255, 255 // لون الضوء
+]);
+const gradientMap = new THREE.DataTexture(colors, 2, 1, format);
+gradientMap.needsUpdate = true;
+gradientMap.minFilter = THREE.NearestFilter;
+gradientMap.magFilter = THREE.NearestFilter;
+
+// خامات الشخصيات الكرتونية
+const catToonMat = new THREE.MeshToonMaterial({
+  color: 0x00bcd4,
+  gradientMap: gradientMap
+});
+
+const dogToonMat = new THREE.MeshToonMaterial({
+  color: 0x8d6e63,
+  gradientMap: gradientMap
+});
+
+const woodToonMat = new THREE.MeshToonMaterial({
+  color: 0xffb74d,
+  gradientMap: gradientMap
+});
+
 // --- 3. الأرضيات والبيئة المقسمة ---
 // أرضية الزقاق المرصوف (يسار)
 const alleyFloor = new THREE.Mesh(
   new THREE.PlaneGeometry(16, 20),
-  new THREE.MeshStandardMaterial({ color: 0x90a4ae, roughness: 0.85 })
+  new THREE.MeshToonMaterial({ color: 0x90a4ae, gradientMap })
 );
 alleyFloor.rotation.x = -Math.PI / 2;
 alleyFloor.position.set(-8, 0, 0);
@@ -103,7 +130,7 @@ scene.add(alleyFloor);
 // أرضية العشب الأخضر للحديقة (يمين)
 const yardFloor = new THREE.Mesh(
   new THREE.PlaneGeometry(16, 20),
-  new THREE.MeshStandardMaterial({ color: 0x558b2f, roughness: 0.65 })
+  new THREE.MeshToonMaterial({ color: 0x558b2f, gradientMap })
 );
 yardFloor.rotation.x = -Math.PI / 2;
 yardFloor.position.set(8, 0, 0);
@@ -113,7 +140,7 @@ scene.add(yardFloor);
 // جدار الزقاق البنفسجي الأيقوني (يسار)
 const alleyWall = new THREE.Mesh(
   new THREE.BoxGeometry(0.8, 12, 20),
-  new THREE.MeshStandardMaterial({ color: 0x8e24aa, roughness: 0.8 })
+  new THREE.MeshToonMaterial({ color: 0x8e24aa, gradientMap })
 );
 alleyWall.position.set(-14, 6, 0);
 alleyWall.receiveShadow = true;
@@ -122,7 +149,7 @@ scene.add(alleyWall);
 // سقف قرميدي على زاوية الحديقة الخلفية (يمين)
 const roof = new THREE.Mesh(
   new THREE.ConeGeometry(4, 3, 4),
-  new THREE.MeshStandardMaterial({ color: 0xd84315, roughness: 0.7 })
+  new THREE.MeshToonMaterial({ color: 0xd84315, gradientMap })
 );
 roof.position.set(13, 8, -6);
 roof.rotation.y = Math.PI / 4;
@@ -131,7 +158,7 @@ scene.add(roof);
 // سحب كرتونية 3D طافية في السماء
 function createCloud(x, y, z) {
   const cloudGroup = new THREE.Group();
-  const cloudMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.2 });
+  const cloudMat = new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap });
   const parts = [
     { r: 0.9, x: 0, y: 0 },
     { r: 1.3, x: 0.8, y: 0.2 },
@@ -151,8 +178,8 @@ createCloud(5, 9, -10);
 
 // --- 4. سياج خشبي واقعي ثلاثي الأبعاد (Center Fence) ---
 const fenceGroup = new THREE.Group();
-const woodMat = new THREE.MeshStandardMaterial({ color: 0x8d6e63, roughness: 0.8 });
-const postMat = new THREE.MeshStandardMaterial({ color: 0xffb74d, roughness: 0.7 });
+const woodMat = new THREE.MeshToonMaterial({ color: 0x8d6e63, gradientMap });
+const postMat = woodToonMat;
 
 // ألواح الخشب المتراصة
 for (let i = -3; i <= 3; i++) {
@@ -180,11 +207,11 @@ scene.add(fenceGroup);
 
 // --- 5. القط الكرتوني 3D (Fleabag Cat) ---
 const catGroup = new THREE.Group();
-const catMat = new THREE.MeshStandardMaterial({ color: 0x00acc1, roughness: 0.4 });
+const catMat = catToonMat;
 const eyeWhiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 const blackMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
-const pinkMat = new THREE.MeshStandardMaterial({ color: 0xff4081 });
-const bandageMat = new THREE.MeshStandardMaterial({ color: 0xfff9c4, roughness: 0.9 });
+const pinkMat = new THREE.MeshToonMaterial({ color: 0xff4081, gradientMap });
+const bandageMat = new THREE.MeshToonMaterial({ color: 0xfff9c4, gradientMap });
 
 // جسم القط المنحني الجالس
 const catTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.7, 1.3, 16), catMat);
@@ -246,7 +273,7 @@ catGroup.add(tail);
 // برميل القمامة المعدني وصندوق الجلوس
 const bin = new THREE.Mesh(
   new THREE.CylinderGeometry(0.85, 0.72, 1.5, 20),
-  new THREE.MeshStandardMaterial({ color: 0x78909c, metalness: 0.45, roughness: 0.5 })
+  new THREE.MeshToonMaterial({ color: 0x78909c, gradientMap })
 );
 bin.position.set(-6.8, 0.75, 0);
 bin.castShadow = true;
@@ -256,7 +283,7 @@ scene.add(bin);
 // الصندوق الخشبي الذي يجلس عليه القط بجانب البرميل
 const seatBox = new THREE.Mesh(
   new THREE.BoxGeometry(1.2, 1.1, 1.2),
-  new THREE.MeshStandardMaterial({ color: 0xd7ccc8, roughness: 0.8 })
+  new THREE.MeshToonMaterial({ color: 0xd7ccc8, gradientMap })
 );
 seatBox.position.set(-8.2, 0.55, 0);
 seatBox.castShadow = true;
@@ -268,9 +295,9 @@ scene.add(catGroup);
 
 // --- 6. الكلب الكرتوني 3D الضاحك (Mutt Dog) ---
 const dogGroup = new THREE.Group();
-const dogFurMat = new THREE.MeshStandardMaterial({ color: 0x8d6e63, roughness: 0.55 });
-const muzzleMat = new THREE.MeshStandardMaterial({ color: 0xefebe9, roughness: 0.5 });
-const earDogMat = new THREE.MeshStandardMaterial({ color: 0x4e342e, roughness: 0.6 });
+const dogFurMat = dogToonMat;
+const muzzleMat = new THREE.MeshToonMaterial({ color: 0xefebe9, gradientMap });
+const earDogMat = new THREE.MeshToonMaterial({ color: 0x4e342e, gradientMap });
 
 // جسم الكلب العريض
 const dogBody = new THREE.Mesh(new THREE.SphereGeometry(0.95, 20, 20), dogFurMat);
@@ -338,7 +365,7 @@ scene.add(dogGroup);
 // صحن طعام الكلب المليء بالعظام أمامه
 const dogBowl = new THREE.Mesh(
   new THREE.CylinderGeometry(0.65, 0.45, 0.35, 16),
-  new THREE.MeshStandardMaterial({ color: 0xe65100, roughness: 0.4 })
+  new THREE.MeshToonMaterial({ color: 0xe65100, gradientMap })
 );
 dogBowl.position.set(6.0, 0.18, 0);
 dogBowl.castShadow = true;
@@ -346,7 +373,7 @@ scene.add(dogBowl);
 
 const boneInBowl = new THREE.Mesh(
   new THREE.BoxGeometry(0.6, 0.14, 0.14),
-  new THREE.MeshStandardMaterial({ color: 0xffffff })
+  new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap })
 );
 boneInBowl.position.set(6.0, 0.38, 0);
 boneInBowl.rotation.set(0.2, 0.4, 0);
@@ -426,7 +453,7 @@ function fireProjectile(power) {
   
   // مجسم المقذوف (عظمة كرتونية 3D)
   const boneGroup = new THREE.Group();
-  const boneMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+  const boneMat = new THREE.MeshToonMaterial({ color: 0xffffff, gradientMap });
   const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.6, 8), boneMat);
   shaft.rotation.z = Math.PI / 2;
   shaft.castShadow = true;
