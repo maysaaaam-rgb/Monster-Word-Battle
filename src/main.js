@@ -1,5 +1,24 @@
 import Phaser from 'phaser';
 
+// Polyfill CanvasRenderingContext2D.roundRect if missing
+if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D.prototype.roundRect) {
+  CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, radii) {
+    const r = Array.isArray(radii) ? radii[0] || 0 : (typeof radii === 'number' ? radii : 0);
+    this.beginPath();
+    this.moveTo(x + r, y);
+    this.lineTo(x + w - r, y);
+    this.quadraticCurveTo(x + w, y, x + w, y + r);
+    this.lineTo(x + w, y + h - r);
+    this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    this.lineTo(x + r, y + h);
+    this.quadraticCurveTo(x, y + h, x, y + h - r);
+    this.lineTo(x, y + r);
+    this.quadraticCurveTo(x, y, x + r, y);
+    this.closePath();
+    return this;
+  };
+}
+
 // --- Procedural Sound Effects (Web Audio API) ---
 class AudioController {
   constructor() {
@@ -27,7 +46,7 @@ class AudioController {
       if (endFreq) {
         osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + duration);
       }
-      gain.gain.setValueAtTime(0.15, this.ctx.currentTime);
+      gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
@@ -38,199 +57,257 @@ class AudioController {
     }
   }
   sfxThrow() {
-    this.playTone(400, 'sine', 0.25, 120);
+    this.playTone(380, 'sine', 0.28, 90);
   }
   sfxHit() {
-    this.playTone(150, 'sawtooth', 0.3, 40);
+    this.playTone(160, 'sawtooth', 0.35, 30);
   }
   sfxCorrect() {
-    this.playTone(523.25, 'triangle', 0.15);
-    setTimeout(() => this.playTone(659.25, 'triangle', 0.25), 120);
+    this.playTone(520, 'triangle', 0.12);
+    setTimeout(() => this.playTone(680, 'triangle', 0.2), 100);
   }
   sfxWrong() {
-    this.playTone(220, 'square', 0.2, 110);
+    this.playTone(200, 'square', 0.25, 90);
   }
 }
 
 const audio = new AudioController();
 
-// --- Main Game Scene ---
 class CatDogScene extends Phaser.Scene {
   constructor() {
     super('CatDogScene');
   }
 
   preload() {
-    // Generate clean vector graphics procedurally
-    this.createTextureAssets();
+    this.createPixelAssets();
   }
 
-  createTextureAssets() {
-    if (this.textures.exists('cat')) return;
+  createPixelAssets() {
+    if (this.textures.exists('fence_wall')) return;
 
-    // Helper for roundRect on canvas
-    const drawRoundRect = (ctx, x, y, w, h, r) => {
-      if (ctx.roundRect) {
-        ctx.beginPath();
-        ctx.roundRect(x, y, w, h, r);
-      } else {
-        ctx.beginPath();
-        ctx.moveTo(x + r, y);
-        ctx.lineTo(x + w - r, y);
-        ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-        ctx.lineTo(x + w, y + h - r);
-        ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-        ctx.lineTo(x + r, y + h);
-        ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-        ctx.lineTo(x, y + r);
-        ctx.quadraticCurveTo(x, y, x + r, y);
-        ctx.closePath();
-      }
-    };
+    // 1. Classic Wooden Plank Fence (Wide like the original)
+    const fCanvas = document.createElement('canvas');
+    fCanvas.width = 420;
+    fCanvas.height = 360;
+    const fCtx = fCanvas.getContext('2d');
 
-    // 1. Cat (Left Character)
+    // Horizontal top rail
+    fCtx.fillStyle = '#E6C687';
+    fCtx.strokeStyle = '#2B1E16';
+    fCtx.lineWidth = 6;
+    fCtx.fillRect(10, 10, 400, 32);
+    fCtx.strokeRect(10, 10, 400, 32);
+
+    // Left post
+    fCtx.fillStyle = '#FFF2AF';
+    fCtx.beginPath();
+    fCtx.roundRect(10, 8, 48, 350, [12, 12, 0, 0]);
+    fCtx.fill();
+    fCtx.stroke();
+
+    // Vertical slats
+    const plankColors = ['#9E8852', '#8C7745', '#94804A', '#836F3D', '#9A854E', '#877442', '#927E48'];
+    for (let i = 0; i < 7; i++) {
+      const px = 58 + (i * 50);
+      fCtx.fillStyle = plankColors[i];
+      fCtx.fillRect(px, 42, 50, 318);
+      fCtx.strokeRect(px, 42, 50, 318);
+    }
+    this.textures.addCanvas('fence_wall', fCanvas);
+
+    // 2. Alley Trash Bin with overflow trash
+    const binCanvas = document.createElement('canvas');
+    binCanvas.width = 160;
+    binCanvas.height = 180;
+    const bCtx = binCanvas.getContext('2d');
+
+    // Garbage pile peeking over the top
+    bCtx.fillStyle = '#6E6E6E';
+    bCtx.beginPath();
+    bCtx.arc(105, 55, 24, 0, Math.PI * 2);
+    bCtx.arc(130, 60, 18, 0, Math.PI * 2);
+    bCtx.fill();
+    bCtx.fillStyle = '#E8A598';
+    bCtx.fillRect(108, 40, 20, 16); // Tin can / paper
+
+    // Metal Bin
+    bCtx.fillStyle = '#A0AAB2';
+    bCtx.strokeStyle = '#232A31';
+    bCtx.lineWidth = 6;
+    bCtx.beginPath();
+    bCtx.moveTo(30, 60);
+    bCtx.lineTo(150, 60);
+    bCtx.lineTo(138, 175);
+    bCtx.lineTo(46, 175);
+    bCtx.closePath();
+    bCtx.fill();
+    bCtx.stroke();
+
+    // Ridges
+    bCtx.lineWidth = 4;
+    bCtx.beginPath();
+    bCtx.moveTo(60, 68); bCtx.lineTo(68, 168);
+    bCtx.moveTo(90, 68); bCtx.lineTo(92, 168);
+    bCtx.moveTo(120, 68); bCtx.lineTo(116, 168);
+    bCtx.stroke();
+    this.textures.addCanvas('trashcan_full', binCanvas);
+
+    // 3. Cat Sprite (Looking Right toward Dog)
     const catCanvas = document.createElement('canvas');
-    catCanvas.width = 120;
+    catCanvas.width = 140;
     catCanvas.height = 140;
     const cCtx = catCanvas.getContext('2d');
-    
-    // Ears
-    cCtx.fillStyle = '#2FA4B8';
-    cCtx.strokeStyle = '#1D2A3A';
-    cCtx.lineWidth = 5;
+
+    // Pointed ears with dark ink stroke
+    cCtx.fillStyle = '#26A69A';
+    cCtx.strokeStyle = '#1A2421';
+    cCtx.lineWidth = 6;
     cCtx.beginPath();
-    cCtx.moveTo(25, 45); cCtx.lineTo(10, 10); cCtx.lineTo(48, 25); cCtx.closePath();
+    cCtx.moveTo(25, 60); cCtx.lineTo(10, 15); cCtx.lineTo(55, 35); cCtx.closePath();
     cCtx.fill(); cCtx.stroke();
     cCtx.beginPath();
-    cCtx.moveTo(95, 45); cCtx.lineTo(110, 10); cCtx.lineTo(72, 25); cCtx.closePath();
+    cCtx.moveTo(70, 40); cCtx.lineTo(110, 15); cCtx.lineTo(100, 60); cCtx.closePath();
     cCtx.fill(); cCtx.stroke();
 
-    // Body
+    // Body & tail
     cCtx.beginPath();
-    cCtx.ellipse(60, 95, 35, 40, 0, 0, Math.PI * 2);
+    cCtx.ellipse(60, 102, 38, 30, 0, 0, Math.PI * 2);
     cCtx.fill(); cCtx.stroke();
 
     // Head
     cCtx.beginPath();
-    cCtx.ellipse(60, 52, 42, 32, 0, 0, Math.PI * 2);
+    cCtx.ellipse(60, 64, 46, 34, 0, 0, Math.PI * 2);
     cCtx.fill(); cCtx.stroke();
 
-    // Bandage on forehead
-    cCtx.fillStyle = '#E8D8B8';
+    // White Head Bandage
+    cCtx.fillStyle = '#F5F5DC';
     cCtx.save();
-    cCtx.translate(45, 35);
-    cCtx.rotate(-0.2);
-    cCtx.fillRect(-15, -6, 30, 12);
-    cCtx.strokeRect(-15, -6, 30, 12);
+    cCtx.translate(45, 45);
+    cCtx.rotate(-0.15);
+    cCtx.fillRect(-18, -8, 36, 16);
+    cCtx.strokeRect(-18, -8, 36, 16);
     cCtx.restore();
 
-    // Eyes
+    // Expressive Eyes (Glancing right toward dog)
     cCtx.fillStyle = '#FFFFFF';
-    cCtx.beginPath(); cCtx.arc(44, 52, 10, 0, Math.PI * 2); cCtx.fill(); cCtx.stroke();
-    cCtx.beginPath(); cCtx.arc(76, 52, 10, 0, Math.PI * 2); cCtx.fill(); cCtx.stroke();
-    cCtx.fillStyle = '#1D2A3A';
-    cCtx.beginPath(); cCtx.arc(47, 52, 4, 0, Math.PI * 2); cCtx.fill();
-    cCtx.beginPath(); cCtx.arc(79, 52, 4, 0, Math.PI * 2); cCtx.fill();
+    cCtx.beginPath(); cCtx.ellipse(48, 64, 12, 14, 0, 0, Math.PI * 2); cCtx.fill(); cCtx.stroke();
+    cCtx.beginPath(); cCtx.ellipse(80, 64, 12, 14, 0, 0, Math.PI * 2); cCtx.fill(); cCtx.stroke();
+    cCtx.fillStyle = '#1A2421';
+    cCtx.beginPath(); cCtx.arc(54, 64, 5, 0, Math.PI * 2); cCtx.fill();
+    cCtx.beginPath(); cCtx.arc(86, 64, 5, 0, Math.PI * 2); cCtx.fill();
 
-    // Snout & Whiskers
-    cCtx.fillStyle = '#E67E96';
-    cCtx.beginPath(); cCtx.arc(60, 62, 5, 0, Math.PI * 2); cCtx.fill();
-    cCtx.strokeStyle = '#1D2A3A';
-    cCtx.lineWidth = 3;
+    // Whiskers
+    cCtx.lineWidth = 4;
     cCtx.beginPath();
-    cCtx.moveTo(25, 62); cCtx.lineTo(10, 60);
-    cCtx.moveTo(25, 67); cCtx.lineTo(12, 72);
-    cCtx.moveTo(95, 62); cCtx.lineTo(110, 60);
-    cCtx.moveTo(95, 67); cCtx.lineTo(108, 72);
+    cCtx.moveTo(25, 75); cCtx.lineTo(5, 70);
+    cCtx.moveTo(25, 82); cCtx.lineTo(8, 88);
+    cCtx.moveTo(95, 75); cCtx.lineTo(115, 70);
+    cCtx.moveTo(95, 82); cCtx.lineTo(112, 88);
     cCtx.stroke();
-    this.textures.addCanvas('cat', catCanvas);
+    this.textures.addCanvas('cat_classic', catCanvas);
 
-    // 2. Dog (Right Character)
+    // 4. Dog Food Bowl & Bones
+    const bowlCanvas = document.createElement('canvas');
+    bowlCanvas.width = 150;
+    bowlCanvas.height = 70;
+    const boCtx = bowlCanvas.getContext('2d');
+
+    // Bones overflowing
+    boCtx.fillStyle = '#FFFFFF';
+    boCtx.strokeStyle = '#2B1E16';
+    boCtx.lineWidth = 4;
+    boCtx.beginPath();
+    boCtx.roundRect(40, 10, 60, 16, 8); boCtx.fill(); boCtx.stroke();
+    boCtx.beginPath();
+    boCtx.roundRect(65, 5, 50, 14, 6); boCtx.fill(); boCtx.stroke();
+
+    // Bowl
+    boCtx.fillStyle = '#F4511E';
+    boCtx.lineWidth = 6;
+    boCtx.beginPath();
+    boCtx.moveTo(15, 24);
+    boCtx.lineTo(135, 24);
+    boCtx.lineTo(122, 65);
+    boCtx.lineTo(28, 65);
+    boCtx.closePath();
+    boCtx.fill();
+    boCtx.stroke();
+    boCtx.fillStyle = '#FFFFFF';
+    boCtx.beginPath();
+    boCtx.roundRect(45, 36, 60, 14, 6);
+    boCtx.fill();
+    this.textures.addCanvas('dog_bowl_full', bowlCanvas);
+
+    // 5. Classic Dog Sprite (Chubby grinning pup)
     const dogCanvas = document.createElement('canvas');
-    dogCanvas.width = 140;
-    dogCanvas.height = 140;
+    dogCanvas.width = 170;
+    dogCanvas.height = 150;
     const dCtx = dogCanvas.getContext('2d');
 
-    // Droopy Ears
-    dCtx.fillStyle = '#6E6259';
-    dCtx.strokeStyle = '#1D2A3A';
-    dCtx.lineWidth = 5;
-    dCtx.beginPath(); dCtx.ellipse(22, 60, 14, 30, 0.3, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
-    dCtx.beginPath(); dCtx.ellipse(118, 60, 14, 30, -0.3, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
+    // Big droopy ears
+    dCtx.fillStyle = '#795548';
+    dCtx.strokeStyle = '#2B1E16';
+    dCtx.lineWidth = 6;
+    dCtx.beginPath(); dCtx.ellipse(22, 70, 18, 36, 0.25, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
+    dCtx.beginPath(); dCtx.ellipse(148, 70, 18, 36, -0.25, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
 
     // Body
-    dCtx.fillStyle = '#9C8C7E';
-    dCtx.beginPath(); dCtx.ellipse(70, 95, 42, 38, 0, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
+    dCtx.fillStyle = '#A1887F';
+    dCtx.beginPath();
+    dCtx.ellipse(85, 105, 52, 38, 0, 0, Math.PI * 2);
+    dCtx.fill(); dCtx.stroke();
 
     // Head
-    dCtx.beginPath(); dCtx.ellipse(70, 52, 46, 36, 0, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
+    dCtx.beginPath();
+    dCtx.ellipse(85, 60, 56, 42, 0, 0, Math.PI * 2);
+    dCtx.fill(); dCtx.stroke();
 
-    // Eyes
+    // Wide Grin / Snout
+    dCtx.fillStyle = '#EFEBE9';
+    dCtx.beginPath();
+    dCtx.ellipse(85, 78, 42, 28, 0, 0, Math.PI * 2);
+    dCtx.fill(); dCtx.stroke();
+
+    // Black Nose
+    dCtx.fillStyle = '#2B1E16';
+    dCtx.beginPath();
+    dCtx.ellipse(85, 65, 12, 8, 0, 0, Math.PI * 2);
+    dCtx.fill();
+
+    // Big Cartoon Grin with Tongue
+    dCtx.beginPath();
+    dCtx.arc(85, 80, 24, 0.1 * Math.PI, 0.9 * Math.PI);
+    dCtx.stroke();
+    dCtx.fillStyle = '#E91E63';
+    dCtx.beginPath();
+    dCtx.arc(85, 88, 12, 0, Math.PI);
+    dCtx.fill(); dCtx.stroke();
+
+    // Big Eyes looking left toward cat
     dCtx.fillStyle = '#FFFFFF';
-    dCtx.beginPath(); dCtx.arc(52, 45, 11, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
-    dCtx.beginPath(); dCtx.arc(88, 45, 11, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
-    dCtx.fillStyle = '#1D2A3A';
-    dCtx.beginPath(); dCtx.arc(49, 45, 5, 0, Math.PI * 2); dCtx.fill();
-    dCtx.beginPath(); dCtx.arc(85, 45, 5, 0, Math.PI * 2); dCtx.fill();
+    dCtx.beginPath(); dCtx.arc(62, 48, 13, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
+    dCtx.beginPath(); dCtx.arc(108, 48, 13, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
+    dCtx.fillStyle = '#2B1E16';
+    dCtx.beginPath(); dCtx.arc(58, 48, 6, 0, Math.PI * 2); dCtx.fill();
+    dCtx.beginPath(); dCtx.arc(104, 48, 6, 0, Math.PI * 2); dCtx.fill();
+    this.textures.addCanvas('dog_classic', dogCanvas);
 
-    // Big Snout & Tongue
-    dCtx.fillStyle = '#D1C4B9';
-    dCtx.beginPath(); dCtx.ellipse(70, 68, 30, 20, 0, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
-    dCtx.fillStyle = '#1D2A3A';
-    dCtx.beginPath(); dCtx.arc(70, 60, 8, 0, Math.PI * 2); dCtx.fill();
-    dCtx.fillStyle = '#E85D75';
-    dCtx.beginPath(); dCtx.arc(70, 78, 10, 0, Math.PI); dCtx.fill(); dCtx.stroke();
-    this.textures.addCanvas('dog', dogCanvas);
-
-    // 3. Trash Can (Cat Base)
-    const binCanvas = document.createElement('canvas');
-    binCanvas.width = 120; binCanvas.height = 100;
-    const bCtx = binCanvas.getContext('2d');
-    bCtx.fillStyle = '#9EA7AA'; bCtx.strokeStyle = '#263238'; bCtx.lineWidth = 5;
-    bCtx.beginPath();
-    bCtx.moveTo(15, 10); bCtx.lineTo(105, 10); bCtx.lineTo(90, 95); bCtx.lineTo(30, 95);
-    bCtx.closePath(); bCtx.fill(); bCtx.stroke();
-    // Ribs
-    bCtx.beginPath();
-    bCtx.moveTo(42, 20); bCtx.lineTo(46, 85);
-    bCtx.moveTo(60, 20); bCtx.lineTo(60, 85);
-    bCtx.moveTo(78, 20); bCtx.lineTo(74, 85);
-    bCtx.stroke();
-    this.textures.addCanvas('trashcan', binCanvas);
-
-    // 4. Dog Food Bowl Base
-    const bowlCanvas = document.createElement('canvas');
-    bowlCanvas.width = 120; bowlCanvas.height = 50;
-    const boCtx = bowlCanvas.getContext('2d');
-    boCtx.fillStyle = '#FF7043'; boCtx.strokeStyle = '#263238'; boCtx.lineWidth = 5;
-    boCtx.beginPath();
-    boCtx.moveTo(15, 10); boCtx.lineTo(105, 10); boCtx.lineTo(95, 45); boCtx.lineTo(25, 45);
-    boCtx.closePath(); boCtx.fill(); boCtx.stroke();
-    // Bone icon
-    boCtx.fillStyle = '#FFFFFF';
-    drawRoundRect(boCtx, 40, 22, 40, 10, 5);
-    boCtx.fill();
-    this.textures.addCanvas('dogbowl', bowlCanvas);
-
-    // 5. Wooden Fence
-    const fenceCanvas = document.createElement('canvas');
-    fenceCanvas.width = 44; fenceCanvas.height = 240;
-    const fCtx = fenceCanvas.getContext('2d');
-    fCtx.fillStyle = '#BCAAA4'; fCtx.strokeStyle = '#3E2723'; fCtx.lineWidth = 4;
-    fCtx.beginPath();
-    fCtx.moveTo(4, 30); fCtx.lineTo(22, 4); fCtx.lineTo(40, 30);
-    fCtx.lineTo(40, 236); fCtx.lineTo(4, 236); fCtx.closePath();
-    fCtx.fill(); fCtx.stroke();
-    this.textures.addCanvas('fence', fenceCanvas);
-
-    // 6. Projectiles (Fish Bone / Dog Bone)
-    const boneCanvas = document.createElement('canvas');
-    boneCanvas.width = 32; boneCanvas.height = 32;
-    const bnCtx = boneCanvas.getContext('2d');
-    bnCtx.fillStyle = '#ECEFF1'; bnCtx.strokeStyle = '#37474F'; bnCtx.lineWidth = 3;
-    drawRoundRect(bnCtx, 6, 12, 20, 8, 4);
-    bnCtx.fill(); bnCtx.stroke();
-    this.textures.addCanvas('bone', boneCanvas);
+    // 6. Projectile (Trash Can / Bone)
+    const pCanvas = document.createElement('canvas');
+    pCanvas.width = 36;
+    pCanvas.height = 36;
+    const pCtx = pCanvas.getContext('2d');
+    pCtx.fillStyle = '#FFF';
+    pCtx.strokeStyle = '#2B1E16';
+    pCtx.lineWidth = 3;
+    pCtx.beginPath();
+    pCtx.roundRect(8, 12, 20, 10, 4);
+    pCtx.fill(); pCtx.stroke();
+    pCtx.beginPath(); pCtx.arc(8, 12, 5, 0, Math.PI*2); pCtx.fill(); pCtx.stroke();
+    pCtx.beginPath(); pCtx.arc(8, 22, 5, 0, Math.PI*2); pCtx.fill(); pCtx.stroke();
+    pCtx.beginPath(); pCtx.arc(28, 12, 5, 0, Math.PI*2); pCtx.fill(); pCtx.stroke();
+    pCtx.beginPath(); pCtx.arc(28, 22, 5, 0, Math.PI*2); pCtx.fill(); pCtx.stroke();
+    this.textures.addCanvas('bone_proj', pCanvas);
   }
 
   create() {
@@ -238,129 +315,146 @@ class CatDogScene extends Phaser.Scene {
     this.catHp = 100;
     this.dogHp = 100;
     this.wind = 0;
-    this.turn = 'CAT'; // 'CAT' or 'DOG'
+    this.turn = 'CAT';
     this.isCharging = false;
     this.chargePower = 0;
     this.isAimingAllowed = false;
     this.projectileInFlight = false;
 
-    // Build World
-    this.createBackground();
-    this.createStageObjects();
-    this.createUI();
+    this.createStageLayout();
+    this.createClassicUI();
 
-    // Set Initial Wind & Start ESL Challenge
     this.changeWind();
     this.startTurn();
   }
 
-  createBackground() {
+  createStageLayout() {
     const { width, height } = this.scale;
+    const floorY = height - 60;
 
-    // Sky Gradient
-    const sky = this.add.graphics();
-    sky.fillGradientStyle(0x7ec8e3, 0x7ec8e3, 0xffe0b2, 0xfff3e0, 1);
-    sky.fillRect(0, 0, width, height);
+    // 1. Sky & Rolling Hills
+    const bg = this.add.graphics();
+    bg.fillGradientStyle(0x76B6E4, 0x76B6E4, 0xEBF7FD, 0xEBF7FD, 1);
+    bg.fillRect(0, 0, width, height);
 
-    // Cartoon Mountain Peaks
-    const mountains = this.add.graphics();
-    mountains.fillStyle(0x7986cb, 0.45);
-    mountains.beginPath();
-    mountains.moveTo(0, height - 120);
-    mountains.lineTo(220, 180);
-    mountains.lineTo(460, height - 120);
-    mountains.lineTo(750, 160);
-    mountains.lineTo(width, height - 100);
-    mountains.lineTo(width, height);
-    mountains.lineTo(0, height);
-    mountains.closePath();
-    mountains.fill();
+    // Far mountains (muted green-grey)
+    bg.fillStyle(0x7EA598, 1);
+    bg.beginPath();
+    bg.moveTo(250, height - 120);
+    bg.lineTo(440, 150);
+    bg.lineTo(650, height - 120);
+    bg.lineTo(850, 180);
+    bg.lineTo(width, height - 100);
+    bg.lineTo(width, height);
+    bg.lineTo(250, height);
+    bg.closePath();
+    bg.fill();
 
-    // Rolling Green Hills
-    const hills = this.add.graphics();
-    hills.fillStyle(0x81c784, 1);
-    hills.fillEllipse(260, height - 40, 720, 280);
-    hills.fillEllipse(800, height - 50, 840, 300);
+    // 2. Left Side: Urban Alley (Purple wall)
+    const alley = this.add.graphics();
+    alley.fillStyle(0xBC8CBF, 1); // Classic purple building
+    alley.fillRect(0, 0, 240, height);
+    alley.lineStyle(5, 0x3E273F);
+    alley.beginPath();
+    alley.moveTo(240, 0);
+    alley.lineTo(240, height);
+    alley.stroke();
 
-    // Ground Floor
-    const ground = this.add.graphics();
-    ground.fillStyle(0x4caf50, 1);
-    ground.lineStyle(6, 0x2e7d32);
-    ground.fillRect(0, height - 70, width, 70);
-    ground.strokeRect(0, height - 70, width, 70);
-  }
+    // Alley floor (Cobblestone pavement)
+    alley.fillStyle(0x9E9D93, 1);
+    alley.lineStyle(5, 0x3E3D38);
+    alley.fillRect(0, floorY, 410, 60);
+    alley.strokeRect(0, floorY, 410, 60);
 
-  createStageObjects() {
-    const { width, height } = this.scale;
-    const floorY = height - 70;
+    // 3. Right Side: Residential Backyard (Green lawn + roof trim)
+    const yard = this.add.graphics();
+    yard.fillStyle(0x5DAE47, 1); // Rich green lawn
+    yard.lineStyle(5, 0x2A581F);
+    yard.fillRect(410, floorY, width - 410, 60);
+    yard.strokeRect(410, floorY, width - 410, 60);
 
-    // Trash Can & Cat
-    this.trashcan = this.add.image(130, floorY - 30, 'trashcan');
-    this.cat = this.add.sprite(130, floorY - 110, 'cat');
+    // Corner roof detail in far top-right
+    yard.fillStyle(0xD84315, 1);
+    yard.lineStyle(4, 0x2B1E16);
+    yard.beginPath();
+    yard.moveTo(width - 140, 100);
+    yard.lineTo(width, 40);
+    yard.lineTo(width, 160);
+    yard.lineTo(width - 100, 210);
+    yard.closePath();
+    yard.fill();
+    yard.stroke();
 
-    // Idle breathing animation for Cat
+    // 4. Center Wooden Fence (Positioned exactly between Cat and Dog)
+    this.fence = this.add.image(width / 2 + 10, floorY - 110, 'fence_wall');
+    this.physics.add.existing(this.fence, true);
+
+    // 5. Cat on Bin
+    this.add.image(130, floorY - 60, 'trashcan_full');
+    this.cat = this.add.sprite(105, floorY - 140, 'cat_classic');
     this.tweens.add({
       targets: this.cat,
+      scaleY: 1.05,
+      duration: 700,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
+    // 6. Dog next to his bowl (Standing tall)
+    this.add.image(width - 130, floorY - 25, 'dog_bowl_full');
+    this.dog = this.add.sprite(width - 130, floorY - 90, 'dog_classic');
+    this.tweens.add({
+      targets: this.dog,
       scaleY: 1.04,
-      scaleX: 0.98,
       duration: 750,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
-
-    // Dog Bowl & Dog
-    this.dogbowl = this.add.image(width - 130, floorY - 15, 'dogbowl');
-    this.dog = this.add.sprite(width - 130, floorY - 80, 'dog');
-
-    // Idle breathing animation for Dog
-    this.tweens.add({
-      targets: this.dog,
-      scaleY: 1.05,
-      scaleX: 0.97,
-      duration: 800,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
-
-    // Center Fence (Obstacle)
-    this.fence = this.add.image(width / 2, floorY - 100, 'fence');
-    this.physics.add.existing(this.fence, true); // Static collider
   }
 
-  createUI() {
+  createClassicUI() {
     const { width } = this.scale;
 
-    // Top Header Status Plaque
-    const headerBg = this.add.graphics();
-    headerBg.fillStyle(0xfff9c4, 0.95);
-    headerBg.lineStyle(4, 0xf57f17);
-    headerBg.fillRoundedRect(width / 2 - 280, 12, 560, 52, 16);
-    headerBg.strokeRoundedRect(width / 2 - 280, 12, 560, 52, 16);
+    // Top Header Plaque with Golden Border
+    const uiBox = this.add.graphics();
+    uiBox.fillStyle(0xFFEB3B, 1);
+    uiBox.lineStyle(4, 0xD84315);
+    uiBox.fillRoundedRect(width / 2 - 310, 12, 620, 56, 18);
+    uiBox.strokeRoundedRect(width / 2 - 310, 12, 620, 56, 18);
 
-    // Cat HP Bar
+    // Health Bar Containers (Red background)
+    uiBox.fillStyle(0xD32F2F, 1);
+    uiBox.fillRoundedRect(width / 2 - 290, 24, 210, 20, 6);
+    uiBox.fillRoundedRect(width / 2 + 80, 24, 210, 20, 6);
+
+    // Dynamic HP Bars
     this.catHpFill = this.add.graphics();
-    this.updateHealthBar('CAT');
-
-    // Dog HP Bar
     this.dogHpFill = this.add.graphics();
+    this.updateHealthBar('CAT');
     this.updateHealthBar('DOG');
 
-    // Wind Indicator
+    // Central Wind Gauge Box
+    const windBox = this.add.graphics();
+    windBox.fillStyle(0xFF9800, 1);
+    windBox.lineStyle(3, 0xD84315);
+    windBox.fillRoundedRect(width / 2 - 68, 16, 136, 44, 10);
+    windBox.strokeRoundedRect(width / 2 - 68, 16, 136, 44, 10);
+
     this.windText = this.add.text(width / 2, 38, '', {
-      fontSize: '20px',
+      fontSize: '18px',
       fontStyle: 'bold',
-      color: '#d84315',
-      stroke: '#ffffff',
+      color: '#FFFFFF',
+      stroke: '#BF360C',
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    // Power Charge Meter (Hidden until holding)
+    // Power Charge Meter
     this.powerBarBg = this.add.graphics().setVisible(false);
     this.powerBarFill = this.add.graphics().setVisible(false);
 
-    // Input Events for Charging Throw
+    // Input handlers
     this.input.on('pointerdown', () => {
       if (!this.isAimingAllowed || this.turn !== 'CAT' || this.projectileInFlight) return;
       this.isCharging = true;
@@ -383,21 +477,20 @@ class CatDogScene extends Phaser.Scene {
     const { width } = this.scale;
     if (target === 'CAT') {
       this.catHpFill.clear();
-      this.catHpFill.fillStyle(0x00e676, 1);
-      this.catHpFill.fillRoundedRect(width / 2 - 260, 24, Math.max(0, this.catHp * 1.8), 18, 6);
+      this.catHpFill.fillStyle(0x00E676, 1);
+      this.catHpFill.fillRoundedRect(width / 2 - 290, 24, Math.max(0, this.catHp * 2.1), 20, 6);
     } else {
       this.dogHpFill.clear();
-      this.dogHpFill.fillStyle(0x00e676, 1);
-      const fillW = Math.max(0, this.dogHp * 1.8);
-      this.dogHpFill.fillRoundedRect(width / 2 + 260 - fillW, 24, fillW, 18, 6);
+      this.dogHpFill.fillStyle(0x00E676, 1);
+      const fillW = Math.max(0, this.dogHp * 2.1);
+      this.dogHpFill.fillRoundedRect(width / 2 + 290 - fillW, 24, fillW, 20, 6);
     }
   }
 
   changeWind() {
-    // Random wind between -6 and +6
-    this.wind = Phaser.Math.Between(-6, 6);
+    this.wind = Phaser.Math.Between(-7, 7);
     const arrow = this.wind > 0 ? '▶▶' : (this.wind < 0 ? '◀◀' : '—');
-    this.windText.setText(`WIND: ${arrow} ${Math.abs(this.wind)}`);
+    this.windText.setText(`WIND ${arrow} ${Math.abs(this.wind)}`);
   }
 
   startTurn() {
@@ -405,7 +498,6 @@ class CatDogScene extends Phaser.Scene {
     if (this.turn === 'CAT') {
       this.promptESLQuestion();
     } else {
-      // Opponent (Dog) Turn logic after 1 second delay
       this.time.delayedCall(1000, () => this.runDogAITurn());
     }
   }
@@ -413,74 +505,81 @@ class CatDogScene extends Phaser.Scene {
   promptESLQuestion() {
     const questions = [
       { q: "The cat is ____ the trash bin.", opts: ["ON", "UNDER", "INTO"], ans: "ON" },
-      { q: "Yesterday the dog ____ a big bone.", opts: ["ATE", "EATING", "EATS"], ans: "ATE" },
-      { q: "Choose the opposite of 'HIGH':", opts: ["LOW", "FAST", "TALL"], ans: "LOW" },
-      { q: "Cats love to catch ____.", opts: ["MICE", "DOGS", "TREES"], ans: "MICE" },
+      { q: "Yesterday the dog ____ a bone.", opts: ["ATE", "EATING", "EATS"], ans: "ATE" },
+      { q: "Which one is an animal?", opts: ["CAT", "FENCE", "CLOUD"], ans: "CAT" },
+      { q: "The fence is in the ____.", opts: ["MIDDLE", "SKY", "WATER"], ans: "MIDDLE" },
       { q: "The dog is sleeping ____ the tree.", opts: ["UNDER", "ABOVE", "THROUGH"], ans: "UNDER" },
       { q: "The bone is ____ the food bowl.", opts: ["IN", "BETWEEN", "AMONG"], ans: "IN" }
     ];
     const item = Phaser.Utils.Array.GetRandom(questions);
 
-    // Modal Background Plaque
-    const modal = this.add.container(this.scale.width / 2, 190);
+    const modal = this.add.container(this.scale.width / 2, 195);
+    this.activeModal = modal;
+    modal.on('destroy', () => { this.activeModal = null; });
+
     const bg = this.add.graphics();
-    bg.fillStyle(0xffffff, 0.98);
-    bg.lineStyle(5, 0x3f51b5);
-    bg.fillRoundedRect(-220, -75, 440, 150, 16);
-    bg.strokeRoundedRect(-220, -75, 440, 150, 16);
+    bg.fillStyle(0xFFFFFF, 0.98);
+    bg.lineStyle(5, 0xF57C00);
+    bg.fillRoundedRect(-230, -75, 460, 150, 16);
+    bg.strokeRoundedRect(-230, -75, 460, 150, 16);
     modal.add(bg);
 
     const title = this.add.text(0, -45, item.q, {
       fontSize: '20px',
       fontStyle: 'bold',
-      color: '#1a237e'
+      color: '#E65100'
     }).setOrigin(0.5);
     modal.add(title);
 
-    // Option Buttons
     item.opts.forEach((opt, idx) => {
-      const btnX = -130 + idx * 130;
+      const btnX = -135 + idx * 135;
       const btnY = 15;
       const btnBg = this.add.graphics();
-      btnBg.fillStyle(0x3f51b5, 1);
-      btnBg.fillRoundedRect(btnX - 55, btnY - 22, 110, 44, 10);
+      btnBg.fillStyle(0xFF9800, 1);
+      btnBg.fillRoundedRect(btnX - 58, btnY - 22, 116, 44, 10);
       modal.add(btnBg);
 
       const btnTxt = this.add.text(btnX, btnY, opt, {
         fontSize: '18px',
         fontStyle: 'bold',
-        color: '#ffffff'
+        color: '#FFFFFF'
       }).setOrigin(0.5);
       modal.add(btnTxt);
 
-      const hitZone = this.add.rectangle(btnX, btnY, 110, 44, 0x000000, 0)
+      const hitZone = this.add.rectangle(btnX, btnY, 116, 44, 0x000000, 0)
         .setInteractive({ useHandCursor: true });
+      hitZone.opt = opt;
+      hitZone.isCorrect = (opt === item.ans);
       modal.add(hitZone);
 
-      hitZone.on('pointerdown', (pointer, localX, localY, event) => {
+      const onSelect = (pointer, localX, localY, event) => {
         if (event && event.stopPropagation) event.stopPropagation();
         if (opt === item.ans) {
           audio.sfxCorrect();
           modal.destroy();
           this.isAimingAllowed = true;
-          this.showFeedbackToast("CORRECT! HOLD & RELEASE TO THROW!", 0x2e7d32);
+          this.showFeedbackToast("CORRECT! HOLD & RELEASE TO THROW!", 0x2E7D32);
         } else {
           audio.sfxWrong();
           this.tweens.add({
             targets: modal,
-            x: modal.x + 10,
-            duration: 60,
+            x: modal.x + 8,
+            duration: 50,
             yoyo: true,
             repeat: 3
           });
         }
-      });
+      };
+
+      hitZone.on('pointerdown', onSelect);
+      btnTxt.setInteractive({ useHandCursor: true });
+      btnTxt.on('pointerdown', onSelect);
     });
   }
 
   showFeedbackToast(text, color) {
     const toast = this.add.text(this.scale.width / 2, 110, text, {
-      fontSize: '22px',
+      fontSize: '20px',
       fontStyle: 'bold',
       color: '#ffffff',
       backgroundColor: '#' + color.toString(16).padStart(6, '0'),
@@ -495,32 +594,29 @@ class CatDogScene extends Phaser.Scene {
     this.isAimingAllowed = false;
     audio.sfxThrow();
 
-    const startX = shooter === 'CAT' ? this.cat.x + 30 : this.dog.x - 30;
+    const startX = shooter === 'CAT' ? this.cat.x + 35 : this.dog.x - 35;
     const startY = shooter === 'CAT' ? this.cat.y - 10 : this.dog.y - 10;
     
-    const proj = this.physics.add.sprite(startX, startY, 'bone');
-    proj.setAngularVelocity(shooter === 'CAT' ? 360 : -360);
+    const proj = this.physics.add.sprite(startX, startY, 'bone_proj');
+    proj.setAngularVelocity(shooter === 'CAT' ? 420 : -420);
 
-    // Initial launch velocity with wind influence
-    const angleRad = shooter === 'CAT' ? -55 * (Math.PI / 180) : -125 * (Math.PI / 180);
-    const speed = 250 + (power * 7.5);
+    const angleRad = shooter === 'CAT' ? -58 * (Math.PI / 180) : -122 * (Math.PI / 180);
+    const speed = 260 + (power * 7.5);
     proj.setVelocity(
       Math.cos(angleRad) * speed + (this.wind * 20),
       Math.sin(angleRad) * speed
     );
 
-    // Continuous wind drift
     const flightTimer = this.time.addEvent({
       delay: 50,
       loop: true,
       callback: () => {
         if (proj && proj.body) {
-          proj.setVelocityX(proj.body.velocity.x + this.wind * 1.5);
+          proj.setVelocityX(proj.body.velocity.x + this.wind * 1.6);
         }
       }
     });
 
-    // Collision with Fence
     this.physics.add.collider(proj, this.fence, () => {
       flightTimer.remove();
       audio.sfxHit();
@@ -528,7 +624,6 @@ class CatDogScene extends Phaser.Scene {
       this.endTurn();
     });
 
-    // Collision Check Loop (Floor or Opponent)
     const checkCollision = this.time.addEvent({
       delay: 30,
       loop: true,
@@ -538,8 +633,7 @@ class CatDogScene extends Phaser.Scene {
           return;
         }
 
-        // Missed hit on Ground
-        if (proj.y >= this.scale.height - 70) {
+        if (proj.y >= this.scale.height - 60) {
           flightTimer.remove();
           checkCollision.remove();
           proj.destroy();
@@ -547,8 +641,7 @@ class CatDogScene extends Phaser.Scene {
           return;
         }
 
-        // Cat hit Dog
-        if (shooter === 'CAT' && Phaser.Math.Distance.Between(proj.x, proj.y, this.dog.x, this.dog.y) < 45) {
+        if (shooter === 'CAT' && Phaser.Math.Distance.Between(proj.x, proj.y, this.dog.x, this.dog.y) < 55) {
           flightTimer.remove();
           checkCollision.remove();
           proj.destroy();
@@ -556,8 +649,7 @@ class CatDogScene extends Phaser.Scene {
           return;
         }
 
-        // Dog hit Cat
-        if (shooter === 'DOG' && Phaser.Math.Distance.Between(proj.x, proj.y, this.cat.x, this.cat.y) < 45) {
+        if (shooter === 'DOG' && Phaser.Math.Distance.Between(proj.x, proj.y, this.cat.x, this.cat.y) < 55) {
           flightTimer.remove();
           checkCollision.remove();
           proj.destroy();
@@ -575,11 +667,11 @@ class CatDogScene extends Phaser.Scene {
     if (target === 'DOG') {
       this.dogHp = Math.max(0, this.dogHp - amount);
       this.updateHealthBar('DOG');
-      this.tweens.add({ targets: this.dog, tint: 0xff5252, duration: 80, yoyo: true, repeat: 2 });
+      this.tweens.add({ targets: this.dog, tint: 0xFF5252, duration: 80, yoyo: true, repeat: 2 });
     } else {
       this.catHp = Math.max(0, this.catHp - amount);
       this.updateHealthBar('CAT');
-      this.tweens.add({ targets: this.cat, tint: 0xff5252, duration: 80, yoyo: true, repeat: 2 });
+      this.tweens.add({ targets: this.cat, tint: 0xFF5252, duration: 80, yoyo: true, repeat: 2 });
     }
 
     if (this.catHp <= 0 || this.dogHp <= 0) {
@@ -590,8 +682,7 @@ class CatDogScene extends Phaser.Scene {
   }
 
   runDogAITurn() {
-    // Dog AI estimates shot based on distance and current wind
-    const estimatedPower = Phaser.Math.Clamp(50 - (this.wind * 3.5) + Phaser.Math.Between(-8, 8), 20, 95);
+    const estimatedPower = Phaser.Math.Clamp(54 - (this.wind * 3.6) + Phaser.Math.Between(-8, 8), 22, 95);
     this.fireProjectile(estimatedPower, 'DOG');
   }
 
@@ -603,10 +694,10 @@ class CatDogScene extends Phaser.Scene {
   }
 
   gameOver(winner) {
-    const banner = this.add.text(this.scale.width / 2, this.scale.height / 2, `${winner} WINS!`, {
+    this.add.text(this.scale.width / 2, this.scale.height / 2, `${winner} WINS!`, {
       fontSize: '48px',
       fontStyle: 'bold',
-      color: '#ffeb3b',
+      color: '#FFEB3B',
       stroke: '#000000',
       strokeThickness: 6
     }).setOrigin(0.5);
@@ -618,19 +709,17 @@ class CatDogScene extends Phaser.Scene {
     if (this.isCharging && this.chargePower < 100) {
       this.chargePower += 1.8;
       
-      // Update charge bar directly over Cat
       this.powerBarBg.clear();
       this.powerBarBg.fillStyle(0x000000, 0.6);
       this.powerBarBg.fillRoundedRect(this.cat.x - 35, this.cat.y - 75, 70, 10, 4);
 
       this.powerBarFill.clear();
-      this.powerBarFill.fillStyle(0xff9800, 1);
+      this.powerBarFill.fillStyle(0xFF9800, 1);
       this.powerBarFill.fillRoundedRect(this.cat.x - 35, this.cat.y - 75, (this.chargePower / 100) * 70, 10, 4);
     }
   }
 }
 
-// --- Phaser Game Configuration ---
 const config = {
   type: Phaser.AUTO,
   parent: 'game-container',
