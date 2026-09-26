@@ -19,11 +19,8 @@ if (typeof CanvasRenderingContext2D !== 'undefined' && !CanvasRenderingContext2D
   };
 }
 
-// --- Procedural Sound Effects (Web Audio API) ---
 class AudioController {
-  constructor() {
-    this.ctx = null;
-  }
+  constructor() { this.ctx = null; }
   init() {
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
@@ -43,9 +40,7 @@ class AudioController {
       const gain = this.ctx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      if (endFreq) {
-        osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + duration);
-      }
+      if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + duration);
       gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
       osc.connect(gain);
@@ -56,19 +51,13 @@ class AudioController {
       // Audio autoplay policy fallback
     }
   }
-  sfxThrow() {
-    this.playTone(380, 'sine', 0.28, 90);
-  }
-  sfxHit() {
-    this.playTone(160, 'sawtooth', 0.35, 30);
-  }
+  sfxThrow() { this.playTone(380, 'sine', 0.28, 90); }
+  sfxHit() { this.playTone(160, 'sawtooth', 0.35, 30); }
   sfxCorrect() {
     this.playTone(520, 'triangle', 0.12);
     setTimeout(() => this.playTone(680, 'triangle', 0.2), 100);
   }
-  sfxWrong() {
-    this.playTone(200, 'square', 0.25, 90);
-  }
+  sfxWrong() { this.playTone(200, 'square', 0.25, 90); }
 }
 
 const audio = new AudioController();
@@ -79,234 +68,236 @@ class CatDogScene extends Phaser.Scene {
   }
 
   preload() {
-    this.createPixelAssets();
+    this.generateAuthenticArt();
   }
 
-  createPixelAssets() {
-    if (this.textures.exists('fence_wall')) return;
+  generateAuthenticArt() {
+    if (this.textures.exists('cat_handdrawn')) return;
 
-    // 1. Classic Wooden Plank Fence (Wide like the original)
+    // --- 1. Authentic Fleabag (Cat) ---
+    const cCanvas = document.createElement('canvas');
+    cCanvas.width = 160; cCanvas.height = 180;
+    const c = cCanvas.getContext('2d');
+    c.lineJoin = 'round'; c.lineCap = 'round';
+
+    // Tail
+    c.strokeStyle = '#1a2634'; c.lineWidth = 14;
+    c.beginPath(); c.moveTo(35, 135); c.quadraticCurveTo(10, 110, 20, 80); c.stroke();
+    c.strokeStyle = '#29B6A8'; c.lineWidth = 8;
+    c.beginPath(); c.moveTo(35, 135); c.quadraticCurveTo(10, 110, 20, 80); c.stroke();
+
+    // Body (sitting scruffy pose)
+    c.fillStyle = '#29B6A8'; c.strokeStyle = '#1a2634'; c.lineWidth = 5;
+    c.beginPath();
+    c.moveTo(50, 100);
+    c.bezierCurveTo(35, 120, 35, 150, 55, 160);
+    c.lineTo(110, 160);
+    c.bezierCurveTo(125, 145, 115, 115, 95, 100);
+    c.closePath();
+    c.fill(); c.stroke();
+
+    // Chest ribs/fur
+    c.strokeStyle = '#1a2634'; c.lineWidth = 3.5;
+    c.beginPath();
+    c.moveTo(60, 120); c.lineTo(75, 122);
+    c.moveTo(58, 130); c.lineTo(78, 133);
+    c.moveTo(62, 140); c.lineTo(76, 142);
+    c.stroke();
+
+    // Big Head
+    c.fillStyle = '#29B6A8'; c.strokeStyle = '#1a2634'; c.lineWidth = 5;
+    c.beginPath();
+    c.ellipse(75, 65, 48, 38, 0, 0, Math.PI * 2);
+    c.fill(); c.stroke();
+
+    // Left Ear (Bandaged)
+    c.beginPath();
+    c.moveTo(38, 50); c.lineTo(22, 12); c.lineTo(58, 32);
+    c.closePath(); c.fill(); c.stroke();
+    // Ear bandage wrap
+    c.fillStyle = '#F5E6CC'; c.lineWidth = 3.5;
+    c.fillRect(25, 20, 20, 12); c.strokeRect(25, 20, 20, 12);
+
+    // Right Ear
+    c.fillStyle = '#29B6A8'; c.lineWidth = 5;
+    c.beginPath();
+    c.moveTo(95, 34); c.lineTo(130, 15); c.lineTo(112, 52);
+    c.closePath(); c.fill(); c.stroke();
+
+    // White Head Gauze Bandage
+    c.fillStyle = '#FFF8E7'; c.lineWidth = 3.5;
+    c.save(); c.translate(50, 44); c.rotate(-0.2);
+    c.fillRect(-18, -9, 36, 18); c.strokeRect(-18, -9, 36, 18);
+    c.restore();
+
+    // Cheerful / Mischievous Eyes
+    c.fillStyle = '#FFF'; c.lineWidth = 4;
+    c.beginPath(); c.ellipse(60, 65, 12, 16, -0.05, 0, Math.PI * 2); c.fill(); c.stroke();
+    c.beginPath(); c.ellipse(92, 65, 12, 16, 0.05, 0, Math.PI * 2); c.fill(); c.stroke();
+    // Pupils looking towards Mutt
+    c.fillStyle = '#1a2634';
+    c.beginPath(); c.arc(65, 65, 5.5, 0, Math.PI * 2); c.fill();
+    c.beginPath(); c.arc(97, 65, 5.5, 0, Math.PI * 2); c.fill();
+
+    // Nose & Whiskers
+    c.fillStyle = '#E91E63';
+    c.beginPath(); c.ellipse(76, 75, 4.5, 3.5, 0, 0, Math.PI * 2); c.fill();
+    c.strokeStyle = '#1a2634'; c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(35, 78); c.lineTo(15, 74);
+    c.moveTo(35, 84); c.lineTo(18, 88);
+    c.moveTo(110, 78); c.lineTo(130, 75);
+    c.moveTo(110, 84); c.lineTo(128, 89);
+    c.stroke();
+    this.textures.addCanvas('cat_handdrawn', cCanvas);
+
+    // --- 2. Authentic Mutt (Dog) ---
+    const dCanvas = document.createElement('canvas');
+    dCanvas.width = 190; dCanvas.height = 180;
+    const d = dCanvas.getContext('2d');
+    d.lineJoin = 'round'; d.lineCap = 'round';
+
+    // Droopy Ears
+    d.fillStyle = '#5A4638'; d.strokeStyle = '#1a2634'; d.lineWidth = 5;
+    d.beginPath(); d.ellipse(32, 75, 20, 42, 0.35, 0, Math.PI * 2); d.fill(); d.stroke();
+    d.beginPath(); d.ellipse(158, 75, 20, 42, -0.35, 0, Math.PI * 2); d.fill(); d.stroke();
+
+    // Body (Upright dog)
+    d.fillStyle = '#8D7765';
+    d.beginPath();
+    d.ellipse(95, 125, 48, 42, 0, 0, Math.PI * 2);
+    d.fill(); d.stroke();
+
+    // Front paws
+    d.fillStyle = '#EDE2D4';
+    d.beginPath(); d.ellipse(75, 162, 16, 12, 0, 0, Math.PI * 2); d.fill(); d.stroke();
+    d.beginPath(); d.ellipse(115, 162, 16, 12, 0, 0, Math.PI * 2); d.fill(); d.stroke();
+
+    // Head
+    d.fillStyle = '#8D7765';
+    d.beginPath();
+    d.ellipse(95, 62, 54, 44, 0, 0, Math.PI * 2);
+    d.fill(); d.stroke();
+
+    // Huge Cream Muzzle
+    d.fillStyle = '#EDE2D4';
+    d.beginPath();
+    d.ellipse(95, 80, 45, 28, 0, 0, Math.PI * 2);
+    d.fill(); d.stroke();
+
+    // Big Black Wet Nose
+    d.fillStyle = '#1a2634';
+    d.beginPath();
+    d.ellipse(95, 66, 14, 10, 0, 0, Math.PI * 2);
+    d.fill();
+    // Nose highlight
+    d.fillStyle = '#FFF';
+    d.beginPath(); d.arc(92, 63, 3, 0, Math.PI * 2); d.fill();
+
+    // Signature Giant Goofy Mouth & Tongue
+    d.strokeStyle = '#1a2634'; d.lineWidth = 4;
+    d.beginPath();
+    d.arc(95, 78, 28, 0.15 * Math.PI, 0.85 * Math.PI);
+    d.stroke();
+    // Pink Floppy Tongue
+    d.fillStyle = '#E85D75';
+    d.beginPath();
+    d.ellipse(95, 104, 14, 16, 0, 0, Math.PI * 2);
+    d.fill(); d.stroke();
+    d.beginPath(); d.moveTo(95, 94); d.lineTo(95, 112); d.stroke();
+
+    // Wide Goofy Cartoon Eyes
+    d.fillStyle = '#FFF'; d.lineWidth = 4;
+    d.beginPath(); d.arc(72, 46, 15, 0, Math.PI * 2); d.fill(); d.stroke();
+    d.beginPath(); d.arc(118, 46, 15, 0, Math.PI * 2); d.fill(); d.stroke();
+    d.fillStyle = '#1a2634';
+    d.beginPath(); d.arc(68, 46, 6, 0, Math.PI * 2); d.fill();
+    d.beginPath(); d.arc(114, 46, 6, 0, Math.PI * 2); d.fill();
+    this.textures.addCanvas('dog_handdrawn', dCanvas);
+
+    // --- 3. Classic Wooden Post Fence ---
     const fCanvas = document.createElement('canvas');
-    fCanvas.width = 420;
-    fCanvas.height = 360;
-    const fCtx = fCanvas.getContext('2d');
+    fCanvas.width = 240; fCanvas.height = 280;
+    const f = fCanvas.getContext('2d');
+    f.lineJoin = 'round';
 
-    // Horizontal top rail
-    fCtx.fillStyle = '#E6C687';
-    fCtx.strokeStyle = '#2B1E16';
-    fCtx.lineWidth = 6;
-    fCtx.fillRect(10, 10, 400, 32);
-    fCtx.strokeRect(10, 10, 400, 32);
+    // Yellow post in front
+    f.fillStyle = '#E6C687'; f.strokeStyle = '#2B1E16'; f.lineWidth = 5;
+    f.fillRect(10, 10, 42, 265); f.strokeRect(10, 10, 42, 265);
+    // Beveled top
+    f.fillStyle = '#FFF2AF';
+    f.beginPath(); f.moveTo(10, 10); f.lineTo(31, 0); f.lineTo(52, 10); f.closePath();
+    f.fill(); f.stroke();
 
-    // Left post
-    fCtx.fillStyle = '#FFF2AF';
-    fCtx.beginPath();
-    fCtx.roundRect(10, 8, 48, 350, [12, 12, 0, 0]);
-    fCtx.fill();
-    fCtx.stroke();
-
-    // Vertical slats
-    const plankColors = ['#9E8852', '#8C7745', '#94804A', '#836F3D', '#9A854E', '#877442', '#927E48'];
-    for (let i = 0; i < 7; i++) {
-      const px = 58 + (i * 50);
-      fCtx.fillStyle = plankColors[i];
-      fCtx.fillRect(px, 42, 50, 318);
-      fCtx.strokeRect(px, 42, 50, 318);
+    // Fence boards
+    const planks = ['#9A8149', '#8A733E', '#9E864E', '#7F6734'];
+    for (let i = 0; i < 4; i++) {
+      const px = 52 + (i * 44);
+      f.fillStyle = planks[i];
+      f.fillRect(px, 35, 44, 240);
+      f.strokeRect(px, 35, 44, 240);
+      // Wood grain lines
+      f.strokeStyle = '#5B4822'; f.lineWidth = 2.5;
+      f.beginPath();
+      f.moveTo(px + 15, 50); f.lineTo(px + 18, 140);
+      f.moveTo(px + 28, 120); f.lineTo(px + 25, 230);
+      f.stroke();
+      f.strokeStyle = '#2B1E16'; f.lineWidth = 5;
     }
-    this.textures.addCanvas('fence_wall', fCanvas);
+    this.textures.addCanvas('fence_post', fCanvas);
 
-    // 2. Alley Trash Bin with overflow trash
-    const binCanvas = document.createElement('canvas');
-    binCanvas.width = 160;
-    binCanvas.height = 180;
-    const bCtx = binCanvas.getContext('2d');
+    // --- 4. Cat Trash Bin & Stand ---
+    const bCanvas = document.createElement('canvas');
+    bCanvas.width = 170; bCanvas.height = 160;
+    const b = bCanvas.getContext('2d');
+    b.lineJoin = 'round';
 
-    // Garbage pile peeking over the top
-    bCtx.fillStyle = '#6E6E6E';
-    bCtx.beginPath();
-    bCtx.arc(105, 55, 24, 0, Math.PI * 2);
-    bCtx.arc(130, 60, 18, 0, Math.PI * 2);
-    bCtx.fill();
-    bCtx.fillStyle = '#E8A598';
-    bCtx.fillRect(108, 40, 20, 16); // Tin can / paper
+    // Wooden stand block on left
+    b.fillStyle = '#D6B485'; b.strokeStyle = '#2B1E16'; b.lineWidth = 5;
+    b.fillRect(10, 80, 50, 75); b.strokeRect(10, 80, 50, 75);
 
-    // Metal Bin
-    bCtx.fillStyle = '#A0AAB2';
-    bCtx.strokeStyle = '#232A31';
-    bCtx.lineWidth = 6;
-    bCtx.beginPath();
-    bCtx.moveTo(30, 60);
-    bCtx.lineTo(150, 60);
-    bCtx.lineTo(138, 175);
-    bCtx.lineTo(46, 175);
-    bCtx.closePath();
-    bCtx.fill();
-    bCtx.stroke();
+    // Trash bin on right
+    b.fillStyle = '#A3ADB2';
+    b.beginPath();
+    b.moveTo(65, 30); b.lineTo(155, 30); b.lineTo(142, 155); b.lineTo(76, 155);
+    b.closePath(); b.fill(); b.stroke();
+    // Ribs
+    b.lineWidth = 3.5;
+    b.beginPath();
+    b.moveTo(90, 40); b.lineTo(95, 145);
+    b.moveTo(110, 40); b.lineTo(110, 145);
+    b.moveTo(130, 40); b.lineTo(125, 145);
+    b.stroke();
+    // Trash overflow
+    b.fillStyle = '#65737E';
+    b.beginPath(); b.arc(105, 25, 16, 0, Math.PI * 2); b.fill();
+    b.fillStyle = '#F48FB1';
+    b.fillRect(115, 15, 22, 14);
+    this.textures.addCanvas('cat_perch', bCanvas);
 
-    // Ridges
-    bCtx.lineWidth = 4;
-    bCtx.beginPath();
-    bCtx.moveTo(60, 68); bCtx.lineTo(68, 168);
-    bCtx.moveTo(90, 68); bCtx.lineTo(92, 168);
-    bCtx.moveTo(120, 68); bCtx.lineTo(116, 168);
-    bCtx.stroke();
-    this.textures.addCanvas('trashcan_full', binCanvas);
+    // --- 5. Dog Bone Bowl ---
+    const boCanvas = document.createElement('canvas');
+    boCanvas.width = 120; boCanvas.height = 60;
+    const bo = boCanvas.getContext('2d');
+    bo.fillStyle = '#F4511E'; bo.strokeStyle = '#2B1E16'; bo.lineWidth = 4;
+    bo.beginPath();
+    bo.moveTo(10, 20); bo.lineTo(110, 20); bo.lineTo(98, 55); bo.lineTo(22, 55);
+    bo.closePath(); bo.fill(); bo.stroke();
+    // Dog bones inside
+    bo.fillStyle = '#FFF';
+    bo.beginPath(); bo.roundRect(35, 10, 45, 14, 6); bo.fill(); bo.stroke();
+    this.textures.addCanvas('dog_bowl', boCanvas);
 
-    // 3. Cat Sprite (Looking Right toward Dog)
-    const catCanvas = document.createElement('canvas');
-    catCanvas.width = 140;
-    catCanvas.height = 140;
-    const cCtx = catCanvas.getContext('2d');
-
-    // Pointed ears with dark ink stroke
-    cCtx.fillStyle = '#26A69A';
-    cCtx.strokeStyle = '#1A2421';
-    cCtx.lineWidth = 6;
-    cCtx.beginPath();
-    cCtx.moveTo(25, 60); cCtx.lineTo(10, 15); cCtx.lineTo(55, 35); cCtx.closePath();
-    cCtx.fill(); cCtx.stroke();
-    cCtx.beginPath();
-    cCtx.moveTo(70, 40); cCtx.lineTo(110, 15); cCtx.lineTo(100, 60); cCtx.closePath();
-    cCtx.fill(); cCtx.stroke();
-
-    // Body & tail
-    cCtx.beginPath();
-    cCtx.ellipse(60, 102, 38, 30, 0, 0, Math.PI * 2);
-    cCtx.fill(); cCtx.stroke();
-
-    // Head
-    cCtx.beginPath();
-    cCtx.ellipse(60, 64, 46, 34, 0, 0, Math.PI * 2);
-    cCtx.fill(); cCtx.stroke();
-
-    // White Head Bandage
-    cCtx.fillStyle = '#F5F5DC';
-    cCtx.save();
-    cCtx.translate(45, 45);
-    cCtx.rotate(-0.15);
-    cCtx.fillRect(-18, -8, 36, 16);
-    cCtx.strokeRect(-18, -8, 36, 16);
-    cCtx.restore();
-
-    // Expressive Eyes (Glancing right toward dog)
-    cCtx.fillStyle = '#FFFFFF';
-    cCtx.beginPath(); cCtx.ellipse(48, 64, 12, 14, 0, 0, Math.PI * 2); cCtx.fill(); cCtx.stroke();
-    cCtx.beginPath(); cCtx.ellipse(80, 64, 12, 14, 0, 0, Math.PI * 2); cCtx.fill(); cCtx.stroke();
-    cCtx.fillStyle = '#1A2421';
-    cCtx.beginPath(); cCtx.arc(54, 64, 5, 0, Math.PI * 2); cCtx.fill();
-    cCtx.beginPath(); cCtx.arc(86, 64, 5, 0, Math.PI * 2); cCtx.fill();
-
-    // Whiskers
-    cCtx.lineWidth = 4;
-    cCtx.beginPath();
-    cCtx.moveTo(25, 75); cCtx.lineTo(5, 70);
-    cCtx.moveTo(25, 82); cCtx.lineTo(8, 88);
-    cCtx.moveTo(95, 75); cCtx.lineTo(115, 70);
-    cCtx.moveTo(95, 82); cCtx.lineTo(112, 88);
-    cCtx.stroke();
-    this.textures.addCanvas('cat_classic', catCanvas);
-
-    // 4. Dog Food Bowl & Bones
-    const bowlCanvas = document.createElement('canvas');
-    bowlCanvas.width = 150;
-    bowlCanvas.height = 70;
-    const boCtx = bowlCanvas.getContext('2d');
-
-    // Bones overflowing
-    boCtx.fillStyle = '#FFFFFF';
-    boCtx.strokeStyle = '#2B1E16';
-    boCtx.lineWidth = 4;
-    boCtx.beginPath();
-    boCtx.roundRect(40, 10, 60, 16, 8); boCtx.fill(); boCtx.stroke();
-    boCtx.beginPath();
-    boCtx.roundRect(65, 5, 50, 14, 6); boCtx.fill(); boCtx.stroke();
-
-    // Bowl
-    boCtx.fillStyle = '#F4511E';
-    boCtx.lineWidth = 6;
-    boCtx.beginPath();
-    boCtx.moveTo(15, 24);
-    boCtx.lineTo(135, 24);
-    boCtx.lineTo(122, 65);
-    boCtx.lineTo(28, 65);
-    boCtx.closePath();
-    boCtx.fill();
-    boCtx.stroke();
-    boCtx.fillStyle = '#FFFFFF';
-    boCtx.beginPath();
-    boCtx.roundRect(45, 36, 60, 14, 6);
-    boCtx.fill();
-    this.textures.addCanvas('dog_bowl_full', bowlCanvas);
-
-    // 5. Classic Dog Sprite (Chubby grinning pup)
-    const dogCanvas = document.createElement('canvas');
-    dogCanvas.width = 170;
-    dogCanvas.height = 150;
-    const dCtx = dogCanvas.getContext('2d');
-
-    // Big droopy ears
-    dCtx.fillStyle = '#795548';
-    dCtx.strokeStyle = '#2B1E16';
-    dCtx.lineWidth = 6;
-    dCtx.beginPath(); dCtx.ellipse(22, 70, 18, 36, 0.25, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
-    dCtx.beginPath(); dCtx.ellipse(148, 70, 18, 36, -0.25, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
-
-    // Body
-    dCtx.fillStyle = '#A1887F';
-    dCtx.beginPath();
-    dCtx.ellipse(85, 105, 52, 38, 0, 0, Math.PI * 2);
-    dCtx.fill(); dCtx.stroke();
-
-    // Head
-    dCtx.beginPath();
-    dCtx.ellipse(85, 60, 56, 42, 0, 0, Math.PI * 2);
-    dCtx.fill(); dCtx.stroke();
-
-    // Wide Grin / Snout
-    dCtx.fillStyle = '#EFEBE9';
-    dCtx.beginPath();
-    dCtx.ellipse(85, 78, 42, 28, 0, 0, Math.PI * 2);
-    dCtx.fill(); dCtx.stroke();
-
-    // Black Nose
-    dCtx.fillStyle = '#2B1E16';
-    dCtx.beginPath();
-    dCtx.ellipse(85, 65, 12, 8, 0, 0, Math.PI * 2);
-    dCtx.fill();
-
-    // Big Cartoon Grin with Tongue
-    dCtx.beginPath();
-    dCtx.arc(85, 80, 24, 0.1 * Math.PI, 0.9 * Math.PI);
-    dCtx.stroke();
-    dCtx.fillStyle = '#E91E63';
-    dCtx.beginPath();
-    dCtx.arc(85, 88, 12, 0, Math.PI);
-    dCtx.fill(); dCtx.stroke();
-
-    // Big Eyes looking left toward cat
-    dCtx.fillStyle = '#FFFFFF';
-    dCtx.beginPath(); dCtx.arc(62, 48, 13, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
-    dCtx.beginPath(); dCtx.arc(108, 48, 13, 0, Math.PI * 2); dCtx.fill(); dCtx.stroke();
-    dCtx.fillStyle = '#2B1E16';
-    dCtx.beginPath(); dCtx.arc(58, 48, 6, 0, Math.PI * 2); dCtx.fill();
-    dCtx.beginPath(); dCtx.arc(104, 48, 6, 0, Math.PI * 2); dCtx.fill();
-    this.textures.addCanvas('dog_classic', dogCanvas);
-
-    // 6. Projectile (Trash Can / Bone)
+    // --- 6. Projectiles ---
     const pCanvas = document.createElement('canvas');
-    pCanvas.width = 36;
-    pCanvas.height = 36;
-    const pCtx = pCanvas.getContext('2d');
-    pCtx.fillStyle = '#FFF';
-    pCtx.strokeStyle = '#2B1E16';
-    pCtx.lineWidth = 3;
-    pCtx.beginPath();
-    pCtx.roundRect(8, 12, 20, 10, 4);
-    pCtx.fill(); pCtx.stroke();
-    pCtx.beginPath(); pCtx.arc(8, 12, 5, 0, Math.PI*2); pCtx.fill(); pCtx.stroke();
-    pCtx.beginPath(); pCtx.arc(8, 22, 5, 0, Math.PI*2); pCtx.fill(); pCtx.stroke();
-    pCtx.beginPath(); pCtx.arc(28, 12, 5, 0, Math.PI*2); pCtx.fill(); pCtx.stroke();
-    pCtx.beginPath(); pCtx.arc(28, 22, 5, 0, Math.PI*2); pCtx.fill(); pCtx.stroke();
+    pCanvas.width = 32; pCanvas.height = 32;
+    const p = pCanvas.getContext('2d');
+    p.fillStyle = '#FFF'; p.strokeStyle = '#2B1E16'; p.lineWidth = 3;
+    p.beginPath(); p.roundRect(6, 11, 20, 10, 4); p.fill(); p.stroke();
+    p.beginPath(); p.arc(6, 11, 4, 0, Math.PI*2); p.fill(); p.stroke();
+    p.beginPath(); p.arc(6, 21, 4, 0, Math.PI*2); p.fill(); p.stroke();
+    p.beginPath(); p.arc(26, 11, 4, 0, Math.PI*2); p.fill(); p.stroke();
+    p.beginPath(); p.arc(26, 21, 4, 0, Math.PI*2); p.fill(); p.stroke();
     this.textures.addCanvas('bone_proj', pCanvas);
   }
 
@@ -321,132 +312,149 @@ class CatDogScene extends Phaser.Scene {
     this.isAimingAllowed = false;
     this.projectileInFlight = false;
 
-    this.createStageLayout();
-    this.createClassicUI();
+    this.buildWorld();
+    this.buildClassicUI();
 
     this.changeWind();
     this.startTurn();
   }
 
-  createStageLayout() {
+  buildWorld() {
     const { width, height } = this.scale;
-    const floorY = height - 60;
+    const floorY = height - 50;
 
-    // 1. Sky & Rolling Hills
-    const bg = this.add.graphics();
-    bg.fillGradientStyle(0x76B6E4, 0x76B6E4, 0xEBF7FD, 0xEBF7FD, 1);
-    bg.fillRect(0, 0, width, height);
+    // Sky with soft gradient
+    const sky = this.add.graphics();
+    sky.fillGradientStyle(0x7EB8E4, 0x7EB8E4, 0xEDF7FC, 0xEDF7FC, 1);
+    sky.fillRect(0, 0, width, height);
 
-    // Far mountains (muted green-grey)
-    bg.fillStyle(0x7EA598, 1);
-    bg.beginPath();
-    bg.moveTo(250, height - 120);
-    bg.lineTo(440, 150);
-    bg.lineTo(650, height - 120);
-    bg.lineTo(850, 180);
-    bg.lineTo(width, height - 100);
-    bg.lineTo(width, height);
-    bg.lineTo(250, height);
-    bg.closePath();
-    bg.fill();
+    // Clouds
+    const cloud = this.add.graphics();
+    cloud.fillStyle(0xFFFFFF, 0.9);
+    cloud.beginPath();
+    cloud.arc(340, 95, 26, 0, Math.PI * 2);
+    cloud.arc(370, 90, 32, 0, Math.PI * 2);
+    cloud.arc(400, 95, 24, 0, Math.PI * 2);
+    cloud.arc(660, 80, 24, 0, Math.PI * 2);
+    cloud.arc(690, 75, 30, 0, Math.PI * 2);
+    cloud.arc(720, 80, 22, 0, Math.PI * 2);
+    cloud.fill();
 
-    // 2. Left Side: Urban Alley (Purple wall)
+    // Rolling Distant Green Mountains
+    const mountains = this.add.graphics();
+    mountains.fillStyle(0x7EA598, 1);
+    mountains.beginPath();
+    mountains.moveTo(240, height - 80);
+    mountains.lineTo(410, 140);
+    mountains.lineTo(620, height - 80);
+    mountains.lineTo(820, 130);
+    mountains.lineTo(width, height - 70);
+    mountains.lineTo(width, height);
+    mountains.lineTo(240, height);
+    mountains.closePath();
+    mountains.fill();
+
+    // Left Alley (Purple Wall & Ground)
     const alley = this.add.graphics();
-    alley.fillStyle(0xBC8CBF, 1); // Classic purple building
-    alley.fillRect(0, 0, 240, height);
-    alley.lineStyle(5, 0x3E273F);
-    alley.beginPath();
-    alley.moveTo(240, 0);
-    alley.lineTo(240, height);
-    alley.stroke();
+    alley.fillStyle(0xBA86BA, 1);
+    alley.fillRect(0, 0, 235, height);
+    alley.lineStyle(6, 0x3A263B);
+    alley.beginPath(); alley.moveTo(235, 0); alley.lineTo(235, height); alley.stroke();
+    // Sidewalk
+    alley.fillStyle(0x9E9B95, 1);
+    alley.lineStyle(5, 0x3A263B);
+    alley.fillRect(0, floorY, 410, 50);
+    alley.strokeRect(0, floorY, 410, 50);
 
-    // Alley floor (Cobblestone pavement)
-    alley.fillStyle(0x9E9D93, 1);
-    alley.lineStyle(5, 0x3E3D38);
-    alley.fillRect(0, floorY, 410, 60);
-    alley.strokeRect(0, floorY, 410, 60);
-
-    // 3. Right Side: Residential Backyard (Green lawn + roof trim)
+    // Right Lawn & Backyard Roof
     const yard = this.add.graphics();
-    yard.fillStyle(0x5DAE47, 1); // Rich green lawn
-    yard.lineStyle(5, 0x2A581F);
-    yard.fillRect(410, floorY, width - 410, 60);
-    yard.strokeRect(410, floorY, width - 410, 60);
+    yard.fillStyle(0x56A838, 1);
+    yard.lineStyle(5, 0x244E18);
+    yard.fillRect(410, floorY, width - 410, 50);
+    yard.strokeRect(410, floorY, width - 410, 50);
 
-    // Corner roof detail in far top-right
-    yard.fillStyle(0xD84315, 1);
-    yard.lineStyle(4, 0x2B1E16);
+    // Brick/Roof corner at right
+    yard.fillStyle(0xCF5A30, 1);
+    yard.lineStyle(5, 0x2B1E16);
     yard.beginPath();
-    yard.moveTo(width - 140, 100);
-    yard.lineTo(width, 40);
-    yard.lineTo(width, 160);
-    yard.lineTo(width - 100, 210);
+    yard.moveTo(width - 150, 70);
+    yard.lineTo(width, 10);
+    yard.lineTo(width, 240);
+    yard.lineTo(width - 90, 200);
     yard.closePath();
-    yard.fill();
-    yard.stroke();
+    yard.fill(); yard.stroke();
 
-    // 4. Center Wooden Fence (Positioned exactly between Cat and Dog)
-    this.fence = this.add.image(width / 2 + 10, floorY - 110, 'fence_wall');
+    // Fence positioned naturally in the center
+    this.fence = this.add.image(width / 2 + 10, floorY - 110, 'fence_post');
     this.physics.add.existing(this.fence, true);
 
-    // 5. Cat on Bin
-    this.add.image(130, floorY - 60, 'trashcan_full');
-    this.cat = this.add.sprite(105, floorY - 140, 'cat_classic');
+    // Cat & Base
+    this.add.image(95, floorY - 55, 'cat_perch');
+    this.cat = this.add.sprite(65, floorY - 135, 'cat_handdrawn');
     this.tweens.add({
       targets: this.cat,
-      scaleY: 1.05,
-      duration: 700,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
-
-    // 6. Dog next to his bowl (Standing tall)
-    this.add.image(width - 130, floorY - 25, 'dog_bowl_full');
-    this.dog = this.add.sprite(width - 130, floorY - 90, 'dog_classic');
-    this.tweens.add({
-      targets: this.dog,
       scaleY: 1.04,
       duration: 750,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
+
+    // Dog & Bowl
+    this.dog = this.add.sprite(width - 130, floorY - 80, 'dog_handdrawn');
+    this.add.image(width - 130, floorY - 10, 'dog_bowl');
+    this.tweens.add({
+      targets: this.dog,
+      scaleY: 1.04,
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
   }
 
-  createClassicUI() {
+  buildClassicUI() {
     const { width } = this.scale;
 
-    // Top Header Plaque with Golden Border
-    const uiBox = this.add.graphics();
-    uiBox.fillStyle(0xFFEB3B, 1);
-    uiBox.lineStyle(4, 0xD84315);
-    uiBox.fillRoundedRect(width / 2 - 310, 12, 620, 56, 18);
-    uiBox.strokeRoundedRect(width / 2 - 310, 12, 620, 56, 18);
+    // Authentic Yellow Status Frame
+    const ui = this.add.graphics();
+    ui.fillStyle(0xFED330, 1);
+    ui.lineStyle(4, 0xEA7700);
+    ui.fillRoundedRect(width / 2 - 320, 10, 640, 52, 16);
+    ui.strokeRoundedRect(width / 2 - 320, 10, 640, 52, 16);
 
-    // Health Bar Containers (Red background)
-    uiBox.fillStyle(0xD32F2F, 1);
-    uiBox.fillRoundedRect(width / 2 - 290, 24, 210, 20, 6);
-    uiBox.fillRoundedRect(width / 2 + 80, 24, 210, 20, 6);
+    // Health Trackers (Red base)
+    ui.fillStyle(0xD63031, 1);
+    ui.fillRoundedRect(width / 2 - 280, 22, 200, 18, 5);
+    ui.fillRoundedRect(width / 2 + 80, 22, 200, 18, 5);
 
-    // Dynamic HP Bars
+    // Dynamic HP bars
     this.catHpFill = this.add.graphics();
     this.dogHpFill = this.add.graphics();
     this.updateHealthBar('CAT');
     this.updateHealthBar('DOG');
 
-    // Central Wind Gauge Box
-    const windBox = this.add.graphics();
-    windBox.fillStyle(0xFF9800, 1);
-    windBox.lineStyle(3, 0xD84315);
-    windBox.fillRoundedRect(width / 2 - 68, 16, 136, 44, 10);
-    windBox.strokeRoundedRect(width / 2 - 68, 16, 136, 44, 10);
+    // Cat & Dog Mini Head Portraits in UI
+    const catHead = this.add.graphics();
+    catHead.fillStyle(0x29B6A8, 1); catHead.lineStyle(2, 0x1a2634);
+    catHead.beginPath(); catHead.arc(width / 2 - 295, 31, 14, 0, Math.PI * 2); catHead.fill(); catHead.stroke();
+    // Dog head
+    const dogHead = this.add.graphics();
+    dogHead.fillStyle(0x8D7765, 1); dogHead.lineStyle(2, 0x1a2634);
+    dogHead.beginPath(); dogHead.arc(width / 2 + 295, 31, 14, 0, Math.PI * 2); dogHead.fill(); dogHead.stroke();
 
-    this.windText = this.add.text(width / 2, 38, '', {
+    // Wind Box
+    const windBox = this.add.graphics();
+    windBox.fillStyle(0xFF9F1A, 1);
+    windBox.lineStyle(3, 0xD35400);
+    windBox.fillRoundedRect(width / 2 - 65, 14, 130, 44, 10);
+    windBox.strokeRoundedRect(width / 2 - 65, 14, 130, 44, 10);
+
+    this.windText = this.add.text(width / 2, 36, '', {
       fontSize: '18px',
       fontStyle: 'bold',
       color: '#FFFFFF',
-      stroke: '#BF360C',
+      stroke: '#D35400',
       strokeThickness: 3
     }).setOrigin(0.5);
 
@@ -454,7 +462,7 @@ class CatDogScene extends Phaser.Scene {
     this.powerBarBg = this.add.graphics().setVisible(false);
     this.powerBarFill = this.add.graphics().setVisible(false);
 
-    // Input handlers
+    // Input
     this.input.on('pointerdown', () => {
       if (!this.isAimingAllowed || this.turn !== 'CAT' || this.projectileInFlight) return;
       this.isCharging = true;
@@ -477,13 +485,13 @@ class CatDogScene extends Phaser.Scene {
     const { width } = this.scale;
     if (target === 'CAT') {
       this.catHpFill.clear();
-      this.catHpFill.fillStyle(0x00E676, 1);
-      this.catHpFill.fillRoundedRect(width / 2 - 290, 24, Math.max(0, this.catHp * 2.1), 20, 6);
+      this.catHpFill.fillStyle(0x2ECC71, 1);
+      this.catHpFill.fillRoundedRect(width / 2 - 280, 22, Math.max(0, this.catHp * 2), 18, 5);
     } else {
       this.dogHpFill.clear();
-      this.dogHpFill.fillStyle(0x00E676, 1);
-      const fillW = Math.max(0, this.dogHp * 2.1);
-      this.dogHpFill.fillRoundedRect(width / 2 + 290 - fillW, 24, fillW, 20, 6);
+      this.dogHpFill.fillStyle(0x2ECC71, 1);
+      const fillW = Math.max(0, this.dogHp * 2);
+      this.dogHpFill.fillRoundedRect(width / 2 + 280 - fillW, 22, fillW, 18, 5);
     }
   }
 
@@ -504,49 +512,50 @@ class CatDogScene extends Phaser.Scene {
 
   promptESLQuestion() {
     const questions = [
-      { q: "The cat is ____ the trash bin.", opts: ["ON", "UNDER", "INTO"], ans: "ON" },
       { q: "Yesterday the dog ____ a bone.", opts: ["ATE", "EATING", "EATS"], ans: "ATE" },
-      { q: "Which one is an animal?", opts: ["CAT", "FENCE", "CLOUD"], ans: "CAT" },
-      { q: "The fence is in the ____.", opts: ["MIDDLE", "SKY", "WATER"], ans: "MIDDLE" },
+      { q: "The cat is sitting ____ the box.", opts: ["ON", "INTO", "UNDER"], ans: "ON" },
+      { q: "Dogs like to chew on ____.", opts: ["BONES", "CARS", "CLOUDS"], ans: "BONES" },
+      { q: "What is between the yards?", opts: ["FENCE", "RIVER", "TRAIN"], ans: "FENCE" },
       { q: "The dog is sleeping ____ the tree.", opts: ["UNDER", "ABOVE", "THROUGH"], ans: "UNDER" },
       { q: "The bone is ____ the food bowl.", opts: ["IN", "BETWEEN", "AMONG"], ans: "IN" }
     ];
     const item = Phaser.Utils.Array.GetRandom(questions);
 
-    const modal = this.add.container(this.scale.width / 2, 195);
+    // Compact in-world question plaque so it doesn't block the screen
+    const modal = this.add.container(this.scale.width / 2, 145);
     this.activeModal = modal;
     modal.on('destroy', () => { this.activeModal = null; });
 
     const bg = this.add.graphics();
     bg.fillStyle(0xFFFFFF, 0.98);
-    bg.lineStyle(5, 0xF57C00);
-    bg.fillRoundedRect(-230, -75, 460, 150, 16);
-    bg.strokeRoundedRect(-230, -75, 460, 150, 16);
+    bg.lineStyle(4, 0xEA7700);
+    bg.fillRoundedRect(-220, -55, 440, 110, 14);
+    bg.strokeRoundedRect(-220, -55, 440, 110, 14);
     modal.add(bg);
 
-    const title = this.add.text(0, -45, item.q, {
-      fontSize: '20px',
+    const title = this.add.text(0, -32, item.q, {
+      fontSize: '18px',
       fontStyle: 'bold',
-      color: '#E65100'
+      color: '#D35400'
     }).setOrigin(0.5);
     modal.add(title);
 
     item.opts.forEach((opt, idx) => {
-      const btnX = -135 + idx * 135;
-      const btnY = 15;
+      const btnX = -130 + idx * 130;
+      const btnY = 16;
       const btnBg = this.add.graphics();
-      btnBg.fillStyle(0xFF9800, 1);
-      btnBg.fillRoundedRect(btnX - 58, btnY - 22, 116, 44, 10);
+      btnBg.fillStyle(0xFF9F1A, 1);
+      btnBg.fillRoundedRect(btnX - 52, btnY - 18, 104, 36, 8);
       modal.add(btnBg);
 
       const btnTxt = this.add.text(btnX, btnY, opt, {
-        fontSize: '18px',
+        fontSize: '16px',
         fontStyle: 'bold',
         color: '#FFFFFF'
       }).setOrigin(0.5);
       modal.add(btnTxt);
 
-      const hitZone = this.add.rectangle(btnX, btnY, 116, 44, 0x000000, 0)
+      const hitZone = this.add.rectangle(btnX, btnY, 104, 36, 0x000000, 0)
         .setInteractive({ useHandCursor: true });
       hitZone.opt = opt;
       hitZone.isCorrect = (opt === item.ans);
@@ -558,7 +567,7 @@ class CatDogScene extends Phaser.Scene {
           audio.sfxCorrect();
           modal.destroy();
           this.isAimingAllowed = true;
-          this.showFeedbackToast("CORRECT! HOLD & RELEASE TO THROW!", 0x2E7D32);
+          this.showFeedbackToast("CORRECT! HOLD & RELEASE TO THROW!", 0x27AE60);
         } else {
           audio.sfxWrong();
           this.tweens.add({
@@ -578,12 +587,12 @@ class CatDogScene extends Phaser.Scene {
   }
 
   showFeedbackToast(text, color) {
-    const toast = this.add.text(this.scale.width / 2, 110, text, {
-      fontSize: '20px',
+    const toast = this.add.text(this.scale.width / 2, 95, text, {
+      fontSize: '18px',
       fontStyle: 'bold',
       color: '#ffffff',
       backgroundColor: '#' + color.toString(16).padStart(6, '0'),
-      padding: { x: 16, y: 8 }
+      padding: { x: 14, y: 6 }
     }).setOrigin(0.5);
 
     this.time.delayedCall(1600, () => toast.destroy());
@@ -595,13 +604,13 @@ class CatDogScene extends Phaser.Scene {
     audio.sfxThrow();
 
     const startX = shooter === 'CAT' ? this.cat.x + 35 : this.dog.x - 35;
-    const startY = shooter === 'CAT' ? this.cat.y - 10 : this.dog.y - 10;
+    const startY = shooter === 'CAT' ? this.cat.y - 15 : this.dog.y - 15;
     
     const proj = this.physics.add.sprite(startX, startY, 'bone_proj');
     proj.setAngularVelocity(shooter === 'CAT' ? 420 : -420);
 
-    const angleRad = shooter === 'CAT' ? -58 * (Math.PI / 180) : -122 * (Math.PI / 180);
-    const speed = 260 + (power * 7.5);
+    const angleRad = shooter === 'CAT' ? -56 * (Math.PI / 180) : -124 * (Math.PI / 180);
+    const speed = 250 + (power * 7.6);
     proj.setVelocity(
       Math.cos(angleRad) * speed + (this.wind * 20),
       Math.sin(angleRad) * speed
@@ -633,7 +642,7 @@ class CatDogScene extends Phaser.Scene {
           return;
         }
 
-        if (proj.y >= this.scale.height - 60) {
+        if (proj.y >= this.scale.height - 50) {
           flightTimer.remove();
           checkCollision.remove();
           proj.destroy();
@@ -682,7 +691,7 @@ class CatDogScene extends Phaser.Scene {
   }
 
   runDogAITurn() {
-    const estimatedPower = Phaser.Math.Clamp(54 - (this.wind * 3.6) + Phaser.Math.Between(-8, 8), 22, 95);
+    const estimatedPower = Phaser.Math.Clamp(53 - (this.wind * 3.5) + Phaser.Math.Between(-8, 8), 20, 95);
     this.fireProjectile(estimatedPower, 'DOG');
   }
 
@@ -695,9 +704,9 @@ class CatDogScene extends Phaser.Scene {
 
   gameOver(winner) {
     this.add.text(this.scale.width / 2, this.scale.height / 2, `${winner} WINS!`, {
-      fontSize: '48px',
+      fontSize: '44px',
       fontStyle: 'bold',
-      color: '#FFEB3B',
+      color: '#F1C40F',
       stroke: '#000000',
       strokeThickness: 6
     }).setOrigin(0.5);
@@ -711,11 +720,11 @@ class CatDogScene extends Phaser.Scene {
       
       this.powerBarBg.clear();
       this.powerBarBg.fillStyle(0x000000, 0.6);
-      this.powerBarBg.fillRoundedRect(this.cat.x - 35, this.cat.y - 75, 70, 10, 4);
+      this.powerBarBg.fillRoundedRect(this.cat.x - 30, this.cat.y - 70, 60, 10, 4);
 
       this.powerBarFill.clear();
-      this.powerBarFill.fillStyle(0xFF9800, 1);
-      this.powerBarFill.fillRoundedRect(this.cat.x - 35, this.cat.y - 75, (this.chargePower / 100) * 70, 10, 4);
+      this.powerBarFill.fillStyle(0xFF9F1A, 1);
+      this.powerBarFill.fillRoundedRect(this.cat.x - 30, this.cat.y - 70, (this.chargePower / 100) * 60, 10, 4);
     }
   }
 }
