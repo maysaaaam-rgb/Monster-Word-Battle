@@ -239,17 +239,43 @@ gauze.position.set(0.25, 2.05, 0.1);
 gauze.rotation.set(0.1, 0, -0.3);
 catGroup.add(gauze);
 
-// العيون الكرتونية الناظرة باتجاه الكلب
-function createEye(x, y, z) {
-  const eye = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 16), eyeWhiteMat);
-  eye.position.set(x, y, z);
-  const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.08, 12, 12), blackMat);
-  pupil.position.set(0.12, 0, 0);
-  eye.add(pupil);
-  return eye;
+// عيون كرتونية ضخمة مع لمعة بيضاء بارزة
+function createCartoonEye(scale = 1) {
+  const eyeGroup = new THREE.Group();
+  
+  // بياض العين
+  const white = new THREE.Mesh(
+    new THREE.SphereGeometry(0.3 * scale, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  );
+  eyeGroup.add(white);
+
+  // النني الأسود الكبير
+  const pupil = new THREE.Mesh(
+    new THREE.SphereGeometry(0.16 * scale, 16, 16),
+    new THREE.MeshBasicMaterial({ color: 0x111111 })
+  );
+  pupil.position.set(0.18 * scale, 0, 0);
+  eyeGroup.add(pupil);
+
+  // لمعة الإضاءة الكرتونية داخل العين
+  const shine = new THREE.Mesh(
+    new THREE.SphereGeometry(0.06 * scale, 8, 8),
+    new THREE.MeshBasicMaterial({ color: 0xffffff })
+  );
+  shine.position.set(0.24 * scale, 0.08 * scale, 0);
+  eyeGroup.add(shine);
+
+  return eyeGroup;
 }
-catGroup.add(createEye(0.6, 1.65, 0.22));
-catGroup.add(createEye(0.6, 1.65, -0.22));
+
+const catEyeL = createCartoonEye(0.8);
+catEyeL.position.set(0.55, 1.7, 0.24);
+catGroup.add(catEyeL);
+
+const catEyeR = createCartoonEye(0.8);
+catEyeR.position.set(0.55, 1.7, -0.24);
+catGroup.add(catEyeR);
 
 // الأنف الوردي
 const catNose = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.12, 4), pinkMat);
@@ -353,8 +379,15 @@ tongue.rotation.z = -0.3;
 dogGroup.add(tongue);
 
 // عيون الكلب الضاحكة المتجهة نحو القط
-dogGroup.add(createEye(-0.7, 2.3, 0.3));
-dogGroup.add(createEye(-0.7, 2.3, -0.3));
+const dogEyeL = createCartoonEye(0.9);
+dogEyeL.rotation.y = Math.PI;
+dogEyeL.position.set(-0.65, 2.3, 0.3);
+dogGroup.add(dogEyeL);
+
+const dogEyeR = createCartoonEye(0.9);
+dogEyeR.rotation.y = Math.PI;
+dogEyeR.position.set(-0.65, 2.3, -0.3);
+dogGroup.add(dogEyeR);
 
 dogGroup.position.set(7.5, 0, 0);
 scene.add(dogGroup);
