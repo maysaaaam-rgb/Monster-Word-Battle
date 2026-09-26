@@ -176,32 +176,29 @@ function createCloud(x, y, z) {
 createCloud(-6, 8, -8);
 createCloud(5, 9, -10);
 
-// --- 4. سياج خشبي واقعي ثلاثي الأبعاد (Center Fence) ---
+// --- 4. سياج خشبي كرتوني عريض وواضح (Center Fence) ---
 const fenceGroup = new THREE.Group();
-const woodMat = new THREE.MeshToonMaterial({ color: 0x8d6e63, gradientMap });
-const postMat = woodToonMat;
 
-// ألواح الخشب المتراصة
-for (let i = -3; i <= 3; i++) {
-  const plank = new THREE.Mesh(new THREE.BoxGeometry(0.28, 3.4, 0.45), woodMat);
-  plank.position.set(0, 1.7, i * 0.48);
+// ألواح خشبية متراصة بعمق الكاميرا
+for (let z = -5; z <= 5; z += 0.8) {
+  const plank = new THREE.Mesh(
+    new THREE.BoxGeometry(0.3, 3.2, 0.7),
+    woodToonMat
+  );
+  plank.position.set(0, 1.6, z);
   plank.castShadow = true;
   plank.receiveShadow = true;
   fenceGroup.add(plank);
 }
 
-// العمود الأصفر الرئيسي الأمامي بالسقف الهرمي
-const fencePost = new THREE.Mesh(new THREE.BoxGeometry(0.48, 3.8, 0.48), postMat);
-fencePost.position.set(0, 1.9, 1.7);
-fencePost.castShadow = true;
-fencePost.receiveShadow = true;
-fenceGroup.add(fencePost);
-
-const postCap = new THREE.Mesh(new THREE.ConeGeometry(0.38, 0.4, 4), postMat);
-postCap.position.set(0, 3.9, 1.7);
-postCap.rotation.y = Math.PI / 4;
-postCap.castShadow = true;
-fenceGroup.add(postCap);
+// عارضة خشبية أفقية تمسك الألواح
+const beam = new THREE.Mesh(
+  new THREE.BoxGeometry(0.4, 0.35, 10.5),
+  woodToonMat
+);
+beam.position.set(0, 2.0, 0);
+beam.castShadow = true;
+fenceGroup.add(beam);
 
 scene.add(fenceGroup);
 
