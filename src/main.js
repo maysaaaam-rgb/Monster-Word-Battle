@@ -111,6 +111,14 @@ yard.position.set(8, 0, 0);
 yard.receiveShadow = true;
 scene.add(yard);
 
+// --- تحسين أرضية ورصيف الزقاق ---
+const curbGeo = new THREE.BoxGeometry(0.3, 0.25, 26);
+const curbMat = new THREE.MeshStandardMaterial({ color: 0x546e7a, roughness: 0.9 });
+const curb = new THREE.Mesh(curbGeo, curbMat);
+curb.position.set(-0.15, 0.12, 0);
+curb.receiveShadow = true;
+scene.add(curb);
+
 // جدار الزقاق البنفسجي المرتفع
 const alleyWall = new THREE.Mesh(new THREE.BoxGeometry(0.8, 14, 26), wallMat);
 alleyWall.position.set(-14.5, 7, 0);
@@ -191,174 +199,169 @@ fenceGroup.add(post);
 
 scene.add(fenceGroup);
 
-// --- 5. شخصية القط 3D (Fleabag Cat) مع التفاصيل ---
+// --- 5. شخصية القط (Fleabag Cat) المحسنة كرتونياً ---
 const catGroup = new THREE.Group();
-const catFur = new THREE.MeshStandardMaterial({ color: 0x00acc1, roughness: 0.45 });
+const catMat = new THREE.MeshToonMaterial({ color: 0x00acc1 });
+const catBellyMat = new THREE.MeshToonMaterial({ color: 0x80deea });
 const whiteMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
 const blackMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
-const pinkMat = new THREE.MeshStandardMaterial({ color: 0xff4081 });
-const bandageMat = new THREE.MeshStandardMaterial({ color: 0xfff9c4 });
+const pinkMat = new THREE.MeshToonMaterial({ color: 0xff4081 });
+const bandageMat = new THREE.MeshToonMaterial({ color: 0xfff9c4 });
 
-// جسم القط المنحني
-const catTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.48, 0.72, 1.3, 18), catFur);
-catTorso.position.y = 0.65;
+// جذع القط
+const catTorso = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.65, 1.25, 16), catMat);
+catTorso.position.y = 0.62;
 catTorso.castShadow = true;
 catGroup.add(catTorso);
 
-// رأس القط
-const catHead = new THREE.Mesh(new THREE.SphereGeometry(0.68, 20, 20), catFur);
-catHead.position.set(0.12, 1.6, 0);
+// رقعة بطن القط الفاتحة
+const catBelly = new THREE.Mesh(new THREE.CylinderGeometry(0.25, 0.45, 0.9, 16), catBellyMat);
+catBelly.position.set(0.22, 0.6, 0);
+catGroup.add(catBelly);
+
+// رأس القط الكرتوني
+const catHead = new THREE.Mesh(new THREE.SphereGeometry(0.65, 18, 18), catMat);
+catHead.position.set(0.1, 1.55, 0);
 catHead.castShadow = true;
 catGroup.add(catHead);
 
-// آذان القط مع الشاش الملفوف
-const earL = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.55, 4), catFur);
-earL.position.set(0.0, 2.2, 0.35);
-earL.rotation.set(0.2, 0, 0.2);
+// آذان القط الحادة
+const earL = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.52, 4), catMat);
+earL.position.set(0.0, 2.15, 0.32);
+earL.rotation.set(0.15, 0, 0.15);
 catGroup.add(earL);
 
-const earR = new THREE.Mesh(new THREE.ConeGeometry(0.24, 0.55, 4), catFur);
-earR.position.set(0.0, 2.2, -0.35);
-earR.rotation.set(-0.2, 0, 0.2);
+const earR = new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.52, 4), catMat);
+earR.position.set(0.0, 2.15, -0.32);
+earR.rotation.set(-0.15, 0, 0.15);
 catGroup.add(earR);
 
-// ضمادة الرأس البيضاء
-const catGauze = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.22, 0.55), bandageMat);
-catGauze.position.set(0.25, 2.05, 0.1);
-catGauze.rotation.set(0.1, 0, -0.25);
-catGroup.add(catGauze);
+// ضمادة الرأس
+const gauze = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.18, 0.5), bandageMat);
+gauze.position.set(0.2, 1.95, 0.1);
+gauze.rotation.set(0.1, 0, -0.25);
+catGroup.add(gauze);
 
-// عيون كرتونية بيضاوية مع بريق
-function createToonEye(x, y, z, lookDir = 1) {
+// عيون القط الكبيرة باتجاه الكلب
+function createEye(x, y, z, lookDir = 1) {
   const eye = new THREE.Group();
-  const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 16), whiteMat);
-  sclera.scale.set(1, 1.15, 0.9);
+  const sclera = new THREE.Mesh(new THREE.SphereGeometry(0.19, 16, 16), whiteMat);
+  sclera.scale.set(1, 1.2, 0.9);
   eye.add(sclera);
-
   const pupil = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 12), blackMat);
-  pupil.position.set(0.15 * lookDir, 0, 0);
+  pupil.position.set(0.14 * lookDir, 0, 0);
   eye.add(pupil);
-
-  const shine = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), whiteMat);
-  shine.position.set(0.18 * lookDir, 0.06, 0);
-  eye.add(shine);
-
   eye.position.set(x, y, z);
   return eye;
 }
-catGroup.add(createToonEye(0.62, 1.66, 0.22, 1));
-catGroup.add(createToonEye(0.62, 1.66, -0.22, 1));
+catGroup.add(createEye(0.55, 1.62, 0.22, 1));
+catGroup.add(createEye(0.55, 1.62, -0.22, 1));
 
-// أنف القط الوردي
-const cNose = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.12, 4), pinkMat);
-cNose.position.set(0.75, 1.5, 0);
-cNose.rotation.z = -Math.PI / 2;
-catGroup.add(cNose);
+// أنف القط وشاربين سوداوين
+const catNose = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.12, 4), pinkMat);
+catNose.position.set(0.7, 1.48, 0);
+catNose.rotation.z = -Math.PI / 2;
+catGroup.add(catNose);
 
-// ذيل القط
-const catTailCurve = new THREE.QuadraticBezierCurve3(
-  new THREE.Vector3(-0.4, 0.2, 0),
-  new THREE.Vector3(-1.1, 0.8, 0),
-  new THREE.Vector3(-0.7, 1.5, 0)
+// ذيل القط المنحني
+const tailCurve = new THREE.QuadraticBezierCurve3(
+  new THREE.Vector3(-0.35, 0.2, 0),
+  new THREE.Vector3(-1.0, 0.75, 0),
+  new THREE.Vector3(-0.65, 1.45, 0)
 );
-const tailMesh = new THREE.Mesh(new THREE.TubeGeometry(catTailCurve, 20, 0.08, 8, false), catFur);
+const tailMesh = new THREE.Mesh(new THREE.TubeGeometry(tailCurve, 16, 0.07, 8, false), catMat);
 tailMesh.castShadow = true;
 catGroup.add(tailMesh);
 
-// الصندوق الخشبي الذي يجلس عليه القط
-const seatBox = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.1, 1.3), new THREE.MeshStandardMaterial({ color: 0xd7ccc8 }));
-seatBox.position.set(-8.2, 0.55, 0);
+// الصندوق والبرميل
+const seatBox = new THREE.Mesh(new THREE.BoxGeometry(1.2, 1.1, 1.2), new THREE.MeshStandardMaterial({ color: 0xd7ccc8 }));
+seatBox.position.set(-8.0, 0.55, 0);
 seatBox.castShadow = true;
 seatBox.receiveShadow = true;
 scene.add(seatBox);
 
-// برميل النفايات
 const bin = new THREE.Mesh(new THREE.CylinderGeometry(0.85, 0.72, 1.5, 20), new THREE.MeshStandardMaterial({ color: 0x78909c, metalness: 0.35 }));
-bin.position.set(-6.6, 0.75, 0);
+bin.position.set(-6.5, 0.75, 0);
 bin.castShadow = true;
 bin.receiveShadow = true;
 scene.add(bin);
 
-catGroup.position.set(-8.2, 1.1, 0);
+catGroup.position.set(-8.0, 1.1, 0);
 scene.add(catGroup);
 
-// --- 6. شخصية الكلب 3D (Mutt) مع الابتسامة العريضة ---
+// --- 6. شخصية الكلب (Mutt) المحسنة بالفك العريض ---
 const dogGroup = new THREE.Group();
-const dogFur = new THREE.MeshStandardMaterial({ color: 0x8d6e63, roughness: 0.6 });
-const muzzleMat = new THREE.MeshStandardMaterial({ color: 0xf5ebe6, roughness: 0.5 });
-const earMat = new THREE.MeshStandardMaterial({ color: 0x4e342e, roughness: 0.65 });
+const dogFurMat = new THREE.MeshToonMaterial({ color: 0x8d6e63 });
+const muzzleMat = new THREE.MeshToonMaterial({ color: 0xfff3e0 });
+const earDogMat = new THREE.MeshToonMaterial({ color: 0x4e342e });
 
 // جسم الكلب
-const dogBody = new THREE.Mesh(new THREE.SphereGeometry(0.96, 20, 20), dogFur);
+const dogBody = new THREE.Mesh(new THREE.SphereGeometry(0.92, 18, 18), dogFurMat);
 dogBody.scale.set(1, 1.15, 1);
-dogBody.position.y = 1.0;
+dogBody.position.y = 0.95;
 dogBody.castShadow = true;
 dogGroup.add(dogBody);
 
-// أقدام الكلب الواقف
-const dPawL = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 12), muzzleMat);
-dPawL.position.set(-0.35, 0.2, 0.45);
-dPawL.scale.set(1.2, 0.7, 1);
-dPawL.castShadow = true;
-dogGroup.add(dPawL);
+// أقدام الكلب
+const pawL = new THREE.Mesh(new THREE.SphereGeometry(0.26, 14, 10), muzzleMat);
+pawL.position.set(-0.35, 0.2, 0.42);
+pawL.scale.set(1.2, 0.7, 1);
+dogGroup.add(pawL);
 
-const dPawR = new THREE.Mesh(new THREE.SphereGeometry(0.28, 16, 12), muzzleMat);
-dPawR.position.set(-0.35, 0.2, -0.45);
-dPawR.scale.set(1.2, 0.7, 1);
-dPawR.castShadow = true;
-dogGroup.add(dPawR);
+const pawR = new THREE.Mesh(new THREE.SphereGeometry(0.26, 14, 10), muzzleMat);
+pawR.position.set(-0.35, 0.2, -0.42);
+pawR.scale.set(1.2, 0.7, 1);
+dogGroup.add(pawR);
 
 // رأس الكلب
-const dogHead = new THREE.Mesh(new THREE.SphereGeometry(0.86, 20, 20), dogFur);
-dogHead.position.set(-0.15, 2.0, 0);
+const dogHead = new THREE.Mesh(new THREE.SphereGeometry(0.82, 18, 18), dogFurMat);
+dogHead.position.set(-0.12, 1.9, 0);
 dogHead.castShadow = true;
 dogGroup.add(dogHead);
 
 // آذان الكلب المتدلية
-const dogEarL = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.32, 1.1, 12), earMat);
-dogEarL.position.set(-0.1, 1.8, 0.95);
-dogEarL.rotation.set(0.3, 0, 0);
-dogEarL.castShadow = true;
-dogGroup.add(dogEarL);
+const dEarL = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.3, 1.0, 12), earDogMat);
+dEarL.position.set(-0.1, 1.7, 0.9);
+dEarL.rotation.set(0.3, 0, 0);
+dogGroup.add(dEarL);
 
-const dogEarR = new THREE.Mesh(new THREE.CylinderGeometry(0.18, 0.32, 1.1, 12), earMat);
-dogEarR.position.set(-0.1, 1.8, -0.95);
-dogEarR.rotation.set(-0.3, 0, 0);
-dogEarR.castShadow = true;
-dogGroup.add(dogEarR);
+const dEarR = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.3, 1.0, 12), earDogMat);
+dEarR.position.set(-0.1, 1.7, -0.9);
+dEarR.rotation.set(-0.3, 0, 0);
+dogGroup.add(dEarR);
 
-// الفم والابتسامة الكرتونية العريضة (Mutt's Grin)
-const dogMuzzle = new THREE.Mesh(new THREE.SphereGeometry(0.56, 16, 16), muzzleMat);
-dogMuzzle.position.set(-0.62, 1.8, 0);
-dogMuzzle.scale.set(1.1, 0.75, 1.35);
-dogGroup.add(dogMuzzle);
+// الفم والفك العريض الضاحك (Muzzle)
+const dMuzzle = new THREE.Mesh(new THREE.SphereGeometry(0.55, 16, 16), muzzleMat);
+dMuzzle.position.set(-0.55, 1.75, 0);
+dMuzzle.scale.set(1.1, 0.75, 1.3);
+dogGroup.add(dMuzzle);
 
 // تجويف الفم المفتوح
-const mouthHole = new THREE.Mesh(new THREE.BoxGeometry(0.25, 0.35, 0.65), blackMat);
-mouthHole.position.set(-0.95, 1.7, 0);
-dogGroup.add(mouthHole);
+const mouthCavity = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.3, 0.6), blackMat);
+mouthCavity.position.set(-0.85, 1.65, 0);
+dogGroup.add(mouthCavity);
 
 // لسان الكلب المتدلي
-const tongue = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.35, 0.26), pinkMat);
-tongue.position.set(-1.0, 1.5, 0);
-tongue.rotation.z = -0.35;
-dogGroup.add(tongue);
+const dogTongue = new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.32, 0.24), pinkMat);
+dogTongue.position.set(-0.9, 1.48, 0);
+dogTongue.rotation.z = -0.3;
+dogGroup.add(dogTongue);
 
-// أنف الكلب
-const dogNose = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), blackMat);
-dogNose.position.set(-1.1, 1.95, 0);
-dogGroup.add(dogNose);
+// أنف الكلب الأسود
+const dNose = new THREE.Mesh(new THREE.SphereGeometry(0.15, 12, 12), blackMat);
+dNose.position.set(-0.98, 1.88, 0);
+dogGroup.add(dNose);
 
 // عيون الكلب الضاحكة
-dogGroup.add(createToonEye(-0.68, 2.3, 0.3, -1));
-dogGroup.add(createToonEye(-0.68, 2.3, -0.3, -1));
+dogGroup.add(createEye(-0.6, 2.15, 0.28, -1));
+dogGroup.add(createEye(-0.6, 2.15, -0.28, -1));
 
 dogGroup.position.set(7.5, 0, 0);
 scene.add(dogGroup);
 
 // صحن طعام الكلب
-const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.45, 0.35, 16), new THREE.MeshStandardMaterial({ color: 0xe65100 }));
-bowl.position.set(5.8, 0.18, 0);
+const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.65, 0.45, 0.32, 16), new THREE.MeshStandardMaterial({ color: 0xe65100 }));
+bowl.position.set(5.8, 0.16, 0);
 bowl.castShadow = true;
 scene.add(bowl);
 
