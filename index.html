@@ -2,12 +2,22 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-    <title>Monster Word Battle</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Cat vs Dog 3D - ESL Battle</title>
     <link rel="stylesheet" href="./src/style.css" />
   </head>
   <body>
-    <div id="game-container"></div>
+    <div id="game-container">
+      <div id="ui-overlay">
+        <div class="top-bar">
+          <div class="hp-box"><div id="cat-hp" class="hp-fill"></div></div>
+          <div id="wind-txt" class="wind-badge">WIND: ▶ 0</div>
+          <div class="hp-box"><div id="dog-hp" class="hp-fill"></div></div>
+        </div>
+        <div id="quiz-box" class="quiz-card" style="display: none;"></div>
+        <div id="power-meter"><div id="power-fill"></div></div>
+      </div>
+    </div>
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>

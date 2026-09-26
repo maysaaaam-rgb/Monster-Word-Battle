@@ -481,6 +481,15 @@ class CatDogScene extends Phaser.Scene {
       strokeThickness: 3
     }).setOrigin(0.5);
 
+    const hasDomOverlay = !!document.getElementById('ui-overlay');
+    if (hasDomOverlay) {
+      ui.setVisible(false);
+      catHead.setVisible(false);
+      dogHead.setVisible(false);
+      windBox.setVisible(false);
+      this.windText.setVisible(false);
+    }
+
     // Power Charge Meter
     this.powerBarBg = this.add.graphics().setVisible(false);
     this.powerBarFill = this.add.graphics().setVisible(false);
@@ -499,12 +508,19 @@ class CatDogScene extends Phaser.Scene {
         this.isCharging = false;
         this.powerBarBg.setVisible(false);
         this.powerBarFill.setVisible(false);
+        const pMeter = document.getElementById('power-meter');
+        if (pMeter) pMeter.style.display = 'none';
         this.fireProjectile(this.chargePower, 'CAT');
       }
     });
   }
 
   updateHealthBar(target) {
+    const catEl = document.getElementById('cat-hp');
+    if (catEl) catEl.style.width = `${Math.max(0, this.catHp)}%`;
+    const dogEl = document.getElementById('dog-hp');
+    if (dogEl) dogEl.style.width = `${Math.max(0, this.dogHp)}%`;
+
     const { width } = this.scale;
     if (target === 'CAT') {
       this.catHpFill.clear();
@@ -522,6 +538,8 @@ class CatDogScene extends Phaser.Scene {
     this.wind = Phaser.Math.Between(-7, 7);
     const arrow = this.wind > 0 ? '▶▶' : (this.wind < 0 ? '◀◀' : '—');
     this.windText.setText(`WIND ${arrow} ${Math.abs(this.wind)}`);
+    const windEl = document.getElementById('wind-txt');
+    if (windEl) windEl.innerText = `WIND: ${this.wind > 0 ? '▶' : (this.wind < 0 ? '◀' : '—')} ${Math.abs(this.wind)}`;
   }
 
   startTurn() {
@@ -543,6 +561,34 @@ class CatDogScene extends Phaser.Scene {
       { q: "The bone is ____ the food bowl.", opts: ["IN", "BETWEEN", "AMONG"], ans: "IN" }
     ];
     const item = Phaser.Utils.Array.GetRandom(questions);
+
+    const quizBox = document.getElementById('quiz-box');
+    if (quizBox) {
+      quizBox.style.display = 'block';
+      quizBox.innerHTML = `
+        <h3>${item.q}</h3>
+        <div class="quiz-options">
+          ${item.opts.map(opt => `<button class="quiz-btn" data-opt="${opt}">${opt}</button>`).join('')}
+        </div>
+      `;
+      quizBox.querySelectorAll('.quiz-btn').forEach(btn => {
+        btn.onclick = (e) => {
+          e.stopPropagation();
+          const opt = btn.getAttribute('data-opt');
+          if (opt === item.ans) {
+            audio.sfxCorrect();
+            quizBox.style.display = 'none';
+            this.isAimingAllowed = true;
+            this.showFeedbackToast("CORRECT! HOLD & RELEASE TO THROW!", 0x27AE60);
+          } else {
+            audio.sfxWrong();
+            btn.style.background = '#d32f2f';
+            setTimeout(() => { btn.style.background = '#ff9800'; }, 400);
+          }
+        };
+      });
+      return;
+    }
 
     // Compact in-world question plaque positioned high up so characters and fence remain 100% visible
     const modal = this.add.container(this.scale.width / 2, 130);
@@ -740,6 +786,13 @@ class CatDogScene extends Phaser.Scene {
   update() {
     if (this.isCharging && this.chargePower < 100) {
       this.chargePower += 1.8;
+
+      const pMeter = document.getElementById('power-meter');
+      const pFill = document.getElementById('power-fill');
+      if (pMeter && pFill) {
+        pMeter.style.display = 'block';
+        pFill.style.width = `${Math.min(100, this.chargePower)}%`;
+      }
       
       this.powerBarBg.clear();
       this.powerBarBg.fillStyle(0x000000, 0.6);
