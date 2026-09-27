@@ -113,7 +113,22 @@ class BattleScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // 6. واجهة المستخدم الكلاسيكية (Classic Flash HUD)
+    // 6. مسار الرمي ومساعد التفاعل الكرتوني
+    this.trajectoryGraphics = this.add.graphics().setDepth(5);
+
+    // Add squash/stretch helper for character reactions
+    this.triggerSquash = (target) => {
+      this.tweens.add({
+        targets: target,
+        scaleX: target.scaleX * 1.25,
+        scaleY: target.scaleY * 0.75,
+        duration: 90,
+        yoyo: true,
+        ease: 'Quad.easeOut'
+      });
+    };
+
+    // 7. واجهة المستخدم الكلاسيكية (Classic Flash HUD)
     this.buildTopUI();
 
     // 7. التقاط الضغط لشحن الرمية
@@ -389,10 +404,12 @@ class BattleScene extends Phaser.Scene {
     if (target === 'DOG') {
       this.dogHp = Math.max(0, this.dogHp - amount);
       this.updateHealthBar('DOG');
+      this.triggerSquash(this.dog);
       this.tweens.add({ targets: this.dog, tint: 0xff3838, duration: 80, yoyo: true, repeat: 2 });
     } else {
       this.catHp = Math.max(0, this.catHp - amount);
       this.updateHealthBar('CAT');
+      this.triggerSquash(this.cat);
       this.tweens.add({ targets: this.cat, tint: 0xff3838, duration: 80, yoyo: true, repeat: 2 });
     }
 
