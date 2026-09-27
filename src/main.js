@@ -216,8 +216,8 @@ class BattleScene extends Phaser.Scene {
     ];
     const item = Phaser.Utils.Array.GetRandom(questions);
 
-    // رفع الصندوق قليلاً للأعلى ليصبح تحت شريط الرياح مباشرة
-    const modal = this.add.container(this.scale.width / 2, 78);
+    // Drop the plaque down slightly so the entire wind badge remains readable
+    const modal = this.add.container(this.scale.width / 2, 108);
     modal.setDepth(10);
 
     const bg = this.add.graphics();
@@ -278,7 +278,7 @@ class BattleScene extends Phaser.Scene {
   }
 
   showToast(msg, color) {
-    const toast = this.add.text(this.scale.width / 2, 130, msg, {
+    const toast = this.add.text(this.scale.width / 2, 155, msg, {
       fontSize: '16px',
       fontStyle: 'bold',
       color: '#ffffff',
