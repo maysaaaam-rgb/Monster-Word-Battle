@@ -216,8 +216,9 @@ class BattleScene extends Phaser.Scene {
     ];
     const item = Phaser.Utils.Array.GetRandom(questions);
 
-    // لافتة السؤال مدمجة في الأعلى أسفل شريط الـ HUD مباشرة لتبقى الساحة مكشوفة
-    const modal = this.add.container(this.scale.width / 2, 95);
+    // رفع الصندوق قليلاً للأعلى ليصبح تحت شريط الرياح مباشرة
+    const modal = this.add.container(this.scale.width / 2, 78);
+    modal.setDepth(10);
 
     const bg = this.add.graphics();
     bg.fillStyle(0xffffff, 0.98);
@@ -277,13 +278,13 @@ class BattleScene extends Phaser.Scene {
   }
 
   showToast(msg, color) {
-    const toast = this.add.text(this.scale.width / 2, 145, msg, {
+    const toast = this.add.text(this.scale.width / 2, 130, msg, {
       fontSize: '16px',
       fontStyle: 'bold',
       color: '#ffffff',
       backgroundColor: '#' + color.toString(16).padStart(6, '0'),
       padding: { x: 14, y: 6 }
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(11);
 
     this.time.delayedCall(1600, () => toast.destroy());
   }
