@@ -1,31 +1,24 @@
 import Phaser from 'phaser';
 
-// نظام صوتي مركب عبر Web Audio API بدون الحاجة لملفات صوت خارجية
-class SoundEffects {
-  constructor() {
-    this.ctx = null;
-  }
+// --- Web Audio SFX Synthesizer ---
+class SoundController {
+  constructor() { this.ctx = null; }
   init() {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) this.ctx = new AudioCtx();
+    if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    if (this.ctx && this.ctx.state === 'suspended') {
+      this.ctx.resume().catch(() => {});
     }
   }
-  playTone(freq, type, duration, endFreq = null) {
+  playTone(freq, type, duration, endFreq = null, vol = 0.2) {
     this.init();
     if (!this.ctx) return;
     try {
-      if (this.ctx.state === 'suspended') {
-        this.ctx.resume().catch(() => {});
-      }
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
       osc.type = type;
       osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-      if (endFreq) {
-        osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + duration);
-      }
-      gain.gain.setValueAtTime(0.18, this.ctx.currentTime);
+      if (endFreq) osc.frequency.exponentialRampToValueAtTime(endFreq, this.ctx.currentTime + duration);
+      gain.gain.setValueAtTime(vol, this.ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
       osc.connect(gain);
       gain.connect(this.ctx.destination);
@@ -33,24 +26,28 @@ class SoundEffects {
       osc.stop(this.ctx.currentTime + duration);
     } catch (e) {}
   }
-  throw() { this.playTone(380, 'sine', 0.28, 90); }
-  hit() { this.playTone(150, 'sawtooth', 0.35, 30); }
-  correct() {
-    this.playTone(520, 'triangle', 0.12);
-    setTimeout(() => this.playTone(680, 'triangle', 0.2), 100);
+  sfxThrow() { this.playTone(340, 'sine', 0.25, 90, 0.25); }
+  sfxHit() { this.playTone(140, 'sawtooth', 0.35, 30, 0.3); }
+  sfxFence() { this.playTone(180, 'square', 0.15, 60, 0.2); }
+  sfxHeal() {
+    this.playTone(400, 'triangle', 0.1);
+    setTimeout(() => this.playTone(600, 'triangle', 0.2), 90);
   }
-  wrong() { this.playTone(180, 'square', 0.25, 80); }
+  sfxCorrect() {
+    this.playTone(520, 'triangle', 0.12);
+    setTimeout(() => this.playTone(700, 'triangle', 0.22), 100);
+  }
+  sfxWrong() { this.playTone(180, 'square', 0.25, 70, 0.2); }
 }
 
-const sfx = new SoundEffects();
+const sfx = new SoundController();
 
-class BattleScene extends Phaser.Scene {
+class CatDogClassicGame extends Phaser.Scene {
   constructor() {
-    super('BattleScene');
+    super('CatDogClassicGame');
   }
 
   preload() {
-    // تحميل الصور عالية الدقة المفرغة المحفوظة في public/assets/
     this.load.image('bg', 'assets/background.jpg');
     this.load.image('fence', 'assets/fence.png');
     this.load.image('cat', 'assets/cat.png');
@@ -64,76 +61,72 @@ class BattleScene extends Phaser.Scene {
     this.catHp = 100;
     this.dogHp = 100;
     this.wind = 0;
-    this.turn = 'CAT'; // يبدأ القط
+    this.turn = 'CAT';
     this.isCharging = false;
     this.chargePower = 0;
     this.canThrow = false;
     this.projectileInFlight = false;
 
-    // 1. Single continuous background pinned to the center
+    // Special item inventory for player
+    this.items = {
+      double: 1, // Double Throw (x2)
+      heavy: 1,  // Giant Bone (Extra dmg)
+      heal: 1    // First Aid Band-Aid
+    };
+    this.activePowerUp = null;
+
+    // 1. Background
     this.bg = this.add.image(width / 2, height / 2, 'bg');
     this.bg.setDisplaySize(width, height);
     this.bg.setDepth(0);
 
-    // Ground line baseline
+    // 2. Ground & World
     this.floorY = height - 42;
     this.ground = this.add.rectangle(width / 2, this.floorY + 20, width, 40, 0x000000, 0);
     this.physics.add.existing(this.ground, true);
 
-    // Center Fence grounded firmly into the turf
+    // 3. Fence in Center
     this.fence = this.physics.add.staticImage(width / 2 - 12, this.floorY - 110, 'fence');
-    this.fence.setDisplaySize(125, 235); // Wider and taller to match the classic proportion
+    this.fence.setDisplaySize(125, 235);
     this.fence.refreshBody();
     this.fence.setDepth(2);
 
-    // Fleabag (Cat) resting solidly on the cobblestone walkway
+    // 4. Cat & Dog Characters
     this.cat = this.add.sprite(260, this.floorY - 95, 'cat');
     this.cat.setDisplaySize(205, 225);
     this.cat.setDepth(3);
-    // حركة تنفس كرتونية خفيفة
+
+    this.dog = this.add.sprite(width - 235, this.floorY - 95, 'dog');
+    this.dog.setDisplaySize(210, 195);
+    this.dog.setDepth(3);
+
+    // Idle breathing tweens
     this.tweens.add({
       targets: this.cat,
-      scaleY: this.cat.scaleY * 1.03,
+      scaleY: this.cat.scaleY * 1.025,
       duration: 750,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
-
-    // Mutt (Dog) anchored on the right lawn
-    this.dog = this.add.sprite(width - 235, this.floorY - 95, 'dog');
-    this.dog.setDisplaySize(210, 195);
-    this.dog.setDepth(3);
     this.tweens.add({
       targets: this.dog,
-      scaleY: this.dog.scaleY * 1.03,
+      scaleY: this.dog.scaleY * 1.025,
       duration: 800,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
 
-    // 6. مسار الرمي ومساعد التفاعل الكرتوني
-    this.trajectoryGraphics = this.add.graphics().setDepth(5);
+    // 5. Classic Flash HUD
+    this.buildClassicHUD();
 
-    // Add squash/stretch helper for character reactions
-    this.triggerSquash = (target) => {
-      this.tweens.add({
-        targets: target,
-        scaleX: target.scaleX * 1.25,
-        scaleY: target.scaleY * 0.75,
-        duration: 90,
-        yoyo: true,
-        ease: 'Quad.easeOut'
-      });
-    };
-
-    // 7. واجهة المستخدم الكلاسيكية (Classic Flash HUD)
-    this.buildTopUI();
-
-    // 7. التقاط الضغط لشحن الرمية
-    this.input.on('pointerdown', () => {
+    // 6. Charging and Controls
+    this.input.on('pointerdown', (pointer) => {
       if (!this.canThrow || this.turn !== 'CAT' || this.projectileInFlight) return;
+      // Prevent throw if clicking an item button in top region
+      if (pointer.y < 120) return;
+
       this.isCharging = true;
       this.chargePower = 0;
       this.powerBarBg.setVisible(true);
@@ -145,20 +138,19 @@ class BattleScene extends Phaser.Scene {
         this.isCharging = false;
         this.powerBarBg.setVisible(false);
         this.powerBarFill.setVisible(false);
-        this.fireProjectile(this.chargePower, 'CAT');
+        this.executePlayerThrow(this.chargePower);
       }
     });
 
-    // بدء الجولة الأولى
     this.updateWind();
     this.startTurn();
   }
 
-  buildTopUI() {
+  buildClassicHUD() {
     const { width } = this.scale;
 
-    // Golden Bar Frame
-    const hud = this.add.graphics();
+    // Golden Main Bar
+    const hud = this.add.graphics().setDepth(10);
     hud.fillStyle(0xfed330, 1);
     hud.lineStyle(4, 0xd35400);
     hud.fillRoundedRect(width / 2 - 340, 10, 680, 54, 18);
@@ -166,29 +158,26 @@ class BattleScene extends Phaser.Scene {
 
     // Health Trackers (Red base)
     hud.fillStyle(0xc0392b, 1);
-    hud.fillRoundedRect(width / 2 - 280, 26, 190, 20, 6);
-    hud.fillRoundedRect(width / 2 + 90, 26, 190, 20, 6);
+    hud.fillRoundedRect(width / 2 - 275, 26, 180, 20, 6);
+    hud.fillRoundedRect(width / 2 + 95, 26, 180, 20, 6);
 
-    // Dynamic HP Bars
-    this.catHpFill = this.add.graphics();
-    this.dogHpFill = this.add.graphics();
+    // Health Fill Bars
+    this.catHpFill = this.add.graphics().setDepth(11);
+    this.dogHpFill = this.add.graphics().setDepth(11);
     this.updateHealthBar('CAT');
     this.updateHealthBar('DOG');
 
-    // Cat Avatar Badge (Left)
-    const catBadgeBg = this.add.circle(width / 2 - 305, 36, 22, 0x22a4a2);
-    catBadgeBg.setStrokeStyle(3, 0xd35400);
-    const catIcon = this.add.image(width / 2 - 305, 36, 'cat');
-    catIcon.setDisplaySize(38, 38);
+    // Cat & Dog Avatar Badges
+    const catBadge = this.add.circle(width / 2 - 300, 36, 22, 0x22a4a2).setDepth(12);
+    catBadge.setStrokeStyle(3, 0xd35400);
+    this.add.image(width / 2 - 300, 36, 'cat').setDisplaySize(38, 38).setDepth(13);
 
-    // Dog Avatar Badge (Right)
-    const dogBadgeBg = this.add.circle(width / 2 + 305, 36, 22, 0x7c6453);
-    dogBadgeBg.setStrokeStyle(3, 0xd35400);
-    const dogIcon = this.add.image(width / 2 + 305, 36, 'dog');
-    dogIcon.setDisplaySize(38, 38);
+    const dogBadge = this.add.circle(width / 2 + 300, 36, 22, 0x7c6453).setDepth(12);
+    dogBadge.setStrokeStyle(3, 0xd35400);
+    this.add.image(width / 2 + 300, 36, 'dog').setDisplaySize(38, 38).setDepth(13);
 
-    // Wind Gauge Badge
-    const windBox = this.add.graphics();
+    // Wind Meter in Center
+    const windBox = this.add.graphics().setDepth(12);
     windBox.fillStyle(0xff9f1a, 1);
     windBox.lineStyle(3, 0xd35400);
     windBox.fillRoundedRect(width / 2 - 68, 14, 136, 44, 12);
@@ -200,11 +189,74 @@ class BattleScene extends Phaser.Scene {
       color: '#ffffff',
       stroke: '#b33939',
       strokeThickness: 3
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(13);
 
-    // Power Charge Meter
-    this.powerBarBg = this.add.graphics().setVisible(false).setDepth(10);
-    this.powerBarFill = this.add.graphics().setVisible(false).setDepth(10);
+    // Power Meter Display over Cat
+    this.powerBarBg = this.add.graphics().setDepth(15).setVisible(false);
+    this.powerBarFill = this.add.graphics().setDepth(15).setVisible(false);
+
+    // Item Action Tray (Double Attack, Heavy Throw, First-Aid Heal)
+    this.itemContainer = this.add.container(width / 2 - 90, 74).setDepth(14);
+    this.buildItemTray();
+  }
+
+  buildItemTray() {
+    this.itemContainer.removeAll(true);
+    const itemTypes = [
+      { key: 'double', label: 'x2', color: 0x2980b9 },
+      { key: 'heavy', label: 'PWR', color: 0x8e44ad },
+      { key: 'heal', label: 'HEAL', color: 0x27ae60 }
+    ];
+
+    itemTypes.forEach((it, idx) => {
+      const btnX = idx * 64;
+      const count = this.items[it.key];
+      const isAvailable = count > 0;
+
+      const bg = this.add.graphics();
+      bg.fillStyle(isAvailable ? it.color : 0x7f8c8d, 1);
+      bg.lineStyle(2, 0xffffff);
+      bg.fillRoundedRect(btnX, 0, 56, 28, 8);
+      bg.strokeRoundedRect(btnX, 0, 56, 28, 8);
+      this.itemContainer.add(bg);
+
+      const txt = this.add.text(btnX + 28, 14, it.label, {
+        fontSize: '12px',
+        fontStyle: 'bold',
+        color: '#ffffff'
+      }).setOrigin(0.5);
+      this.itemContainer.add(txt);
+
+      if (isAvailable) {
+        const hitZone = this.add.zone(btnX + 28, 14, 56, 28).setOrigin(0.5).setInteractive({ useHandCursor: true });
+        this.itemContainer.add(hitZone);
+
+        const onTrigger = () => this.activateItem(it.key);
+        hitZone.on('pointerdown', onTrigger);
+        txt.setInteractive({ useHandCursor: true }).on('pointerdown', onTrigger);
+      }
+    });
+  }
+
+  activateItem(key) {
+    if (!this.canThrow || this.turn !== 'CAT' || this.projectileInFlight) return;
+    if (this.items[key] <= 0) return;
+
+    if (key === 'heal') {
+      this.items.heal--;
+      this.catHp = Math.min(100, this.catHp + 25);
+      this.updateHealthBar('CAT');
+      sfx.sfxHeal();
+      this.showToast("+25 HP RECOVERED!", 0x27ae60);
+      this.buildItemTray();
+      this.endTurn();
+      return;
+    }
+
+    this.activePowerUp = key;
+    this.items[key]--;
+    this.buildItemTray();
+    this.showToast(`${key.toUpperCase()} ACTIVATED! HOLD TO THROW`, 0xf39c12);
   }
 
   updateHealthBar(target) {
@@ -212,23 +264,24 @@ class BattleScene extends Phaser.Scene {
     if (target === 'CAT') {
       this.catHpFill.clear();
       this.catHpFill.fillStyle(0x2ecc71, 1);
-      this.catHpFill.fillRoundedRect(width / 2 - 280, 26, Math.max(0, this.catHp * 1.9), 20, 6);
+      this.catHpFill.fillRoundedRect(width / 2 - 275, 26, Math.max(0, this.catHp * 1.8), 20, 6);
     } else {
       this.dogHpFill.clear();
       this.dogHpFill.fillStyle(0x2ecc71, 1);
-      const fillW = Math.max(0, this.dogHp * 1.9);
-      this.dogHpFill.fillRoundedRect(width / 2 + 280 - fillW, 26, fillW, 20, 6);
+      const fillW = Math.max(0, this.dogHp * 1.8);
+      this.dogHpFill.fillRoundedRect(width / 2 + 275 - fillW, 26, fillW, 20, 6);
     }
   }
 
   updateWind() {
-    this.wind = Phaser.Math.Between(-6, 6);
+    this.wind = Phaser.Math.Between(-7, 7);
     const arrow = this.wind > 0 ? '▶▶' : (this.wind < 0 ? '◀◀' : '—');
     this.windText.setText(`WIND ${arrow} ${Math.abs(this.wind)}`);
   }
 
   startTurn() {
     this.canThrow = false;
+    this.activePowerUp = null;
     if (this.turn === 'CAT') {
       this.showESLQuiz();
     } else {
@@ -245,9 +298,7 @@ class BattleScene extends Phaser.Scene {
     ];
     const item = Phaser.Utils.Array.GetRandom(questions);
 
-    // Drop the plaque down slightly so the entire wind badge remains readable
-    const modal = this.add.container(this.scale.width / 2, 108);
-    modal.setDepth(10);
+    const modal = this.add.container(this.scale.width / 2, 115).setDepth(20);
 
     const bg = this.add.graphics();
     bg.fillStyle(0xffffff, 0.98);
@@ -279,18 +330,17 @@ class BattleScene extends Phaser.Scene {
       }).setOrigin(0.5);
       modal.add(btnText);
 
-      // Hit area covering the button
       const hitZone = this.add.zone(btnX, btnY, 96, 28).setOrigin(0.5).setInteractive({ useHandCursor: true });
       modal.add(hitZone);
 
-      const handleChoice = () => {
+      const onSelect = () => {
         if (opt === item.ans) {
-          sfx.correct();
+          sfx.sfxCorrect();
           modal.destroy();
           this.canThrow = true;
           this.showToast("CORRECT! HOLD & RELEASE TO THROW!", 0x27ae60);
         } else {
-          sfx.wrong();
+          sfx.sfxWrong();
           this.tweens.add({
             targets: modal,
             x: modal.x + 8,
@@ -301,108 +351,142 @@ class BattleScene extends Phaser.Scene {
         }
       };
 
-      hitZone.on('pointerdown', handleChoice);
-      btnText.setInteractive({ useHandCursor: true }).on('pointerdown', handleChoice);
+      hitZone.on('pointerdown', onSelect);
+      btnText.setInteractive({ useHandCursor: true }).on('pointerdown', onSelect);
     });
   }
 
   showToast(msg, color) {
-    const toast = this.add.text(this.scale.width / 2, 155, msg, {
-      fontSize: '16px',
+    const toast = this.add.text(this.scale.width / 2, 160, msg, {
+      fontSize: '15px',
       fontStyle: 'bold',
       color: '#ffffff',
       backgroundColor: '#' + color.toString(16).padStart(6, '0'),
       padding: { x: 14, y: 6 }
-    }).setOrigin(0.5).setDepth(11);
+    }).setOrigin(0.5).setDepth(25);
 
     this.time.delayedCall(1600, () => toast.destroy());
   }
 
-  fireProjectile(power, shooter) {
+  executePlayerThrow(power) {
+    if (this.activePowerUp === 'double') {
+      this.fireSingleBone(power, 'CAT', 1.0, 20);
+      this.time.delayedCall(240, () => {
+        this.fireSingleBone(power * 1.06, 'CAT', 1.0, 20);
+      });
+    } else if (this.activePowerUp === 'heavy') {
+      this.fireSingleBone(power, 'CAT', 0.5, 40, 1.4); // 40 damage, less wind drift
+    } else {
+      this.fireSingleBone(power, 'CAT', 1.0, 25);
+    }
+  }
+
+  fireSingleBone(power, shooter, windSensitivity = 1.0, damage = 25, scale = 1.0) {
     this.projectileInFlight = true;
-    sfx.throw();
+    sfx.sfxThrow();
 
     const startX = shooter === 'CAT' ? this.cat.x + 40 : this.dog.x - 40;
     const startY = shooter === 'CAT' ? this.cat.y - 30 : this.dog.y - 30;
 
-    const proj = this.physics.add.image(startX, startY, 'bone');
-    proj.setDisplaySize(38, 22);
-    proj.setDepth(5);
-    proj.setAngularVelocity(shooter === 'CAT' ? 420 : -420);
+    const proj = this.physics.add.image(startX, startY, 'bone').setDepth(8);
+    proj.setDisplaySize(38 * scale, 22 * scale);
+    proj.setAngularVelocity(shooter === 'CAT' ? 440 : -440);
 
-    // زاوية وسرعة القذف الباليستي
-    const angleRad = shooter === 'CAT' ? -55 * (Math.PI / 180) : -125 * (Math.PI / 180);
-    const speed = 260 + (power * 7.5);
+    const angleDeg = shooter === 'CAT' ? -56 : -124;
+    const angleRad = angleDeg * (Math.PI / 180);
+    const speed = 255 + (power * 7.6);
+
     proj.setVelocity(
-      Math.cos(angleRad) * speed + (this.wind * 20),
+      Math.cos(angleRad) * speed + (this.wind * 18 * windSensitivity),
       Math.sin(angleRad) * speed
     );
 
-    // تأثير الرياح المستمر خلال الطيران
     const windTimer = this.time.addEvent({
       delay: 50,
       loop: true,
       callback: () => {
         if (proj && proj.body) {
-          proj.setVelocityX(proj.body.velocity.x + this.wind * 1.6);
+          proj.setVelocityX(proj.body.velocity.x + (this.wind * 1.5 * windSensitivity));
         }
       }
     });
 
-    // الاصطدام بالسياج الخشبي
+    // Fence Collision
     this.physics.add.collider(proj, this.fence, () => {
       windTimer.remove();
-      sfx.hit();
+      sfx.sfxFence();
+      this.createDirtPuff(proj.x, proj.y);
       proj.destroy();
       this.endTurn();
     });
 
-    // مراقبة مسار المقذوف والاصطدام بالخصم أو الأرض
-    const checkCollision = this.time.addEvent({
-      delay: 30,
+    // Dynamic flight check
+    const flightCheck = this.time.addEvent({
+      delay: 25,
       loop: true,
       callback: () => {
         if (!proj.active) {
-          checkCollision.remove();
+          flightCheck.remove();
           return;
         }
 
-        // السقوط على الأرض
+        // Ground hit
         if (proj.y >= this.floorY) {
           windTimer.remove();
-          checkCollision.remove();
+          flightCheck.remove();
+          sfx.sfxFence();
+          this.createDirtPuff(proj.x, this.floorY);
           proj.destroy();
           this.endTurn();
           return;
         }
 
-        // إصابة الكلب
+        // Hit Dog
         if (shooter === 'CAT' && Phaser.Math.Distance.Between(proj.x, proj.y, this.dog.x, this.dog.y) < 65) {
           windTimer.remove();
-          checkCollision.remove();
+          flightCheck.remove();
           proj.destroy();
-          this.applyDamage('DOG', 25);
+          this.applyDamage('DOG', damage);
           return;
         }
 
-        // إصابة القط
+        // Hit Cat
         if (shooter === 'DOG' && Phaser.Math.Distance.Between(proj.x, proj.y, this.cat.x, this.cat.y) < 65) {
           windTimer.remove();
-          checkCollision.remove();
+          flightCheck.remove();
           proj.destroy();
-          this.applyDamage('CAT', 25);
+          this.applyDamage('CAT', damage);
           return;
         }
       }
     });
   }
 
+  createDirtPuff(x, y) {
+    const puff = this.add.circle(x, y, 12, 0xdfe6e9, 0.8).setDepth(9);
+    this.tweens.add({
+      targets: puff,
+      scaleX: 2.2,
+      scaleY: 2.2,
+      alpha: 0,
+      duration: 250,
+      onComplete: () => puff.destroy()
+    });
+  }
+
   applyDamage(target, amount) {
-    sfx.hit();
-    this.cameras.main.shake(220, 0.015);
+    sfx.sfxHit();
+    this.cameras.main.shake(240, 0.018);
 
     const victim = target === 'DOG' ? this.dog : this.cat;
-    this.triggerSquash(victim);
+    this.tweens.add({
+      targets: victim,
+      scaleX: victim.scaleX * 1.25,
+      scaleY: victim.scaleY * 0.75,
+      duration: 90,
+      yoyo: true,
+      ease: 'Quad.easeOut'
+    });
 
     if (target === 'DOG') {
       this.dogHp = Math.max(0, this.dogHp - amount);
@@ -422,8 +506,10 @@ class BattleScene extends Phaser.Scene {
   }
 
   runDogAI() {
-    const estimatedPower = Phaser.Math.Clamp(52 - (this.wind * 3.4) + Phaser.Math.Between(-8, 8), 20, 95);
-    this.fireProjectile(estimatedPower, 'DOG');
+    // Dog AI calculates ballistic curve against wind with intelligent margin of error
+    const idealPower = 52 - (this.wind * 3.4);
+    const aiPower = Phaser.Math.Clamp(idealPower + Phaser.Math.Between(-6, 6), 20, 95);
+    this.fireSingleBone(aiPower, 'DOG', 1.0, 25);
   }
 
   endTurn() {
@@ -434,13 +520,13 @@ class BattleScene extends Phaser.Scene {
   }
 
   gameOver(winner) {
-    this.add.text(this.scale.width / 2, this.scale.height / 2, `${winner} WINS!`, {
+    const text = this.add.text(this.scale.width / 2, this.scale.height / 2, `${winner} WINS!`, {
       fontSize: '48px',
       fontStyle: 'bold',
       color: '#f1c40f',
       stroke: '#000000',
       strokeThickness: 6
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(30);
 
     this.time.delayedCall(3000, () => this.scene.restart());
   }
@@ -451,11 +537,11 @@ class BattleScene extends Phaser.Scene {
 
       this.powerBarBg.clear();
       this.powerBarBg.fillStyle(0x000000, 0.65);
-      this.powerBarBg.fillRoundedRect(this.cat.x - 35, this.cat.y - 120, 70, 10, 4);
+      this.powerBarBg.fillRoundedRect(this.cat.x - 35, this.cat.y - 130, 70, 10, 4);
 
       this.powerBarFill.clear();
       this.powerBarFill.fillStyle(0xff9f1a, 1);
-      this.powerBarFill.fillRoundedRect(this.cat.x - 35, this.cat.y - 120, (this.chargePower / 100) * 70, 10, 4);
+      this.powerBarFill.fillRoundedRect(this.cat.x - 35, this.cat.y - 130, (this.chargePower / 100) * 70, 10, 4);
     }
   }
 }
@@ -476,7 +562,7 @@ const config = {
       debug: false
     }
   },
-  scene: [BattleScene]
+  scene: [CatDogClassicGame]
 };
 
 const game = new Phaser.Game(config);
