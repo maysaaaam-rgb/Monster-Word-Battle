@@ -3,21 +3,34 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cat vs Dog 3D - ESL Battle</title>
-    <link rel="stylesheet" href="./src/style.css" />
+    <title>Cat vs Dog: ESL Battle</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        user-select: none;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #11141a;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        overflow: hidden;
+      }
+      #game-container {
+        width: 1024px;
+        height: 576px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+        border: 4px solid #2d3748;
+      }
+    </style>
   </head>
   <body>
-    <div id="game-container">
-      <div id="ui-overlay">
-        <div class="top-bar">
-          <div class="hp-box"><div id="cat-hp" class="hp-fill"></div></div>
-          <div id="wind-txt" class="wind-badge">WIND: ▶ 0</div>
-          <div class="hp-box"><div id="dog-hp" class="hp-fill"></div></div>
-        </div>
-        <div id="quiz-box" class="quiz-card" style="display: none;"></div>
-        <div id="power-meter"><div id="power-fill"></div></div>
-      </div>
-    </div>
+    <div id="game-container"></div>
     <script type="module" src="./src/main.js"></script>
   </body>
 </html>
