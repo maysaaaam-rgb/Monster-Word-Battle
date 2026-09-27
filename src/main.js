@@ -140,40 +140,52 @@ class BattleScene extends Phaser.Scene {
   buildTopUI() {
     const { width } = this.scale;
 
-    // الإطار الذهبي العلوي
+    // Golden Bar Frame
     const hud = this.add.graphics();
     hud.fillStyle(0xfed330, 1);
     hud.lineStyle(4, 0xd35400);
-    hud.fillRoundedRect(width / 2 - 330, 12, 660, 52, 18);
-    hud.strokeRoundedRect(width / 2 - 330, 12, 660, 52, 18);
+    hud.fillRoundedRect(width / 2 - 340, 10, 680, 54, 18);
+    hud.strokeRoundedRect(width / 2 - 340, 10, 680, 54, 18);
 
-    // خلفية أشرطة الصحة الحمراء
+    // Health Trackers (Red base)
     hud.fillStyle(0xc0392b, 1);
-    hud.fillRoundedRect(width / 2 - 300, 25, 210, 18, 6);
-    hud.fillRoundedRect(width / 2 + 90, 25, 210, 18, 6);
+    hud.fillRoundedRect(width / 2 - 280, 26, 190, 20, 6);
+    hud.fillRoundedRect(width / 2 + 90, 26, 190, 20, 6);
 
-    // أشرطة الصحة الخضراء التفاعلية
+    // Dynamic HP Bars
     this.catHpFill = this.add.graphics();
     this.dogHpFill = this.add.graphics();
     this.updateHealthBar('CAT');
     this.updateHealthBar('DOG');
 
-    // لافتة الرياح في المنتصف
+    // Cat Avatar Badge (Left)
+    const catBadgeBg = this.add.circle(width / 2 - 305, 36, 22, 0x22a4a2);
+    catBadgeBg.setStrokeStyle(3, 0xd35400);
+    const catIcon = this.add.image(width / 2 - 305, 36, 'cat');
+    catIcon.setDisplaySize(38, 38);
+
+    // Dog Avatar Badge (Right)
+    const dogBadgeBg = this.add.circle(width / 2 + 305, 36, 22, 0x7c6453);
+    dogBadgeBg.setStrokeStyle(3, 0xd35400);
+    const dogIcon = this.add.image(width / 2 + 305, 36, 'dog');
+    dogIcon.setDisplaySize(38, 38);
+
+    // Wind Gauge Badge
     const windBox = this.add.graphics();
     windBox.fillStyle(0xff9f1a, 1);
     windBox.lineStyle(3, 0xd35400);
-    windBox.fillRoundedRect(width / 2 - 68, 16, 136, 44, 12);
-    windBox.strokeRoundedRect(width / 2 - 68, 16, 136, 44, 12);
+    windBox.fillRoundedRect(width / 2 - 68, 14, 136, 44, 12);
+    windBox.strokeRoundedRect(width / 2 - 68, 14, 136, 44, 12);
 
-    this.windText = this.add.text(width / 2, 38, '', {
-      fontSize: '18px',
+    this.windText = this.add.text(width / 2, 36, '', {
+      fontSize: '17px',
       fontStyle: 'bold',
       color: '#ffffff',
       stroke: '#b33939',
       strokeThickness: 3
     }).setOrigin(0.5);
 
-    // شريط قوة الرمية أثناء الشحن
+    // Power Charge Meter
     this.powerBarBg = this.add.graphics().setVisible(false).setDepth(10);
     this.powerBarFill = this.add.graphics().setVisible(false).setDepth(10);
   }
@@ -183,12 +195,12 @@ class BattleScene extends Phaser.Scene {
     if (target === 'CAT') {
       this.catHpFill.clear();
       this.catHpFill.fillStyle(0x2ecc71, 1);
-      this.catHpFill.fillRoundedRect(width / 2 - 300, 25, Math.max(0, this.catHp * 2.1), 18, 6);
+      this.catHpFill.fillRoundedRect(width / 2 - 280, 26, Math.max(0, this.catHp * 1.9), 20, 6);
     } else {
       this.dogHpFill.clear();
       this.dogHpFill.fillStyle(0x2ecc71, 1);
-      const fillW = Math.max(0, this.dogHp * 2.1);
-      this.dogHpFill.fillRoundedRect(width / 2 + 300 - fillW, 25, fillW, 18, 6);
+      const fillW = Math.max(0, this.dogHp * 1.9);
+      this.dogHpFill.fillRoundedRect(width / 2 + 280 - fillW, 26, fillW, 20, 6);
     }
   }
 
