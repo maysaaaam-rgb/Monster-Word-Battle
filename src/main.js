@@ -401,15 +401,16 @@ class BattleScene extends Phaser.Scene {
     sfx.hit();
     this.cameras.main.shake(220, 0.015);
 
+    const victim = target === 'DOG' ? this.dog : this.cat;
+    this.triggerSquash(victim);
+
     if (target === 'DOG') {
       this.dogHp = Math.max(0, this.dogHp - amount);
       this.updateHealthBar('DOG');
-      this.triggerSquash(this.dog);
       this.tweens.add({ targets: this.dog, tint: 0xff3838, duration: 80, yoyo: true, repeat: 2 });
     } else {
       this.catHp = Math.max(0, this.catHp - amount);
       this.updateHealthBar('CAT');
-      this.triggerSquash(this.cat);
       this.tweens.add({ targets: this.cat, tint: 0xff3838, duration: 80, yoyo: true, repeat: 2 });
     }
 
