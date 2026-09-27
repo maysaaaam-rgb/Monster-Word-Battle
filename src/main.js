@@ -75,21 +75,21 @@ class BattleScene extends Phaser.Scene {
     this.bg.setDisplaySize(width, height);
     this.bg.setDepth(0);
 
-    // 2. Continuous floor level across the full width
-    this.floorY = height - 45;
+    // Ground line baseline
+    this.floorY = height - 42;
     this.ground = this.add.rectangle(width / 2, this.floorY + 20, width, 40, 0x000000, 0);
     this.physics.add.existing(this.ground, true);
 
-    // 3. Center Fence placed right in the middle of the panoramic yard
-    this.fence = this.physics.add.staticImage(width / 2, this.floorY - 95, 'fence');
-    this.fence.setDisplaySize(95, 210);
+    // Center Fence grounded firmly into the turf
+    this.fence = this.physics.add.staticImage(width / 2 - 12, this.floorY - 110, 'fence');
+    this.fence.setDisplaySize(125, 235); // Wider and taller to match the classic proportion
     this.fence.refreshBody();
-    this.fence.setDepth(1);
+    this.fence.setDepth(2);
 
-    // 4. Cat stationed on the left alley sidewalk
-    this.cat = this.add.sprite(220, this.floorY - 110, 'cat');
-    this.cat.setDisplaySize(200, 220);
-    this.cat.setDepth(2);
+    // Fleabag (Cat) resting solidly on the cobblestone walkway
+    this.cat = this.add.sprite(260, this.floorY - 95, 'cat');
+    this.cat.setDisplaySize(205, 225);
+    this.cat.setDepth(3);
     // حركة تنفس كرتونية خفيفة
     this.tweens.add({
       targets: this.cat,
@@ -100,10 +100,10 @@ class BattleScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // 5. Dog stationed on the right lawn
-    this.dog = this.add.sprite(width - 220, this.floorY - 90, 'dog');
-    this.dog.setDisplaySize(200, 185);
-    this.dog.setDepth(2);
+    // Mutt (Dog) anchored on the right lawn
+    this.dog = this.add.sprite(width - 235, this.floorY - 95, 'dog');
+    this.dog.setDisplaySize(210, 195);
+    this.dog.setDepth(3);
     this.tweens.add({
       targets: this.dog,
       scaleY: this.dog.scaleY * 1.03,
