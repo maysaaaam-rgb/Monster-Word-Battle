@@ -4,22 +4,30 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Cat vs Dog: ESL Battle</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap" rel="stylesheet" />
     <style>
       * {
         box-sizing: border-box;
         user-select: none;
       }
-      body {
+
+      html, body {
         margin: 0;
         padding: 0;
+        width: 100vw;
+        height: 100vh;
         background: #11141a;
         display: flex;
         justify-content: center;
         align-items: center;
-        height: 100vh;
         overflow: hidden;
+        font-family: 'Fredoka', 'Segoe UI', Tahoma, sans-serif;
       }
+
       #game-container {
+        position: relative;
         width: 1024px;
         height: 576px;
         border-radius: 12px;
