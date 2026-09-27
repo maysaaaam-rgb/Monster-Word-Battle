@@ -70,23 +70,25 @@ class BattleScene extends Phaser.Scene {
     this.canThrow = false;
     this.projectileInFlight = false;
 
-    // 1. الخلفية الممتدة بكامل الشاشة
+    // 1. Single continuous background pinned to the center
     this.bg = this.add.image(width / 2, height / 2, 'bg');
     this.bg.setDisplaySize(width, height);
+    this.bg.setDepth(0);
 
-    // 1. تثبيت أرضية التلامس
+    // 2. Continuous floor level across the full width
     this.floorY = height - 45;
     this.ground = this.add.rectangle(width / 2, this.floorY + 20, width, 40, 0x000000, 0);
     this.physics.add.existing(this.ground, true);
 
-    // 2. السياج في المنتصف مستنداً على الأرض تماماً
-    this.fence = this.physics.add.staticImage(width / 2 - 8, this.floorY - 95, 'fence');
+    // 3. Center Fence placed right in the middle of the panoramic yard
+    this.fence = this.physics.add.staticImage(width / 2, this.floorY - 95, 'fence');
     this.fence.setDisplaySize(95, 210);
     this.fence.refreshBody();
+    this.fence.setDepth(1);
 
-    // 3. تقديم القط وتكبيره ليتوازن مع الكلب
-    this.cat = this.add.sprite(220, this.floorY - 115, 'cat');
-    this.cat.setDisplaySize(210, 225); // تكبير القط ليصبح واضحاً وبارزاً
+    // 4. Cat stationed on the left alley sidewalk
+    this.cat = this.add.sprite(220, this.floorY - 110, 'cat');
+    this.cat.setDisplaySize(200, 220);
     this.cat.setDepth(2);
     // حركة تنفس كرتونية خفيفة
     this.tweens.add({
@@ -98,9 +100,9 @@ class BattleScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // 4. ضبط الكلب على العشب بمحاذاة ممتازة
-    this.dog = this.add.sprite(width - 210, this.floorY - 90, 'dog');
-    this.dog.setDisplaySize(210, 195);
+    // 5. Dog stationed on the right lawn
+    this.dog = this.add.sprite(width - 220, this.floorY - 90, 'dog');
+    this.dog.setDisplaySize(200, 185);
     this.dog.setDepth(2);
     this.tweens.add({
       targets: this.dog,
