@@ -74,19 +74,20 @@ class BattleScene extends Phaser.Scene {
     this.bg = this.add.image(width / 2, height / 2, 'bg');
     this.bg.setDisplaySize(width, height);
 
-    // 2. خط الأرضية المخفي لارتداد أو توقف المقذوفات
-    this.floorY = height - 55;
+    // 1. تثبيت أرضية التلامس
+    this.floorY = height - 45;
     this.ground = this.add.rectangle(width / 2, this.floorY + 20, width, 40, 0x000000, 0);
     this.physics.add.existing(this.ground, true);
 
-    // 3. السياج الخشبي الفاصل في منتصف الساحة
-    this.fence = this.physics.add.staticImage(width / 2, this.floorY - 95, 'fence');
-    this.fence.setDisplaySize(110, 210);
+    // 2. السياج في المنتصف مستنداً على الأرض تماماً
+    this.fence = this.physics.add.staticImage(width / 2 - 8, this.floorY - 95, 'fence');
+    this.fence.setDisplaySize(95, 210);
     this.fence.refreshBody();
 
-    // 4. شخصية القط (Fleabag)
-    this.cat = this.add.sprite(150, this.floorY - 110, 'cat');
-    this.cat.setDisplaySize(180, 200);
+    // 3. تقديم القط وتكبيره ليتوازن مع الكلب
+    this.cat = this.add.sprite(220, this.floorY - 115, 'cat');
+    this.cat.setDisplaySize(210, 225); // تكبير القط ليصبح واضحاً وبارزاً
+    this.cat.setDepth(2);
     // حركة تنفس كرتونية خفيفة
     this.tweens.add({
       targets: this.cat,
@@ -97,9 +98,10 @@ class BattleScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // 5. شخصية الكلب (Mutt)
-    this.dog = this.add.sprite(width - 150, this.floorY - 90, 'dog');
-    this.dog.setDisplaySize(200, 185);
+    // 4. ضبط الكلب على العشب بمحاذاة ممتازة
+    this.dog = this.add.sprite(width - 210, this.floorY - 90, 'dog');
+    this.dog.setDisplaySize(210, 195);
+    this.dog.setDepth(2);
     this.tweens.add({
       targets: this.dog,
       scaleY: this.dog.scaleY * 1.03,
@@ -172,8 +174,8 @@ class BattleScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // شريط قوة الرمية أثناء الشحن
-    this.powerBarBg = this.add.graphics().setVisible(false);
-    this.powerBarFill = this.add.graphics().setVisible(false);
+    this.powerBarBg = this.add.graphics().setVisible(false).setDepth(10);
+    this.powerBarFill = this.add.graphics().setVisible(false).setDepth(10);
   }
 
   updateHealthBar(target) {
@@ -295,6 +297,7 @@ class BattleScene extends Phaser.Scene {
 
     const proj = this.physics.add.image(startX, startY, 'bone');
     proj.setDisplaySize(38, 22);
+    proj.setDepth(5);
     proj.setAngularVelocity(shooter === 'CAT' ? 420 : -420);
 
     // زاوية وسرعة القذف الباليستي
